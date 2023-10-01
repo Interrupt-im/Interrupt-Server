@@ -35,3 +35,8 @@ logging:
         orm:
           jpa: debug
         transaction: debug
+
+security:
+  encrypt-key: 7a3b15e8f2772c2a9f28d04996b9f35c
+  pre-salt: salt
+  post-salt: salt
