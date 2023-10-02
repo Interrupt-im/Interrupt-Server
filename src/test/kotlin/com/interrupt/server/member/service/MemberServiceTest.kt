@@ -15,19 +15,30 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.springframework.test.util.ReflectionTestUtils
 
 class MemberServiceTest {
 
-    private val memberRepository: MemberRepository = mockk<MemberRepository>()
-    private val stringEncoder: StringEncoder = mockk<StringEncoder>()
-    private val memberService = MemberService(memberRepository, stringEncoder)
-
     companion object {
+
+        private val memberRepository: MemberRepository = mockk<MemberRepository>()
+        private val stringEncoder: StringEncoder = mockk<StringEncoder>()
+        private val memberService = MemberService(memberRepository, stringEncoder)
 
         @BeforeAll
         @JvmStatic
         fun setUpAll() {
             MockKAnnotations.init(this)
+
+            ReflectionTestUtils.setField(memberService, "secretKey", "2b7e151628aed2a6abf7158809cf4f3c")
+            ReflectionTestUtils.setField(memberService, "idPreSalt", "salt")
+            ReflectionTestUtils.setField(memberService, "idPostSalt", "salt")
+            ReflectionTestUtils.setField(memberService, "pwPreSalt", "salt")
+            ReflectionTestUtils.setField(memberService, "pwPostSalt", "salt")
+            ReflectionTestUtils.setField(memberService, "namePreSalt", "salt")
+            ReflectionTestUtils.setField(memberService, "namePostSalt", "salt")
+            ReflectionTestUtils.setField(memberService, "emailPreSalt", "salt")
+            ReflectionTestUtils.setField(memberService, "emailPostSalt", "salt")
         }
 
         @AfterAll
@@ -43,10 +54,16 @@ class MemberServiceTest {
         // given
         val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com")
 
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
-        every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
+        every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
+        every { stringEncoder.decrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
         every { memberRepository.findByLoginId(any<String>()) } returns null
-        every { memberRepository.save(any<Member>()) } returns Member(memberRegisterRequest.loginId, memberRegisterRequest.password, memberRegisterRequest.name, memberRegisterRequest.email)
+        every { memberRepository.save(any<Member>()) } returns
+                Member(
+                    "salt" + memberRegisterRequest.loginId + "salt",
+                    "salt" + memberRegisterRequest.password + "salt",
+                    "salt" + memberRegisterRequest.name + "salt",
+                    "salt" + memberRegisterRequest.email + "salt"
+                )
 
         // when
         val savedMember = memberService.registerMember(memberRegisterRequest)
@@ -62,8 +79,8 @@ class MemberServiceTest {
         // given
         val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com")
 
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
-        every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
+        every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
+        every { stringEncoder.decrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
         every { memberRepository.findByLoginId(any<String>()) } returns mockk<Member>(relaxed = true)
         every { memberRepository.save(any<Member>()) } returns Member(memberRegisterRequest.loginId, memberRegisterRequest.password, memberRegisterRequest.name, memberRegisterRequest.email)
 
