@@ -9,7 +9,8 @@ enum class ErrorCode(
 ) {
 
     // MEMBER
-    DUPLICATED_LOGIN_ID(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다.", "ME0001"),
+    DUPLICATED_REGISTER_LOGIN_ID(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다.", "ME0001"),
+    MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "아이디 또는 비밀번호를 확인해주세요.", "ME0002"),
 
     // COMMON
     NOT_SALTED_STRING(HttpStatus.INTERNAL_SERVER_ERROR, "관리자에게 문의 바랍니다.", "IE0001"),
