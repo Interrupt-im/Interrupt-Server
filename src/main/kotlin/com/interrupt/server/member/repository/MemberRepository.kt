@@ -9,4 +9,6 @@ interface MemberRepository: JpaRepository<Member, Long> {
 
     fun findByLoginId(loginId: String): Member?
 
+    fun findByLoginIdAndPassword(loginId: String, password: String): Member?
+
 }
