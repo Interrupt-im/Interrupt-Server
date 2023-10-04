@@ -59,6 +59,14 @@ dependencies {
 
     // 로깅
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+
+    // 메일
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+
+    // 타임리프
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
+
 }
 
 tasks.withType<KotlinCompile> {
