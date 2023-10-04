@@ -35,3 +35,14 @@ logging:
         orm:
           jpa: debug
         transaction: debug
+
+security:
+  encrypt-key: 7a3b15e8f2772c2a9f28d04996b9f35c
+  id-pre-salt: id-pre-salt
+  id-post-salt: id-post-salt
+  pw-pre-salt: pw-pre-salt
+  pw-post-salt: pw-post-salt
+  name-pre-salt: name-pre-salt
+  name-post-salt: name-post-salt
+  email-pre-salt: email-pre-salt
+  email-post-salt: email-post-salt
