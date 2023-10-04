@@ -3,12 +3,16 @@ package com.interrupt.server.member.service
 import com.interrupt.server.IntegrationTestSupport
 import com.interrupt.server.common.exception.ErrorCode
 import com.interrupt.server.common.exception.InterruptServerException
+import com.interrupt.server.member.dto.delete.MemberDeleteRequest
+import com.interrupt.server.member.dto.login.MemberLoginRequest
 import com.interrupt.server.member.dto.register.MemberRegisterRequest
+import com.interrupt.server.member.entity.Member
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Transactional
 class MemberServiceIntegrationTest: IntegrationTestSupport() {
@@ -45,8 +49,71 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
         // then
         result
             .isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.DUPLICATED_LOGIN_ID.message)
+            .hasMessage(ErrorCode.DUPLICATED_REGISTER_LOGIN_ID.message)
+    }
 
+    @Test
+    fun `회원 ID 와 비밀번호를 전달받아 로그인 로직을 수행한다`() {
+        // given
+        val loginId = "test1"
+        val password = "testPassword"
+        val memberRegisterRequest = MemberRegisterRequest(loginId, password, "testName", "test@mail.com")
+        val memberLoginRequest = MemberLoginRequest(loginId, password)
+
+        memberService.registerMember(memberRegisterRequest)
+
+        // when
+        val memberLoginResponse = memberService.login(memberLoginRequest)
+
+        // then
+        assertThat(memberLoginResponse.loginId).isEqualTo(loginId)
+    }
+
+    @Test
+    fun `존재하지 않는 회원 ID 와 비밀번호로 로그인을 시도하면 적절한 예외를 반환`() {
+        // given
+        val loginId = "test1"
+        val password = "testPassword"
+        val memberLoginRequest = MemberLoginRequest(loginId, password)
+
+        // when
+        val result = assertThatThrownBy { memberService.login(memberLoginRequest) }
+
+        // then
+        result.isInstanceOf(InterruptServerException::class.java)
+            .hasMessage(ErrorCode.MEMBER_NOT_FOUND.message)
+    }
+
+    @Test
+    fun `회원 정보를 받아 해당되는 회원 탈퇴 비지니스 로직을 수행한다`() {
+        // given
+        val loginId = "test1"
+        val password = "testPassword"
+        val memberRegisterRequest = MemberRegisterRequest(loginId, password, "testName", "test@mail.com")
+        val memberDeleteRequest = MemberDeleteRequest(loginId, password)
+
+        memberService.registerMember(memberRegisterRequest)
+
+        // when
+        val memberDeleteResponse = memberService.deleteMember(memberDeleteRequest)
+
+        // then
+        assertThat(memberDeleteResponse.loginId).isEqualTo(loginId)
+    }
+
+    @Test
+    fun `존재하지 않는 회원 ID 와 비밀번호로 회원탈퇴를 시도하면 적절한 예외를 반환`() {
+        // given
+        val loginId = "test1"
+        val password = "testPassword"
+        val memberDeleteRequest = MemberDeleteRequest(loginId, password)
+
+        // when
+        val result = assertThatThrownBy { memberService.deleteMember(memberDeleteRequest) }
+
+        // then
+        result.isInstanceOf(InterruptServerException::class.java)
+            .hasMessage(ErrorCode.MEMBER_NOT_FOUND.message)
     }
 
 }
