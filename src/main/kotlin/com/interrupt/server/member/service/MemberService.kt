@@ -3,6 +3,8 @@ package com.interrupt.server.member.service
 import com.interrupt.server.common.exception.ErrorCode
 import com.interrupt.server.common.exception.InterruptServerException
 import com.interrupt.server.common.security.StringEncoder
+import com.interrupt.server.email.dto.verify.EmailAddressVerifyRequest
+import com.interrupt.server.email.service.EmailSendService
 import com.interrupt.server.member.dto.delete.MemberDeleteRequest
 import com.interrupt.server.member.dto.delete.MemberDeleteResponse
 import com.interrupt.server.member.dto.login.MemberLoginRequest
@@ -54,16 +56,22 @@ class MemberService(
             name = addSalt(memberRegisterRequest.name, namePreSalt, namePostSalt),
             email = addSalt(memberRegisterRequest.email, emailPreSalt, emailPostSalt),
         ).let {  request ->
+            val encryptedEmail = stringEncoder.encrypt(request.email, secretKey)
+            // TODO 인증된 이메일인지 검증하는 로직 추가
+
             val encryptedLoginId = stringEncoder.encrypt(request.loginId, secretKey)
+
+            // TODO 회원가입 완료 전 아이디 중복 검사 하는 로직으로 중복체크(레디스에서 먼저, 2차로 DB 확인)
+            // TODO 중복 검사 후 유효한 아이디이면 UUID 를 생성해서 레디스에 저장(유효시간 설정), 회원가입 요청 시 해당 UUID 를 같이 받아 레디스에서 삭제
 
             val foundMember = memberRepository.findByLoginId(encryptedLoginId)
             validDuplicatedLoginId(foundMember)
 
             val member = request.also {
-                it.loginId = stringEncoder.encrypt(it.loginId, secretKey)
+                it.loginId = encryptedLoginId
                 it.password = stringEncoder.encrypt(it.password, secretKey)
                 it.name = stringEncoder.encrypt(it.name, secretKey)
-                it.email = stringEncoder.encrypt(it.email, secretKey)
+                it.email = encryptedEmail
             }.toEntity()
 
             val registeredMember = memberRepository.save(member)
