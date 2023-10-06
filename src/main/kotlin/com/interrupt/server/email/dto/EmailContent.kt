@@ -1,4 +1,4 @@
-package com.interrupt.server.email.dto.content
+package com.interrupt.server.email.dto
 
 class EmailContent(
     val subject: String,
