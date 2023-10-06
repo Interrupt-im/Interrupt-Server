@@ -1,68 +1,31 @@
 package com.interrupt.server.email.service
 
+import com.interrupt.server.common.security.StringEncoder
 import com.interrupt.server.email.dto.EmailSendDto
-import com.interrupt.server.email.dto.content.EmailContent
-import com.interrupt.server.email.entity.EmailMessage
-import org.springframework.mail.javamail.JavaMailSender
-import org.springframework.mail.javamail.MimeMessageHelper
+import com.interrupt.server.email.dto.EmailType
+import com.interrupt.server.email.dto.verify.EmailAddressVerificationApplyRequest
+import com.interrupt.server.email.dto.verify.EmailAddressVerificationApplyResponse
+import com.interrupt.server.email.dto.verify.EmailAddressVerifyRequest
+import com.interrupt.server.email.dto.verify.EmailAddressVerifyResponse
 import org.springframework.stereotype.Service
-import org.thymeleaf.context.Context
-import org.thymeleaf.spring6.SpringTemplateEngine
-import kotlin.random.Random
 
 @Service
 class EmailService(
-    private val javaMailSender: JavaMailSender,
-    private val templateEngine: SpringTemplateEngine,
+    private val emailSendService: EmailSendService,
+    private val stringEncoder: StringEncoder,
 ) {
 
-    fun sendMail(emailSendDto: EmailSendDto) {
-        val mimeMessage = javaMailSender.createMimeMessage()
+    fun applyVerificationEmailAddress(emailAddressVerificationApplyRequest: EmailAddressVerificationApplyRequest): EmailAddressVerificationApplyResponse {
+        val sendResult = emailSendService.sendMail(EmailSendDto(EmailType.MEMBER_REGISTER, emailAddressVerificationApplyRequest.emailAddress, EmailType.MEMBER_REGISTER.subject))
 
-        val emailContent: EmailContent = createEmailContent(emailSendDto)
-
-        val emailMessage = EmailMessage(emailSendDto.receiver, emailSendDto.emailType, emailContent)
-
-        MimeMessageHelper(mimeMessage, false, "UTF-8").apply {
-            setTo(emailMessage.to)
-            setSubject(emailMessage.emailContents.subject)
-            setText(emailMessage.emailContents.content, true)
-        }
-
-        javaMailSender.send(mimeMessage)
+        return EmailAddressVerificationApplyResponse(sendResult)
     }
 
-    private fun createEmailContent(emailSendDto: EmailSendDto): EmailContent {
-        val type = emailSendDto.emailType
-        val content = when(type) {
-            EmailType.MEMBER_REGISTER -> {
-                val code = generateRandomCode()
-//                type.variables.get("code") = code
-                templateEngine.process(
-                    type.template,
-                    Context().apply { setVariable("code", code) }
-                )
-            }
-        }
+    fun verifyEmailAddress(emailAddressVerifyRequest: EmailAddressVerifyRequest): EmailAddressVerifyResponse {
+        // TODO 레디스에서 인증 코드를 검증하는 로직(email 주소도 함께 확인)
+        // TODO 레디스에 이메일을 암호화 하여 저장(유효시간 설정, 해당 유효시간이 메일 인증 후 회원가입 할 수 있는 유효시간)
 
-        val subject: String =
-            if (!emailSendDto.subject.isNullOrBlank()) emailSendDto.subject
-            else emailSendDto.emailType.subject
-
-        return EmailContent(subject, content)
+        return EmailAddressVerifyResponse(true)
     }
-
-    fun generateRandomCode(): String {
-        val min = 0
-        val max = 999_999
-        val randomNumber = Random.nextInt(min, max + 1)
-        return String.format("%06d", randomNumber)
-    }
-
-    private fun createEmailTemplate(content: String, emailType: EmailType): String =
-        templateEngine.process(
-            emailType.template,
-            Context().apply { setVariable("content", content) }
-        )
 
 }
