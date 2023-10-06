@@ -3,8 +3,6 @@ package com.interrupt.server.member.service
 import com.interrupt.server.common.exception.ErrorCode
 import com.interrupt.server.common.exception.InterruptServerException
 import com.interrupt.server.common.security.StringEncoder
-import com.interrupt.server.email.dto.verify.EmailAddressVerifyRequest
-import com.interrupt.server.email.service.EmailSendService
 import com.interrupt.server.member.dto.delete.MemberDeleteRequest
 import com.interrupt.server.member.dto.delete.MemberDeleteResponse
 import com.interrupt.server.member.dto.login.MemberLoginRequest
