@@ -19,6 +19,7 @@ allOpen {
 
 noArg {
     annotation("jakarta.persistence.Entity")
+    annotation("com.interrupt.server.common.redis.RedisEntity")
 }
 
 group = "com.interrupt"
@@ -66,6 +67,14 @@ dependencies {
     // 타임리프
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
+
+    // Redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+    // 코루틴
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.6.0")
 
 }
 
