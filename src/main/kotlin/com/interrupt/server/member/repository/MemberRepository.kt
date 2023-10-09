@@ -11,4 +11,6 @@ interface MemberRepository: JpaRepository<Member, Long> {
 
     fun findByLoginIdAndPassword(loginId: String, password: String): Member?
 
+    fun findByNameAndEmail(name: String, email: String): Member?
+
 }
