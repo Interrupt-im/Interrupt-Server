@@ -1,6 +1,6 @@
 package com.interrupt.server.email.dto
 
-class EmailContent(
+data class EmailContent(
     val subject: String,
     val content: String
 ) {
