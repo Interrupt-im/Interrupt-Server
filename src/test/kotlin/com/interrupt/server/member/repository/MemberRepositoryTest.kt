@@ -80,4 +80,37 @@ class MemberRepositoryTest: IntegrationTestSupport() {
         assertThat(foundMember).isNull()
     }
 
+    @Test
+    fun `회원 이름 와 이메일 주소 를 이용해 회원 엔티티 반환`() {
+        // given
+        val member = Member("test1", "testPassword", "testName", "test@mail.com")
+
+        memberRepository.save(member)
+
+        // when
+        val foundMember = memberRepository.findByNameAndEmail(member.name, member.email)
+        val now = LocalDateTime.now()
+
+        // then
+        assertThat(foundMember)
+            .isNotNull
+            .isEqualTo(member)
+            .extracting("id", "loginId", "password", "name", "email","deletedAt")
+            .contains(member.id, member.loginId, member.password, member.name, member.email, null)
+        assertThat(foundMember!!.createdAt).isBeforeOrEqualTo(now)
+        assertThat(foundMember!!.modifiedAt).isBeforeOrEqualTo(now)
+    }
+
+    @Test
+    fun `일치하는 회원 이름과 이메일 주소를 가진 레코드가 없을 때 null 반환`() {
+        // given
+        val member = Member("test1", "testPassword", "testName", "test@mail.com")
+
+        // when
+        val foundMember = memberRepository.findByNameAndEmail(member.loginId, member.password)
+
+        // then
+        assertThat(foundMember).isNull()
+    }
+
 }
