@@ -6,13 +6,11 @@ import com.interrupt.server.common.exception.InterruptServerException
 import com.interrupt.server.member.dto.delete.MemberDeleteRequest
 import com.interrupt.server.member.dto.login.MemberLoginRequest
 import com.interrupt.server.member.dto.register.MemberRegisterRequest
-import com.interrupt.server.member.entity.Member
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 @Transactional
 class MemberServiceIntegrationTest: IntegrationTestSupport() {
@@ -81,7 +79,7 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
 
         // then
         result.isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.MEMBER_NOT_FOUND.message)
+            .hasMessage(ErrorCode.FAILED_LOGIN.message)
     }
 
     @Test
@@ -113,7 +111,7 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
 
         // then
         result.isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.MEMBER_NOT_FOUND.message)
+            .hasMessage(ErrorCode.FAILED_LOGIN.message)
     }
 
 }
