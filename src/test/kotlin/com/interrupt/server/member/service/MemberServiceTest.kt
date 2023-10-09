@@ -3,10 +3,15 @@ package com.interrupt.server.member.service
 import com.interrupt.server.common.exception.ErrorCode
 import com.interrupt.server.common.exception.InterruptServerException
 import com.interrupt.server.common.security.StringEncoder
+import com.interrupt.server.email.service.EmailSendService
 import com.interrupt.server.member.dto.delete.MemberDeleteRequest
+import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRequest
 import com.interrupt.server.member.dto.login.MemberLoginRequest
 import com.interrupt.server.member.dto.register.MemberRegisterRequest
+import com.interrupt.server.member.entity.EmailVerifyCode
 import com.interrupt.server.member.entity.Member
+import com.interrupt.server.member.repository.EmailVerifyCodeRepository
+import com.interrupt.server.member.repository.MemberRecoverRepository
 import com.interrupt.server.member.repository.MemberRepository
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
@@ -25,8 +30,11 @@ class MemberServiceTest {
     companion object {
 
         private val memberRepository: MemberRepository = mockk<MemberRepository>()
+        private val emailSendService: EmailSendService = mockk<EmailSendService>()
+        private val emailVerifyCodeRepository: EmailVerifyCodeRepository = mockk<EmailVerifyCodeRepository>()
+        private val memberRecoverRepository: MemberRecoverRepository = mockk<MemberRecoverRepository>()
         private val stringEncoder: StringEncoder = mockk<StringEncoder>()
-        private val memberService = MemberService(memberRepository, stringEncoder)
+        private val memberService = MemberService(memberRepository, emailSendService, emailVerifyCodeRepository, memberRecoverRepository, stringEncoder)
 
         @BeforeAll
         @JvmStatic
@@ -56,7 +64,9 @@ class MemberServiceTest {
     fun `회원 정보를 받아 회원 가입을 하는 단위 테스트`() {
         // given
         val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com")
+        val verifyCode = EmailVerifyCode(memberRegisterRequest.email, "000000", true)
 
+        every { emailVerifyCodeRepository.findByUuid(any<String>()) } returns verifyCode
         every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
         every { stringEncoder.decrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
         every { memberRepository.findByLoginId(any<String>()) } returns null
@@ -78,10 +88,33 @@ class MemberServiceTest {
     }
 
     @Test
+    fun `인증이 완료되지 않은 이메일 주소 로 회원 가입을 시도할 때 적절한 에러를 발생 시키는 단위 테스트`() {
+        // given
+        val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com")
+        val verifyCode = EmailVerifyCode(memberRegisterRequest.email, "000000", false)
+
+        every { emailVerifyCodeRepository.findByUuid(any<String>()) } returns verifyCode
+        every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
+        every { stringEncoder.decrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
+        every { memberRepository.findByLoginId(any<String>()) } returns mockk<Member>(relaxed = true)
+        every { memberRepository.save(any<Member>()) } returns Member(memberRegisterRequest.loginId, memberRegisterRequest.password, memberRegisterRequest.name, memberRegisterRequest.email)
+
+        // when
+        val result = assertThatThrownBy { memberService.registerMember(memberRegisterRequest) }
+
+        // then
+        result
+            .isInstanceOf(InterruptServerException::class.java)
+            .hasMessage(ErrorCode.EMAIL_NOT_VERIFIED.message)
+    }
+
+    @Test
     fun `이미 존재하는 ID 로 회원 가입을 시도할 때 적절한 에러를 발생 시키는 단위 테스트`() {
         // given
         val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com")
+        val verifyCode = EmailVerifyCode(memberRegisterRequest.email, "000000", true)
 
+        every { emailVerifyCodeRepository.findByUuid(any<String>()) } returns verifyCode
         every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
         every { stringEncoder.decrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
         every { memberRepository.findByLoginId(any<String>()) } returns mockk<Member>(relaxed = true)
@@ -94,6 +127,38 @@ class MemberServiceTest {
         result
             .isInstanceOf(InterruptServerException::class.java)
             .hasMessage(ErrorCode.DUPLICATED_REGISTER_LOGIN_ID.message)
+    }
+
+    @Test
+    fun `중복된 ID 가 없는 회원 ID 에 대한 중복체크를 수행한다`() {
+        // given
+        val loginId = "testId"
+        val request = LoginIdDuplicateCheckRequest(loginId)
+
+        every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
+        every { memberRepository.findByLoginId(any<String>()) } returns null
+
+        // when
+        val response = memberService.checkLoginIdDuplication(request)
+
+        // then
+        assertThat(response.isUnique).isTrue()
+    }
+
+    @Test
+    fun `중복된 ID 가 존재하는 회원 ID 에 대한 중복체크를 수행한다`() {
+        // given
+        val loginId = "testId"
+        val request = LoginIdDuplicateCheckRequest(loginId)
+
+        every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
+        every { memberRepository.findByLoginId(any<String>()) } returns Member(loginId, "testPw", "testName", "test@test.com")
+
+        // when
+        val response = memberService.checkLoginIdDuplication(request)
+
+        // then
+        assertThat(response.isUnique).isFalse()
     }
 
     @Test
@@ -139,7 +204,7 @@ class MemberServiceTest {
 
         // then
         result.isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.MEMBER_NOT_FOUND.message)
+            .hasMessage(ErrorCode.FAILED_LOGIN.message)
     }
 
     @Test
