@@ -17,7 +17,6 @@ import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRe
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyResponse
 import com.interrupt.server.member.dto.emailverify.EmailVerifyRequest
-import com.interrupt.server.member.dto.emailverify.EmailVerifyResponse
 import com.interrupt.server.member.dto.login.MemberLoginRequest
 import com.interrupt.server.member.dto.login.MemberLoginResponse
 import com.interrupt.server.member.dto.recover.*
@@ -102,15 +101,14 @@ class MemberService(
     /**
      * 이메일 인증 코드 확인
      */
-    fun validateEmailVerifyCode(emailVerifyRequest: EmailVerifyRequest): EmailVerifyResponse {
-        emailVerifyCodeRepository.findByUuid(emailVerifyRequest.emailVerifyCodeKey)?.let {
-            validateVerifyCode(emailVerifyRequest.verifyCode, it.verifyCode)
+    fun validateEmailVerifyCode(emailVerifyRequest: EmailVerifyRequest) {
+        val foundVerifyCode = emailVerifyCodeRepository.findByUuid(emailVerifyRequest.emailVerifyCodeKey)
+        validateExistEmailVerifyCode(foundVerifyCode)
 
-            it.isVerified = true
-            emailVerifyCodeRepository.save(it)
+        validateCorrectVerifyCode(emailVerifyRequest.verifyCode, foundVerifyCode!!.verifyCode)
 
-            return EmailVerifyResponse(true)
-        } ?: throw InterruptServerException(errorCode = ErrorCode.EMAIL_VERIFY_CODE_NOT_FOUND)
+        foundVerifyCode.isVerified = true
+        emailVerifyCodeRepository.save(foundVerifyCode)
     }
 
     /**
@@ -136,7 +134,7 @@ class MemberService(
         val encryptedPassword = stringEncoder.encrypt(memberDeleteRequest.password, secretKey)
 
         val foundMember = memberRepository.findByLoginIdAndPassword(encryptedLoginId, encryptedPassword)
-        validateMember(foundMember)
+        validateExistMember(foundMember)
         foundMember!!.deletedAt = LocalDateTime.now()
         memberRepository.save(foundMember)
     }
@@ -150,7 +148,7 @@ class MemberService(
         val encryptedEmail = stringEncoder.encrypt(recoverLoginIdRequest.email, secretKey)
         val foundMember = memberRepository.findByNameAndEmail(encryptedName, encryptedEmail)
 
-        validateMember(foundMember)
+        validateExistMember(foundMember)
 
         val verifyCode = generateRandomCode()
         val content = emailSendService.generateEmailTemplate(LOGIN_ID_RECOVER.template, mapOf(("notice" to "아이디"), ("code" to verifyCode)))
@@ -171,11 +169,12 @@ class MemberService(
      * 회원 ID 찾기 메일 인증 확인
      */
     fun validateLoginIdRecoverVerifyCode(recoverLoginIdRequest: VerifyRecoverLoginIdRequest): VerifyRecoverLoginIdResponse {
-        memberRecoverRepository.findByUuid(recoverLoginIdRequest.memberRecoverKey)?.let {
-            validateVerifyCode(enteredVerifyCode = recoverLoginIdRequest.verifyCode, it.verifyCode)
+        val foundMemberRecover = memberRecoverRepository.findByUuid(recoverLoginIdRequest.memberRecoverKey)
+        validateExistMemberRecover(foundMemberRecover)
 
-            return VerifyRecoverLoginIdResponse(stringEncoder.decrypt(it.loginId, secretKey))
-        } ?: throw InterruptServerException(errorCode = ErrorCode.EMAIL_VERIFY_CODE_NOT_FOUND)
+        validateCorrectVerifyCode(enteredVerifyCode = recoverLoginIdRequest.verifyCode, foundMemberRecover!!.verifyCode)
+
+        return VerifyRecoverLoginIdResponse(stringEncoder.decrypt(foundMemberRecover.loginId, secretKey))
     }
 
     /**
@@ -187,7 +186,7 @@ class MemberService(
         val encryptedEmail = stringEncoder.encrypt(recoverPasswordRequest.email, secretKey)
 
         val foundMember = memberRepository.findByLoginIdAndEmail(encryptedLoginId, encryptedEmail)
-        validateMember(foundMember)
+        validateExistMember(foundMember)
 
         val verifyCode = generateRandomCode()
         val content = emailSendService.generateEmailTemplate(PASSWORD_RECOVER.template, mapOf(("recover" to "비밀번호"), ("code" to verifyCode)))
@@ -207,18 +206,16 @@ class MemberService(
     /**
      * 비밀번호 찾기 메일 인증 확인
      */
-    fun validatePasswordRecoverVerifyCode(recoverPasswordRequest: VerifyRecoverPasswordRequest): VerifyRecoverPasswordResponse {
-        memberRecoverRepository.findByUuid(recoverPasswordRequest.memberRecoverKey)?.let {
-            validateVerifyCode(enteredVerifyCode = recoverPasswordRequest.verifyCode, it.verifyCode)
+    fun validatePasswordRecoverVerifyCode(recoverPasswordRequest: VerifyRecoverPasswordRequest) {
+        val foundMemberRecover = memberRecoverRepository.findByUuid(recoverPasswordRequest.memberRecoverKey)
+        validateExistMemberRecover(foundMemberRecover)
+        validateCorrectVerifyCode(enteredVerifyCode = recoverPasswordRequest.verifyCode, foundMemberRecover!!.verifyCode)
 
-            val foundMember = memberRepository.findByLoginId(it.loginId)
-            validateMember(foundMember)
+        val foundMember = memberRepository.findByLoginId(foundMemberRecover.loginId)
+        validateExistMember(foundMember)
 
-            foundMember!!.password = recoverPasswordRequest.password
-            memberRepository.save(foundMember)
-
-            return VerifyRecoverPasswordResponse(true)
-        } ?: throw InterruptServerException(errorCode = ErrorCode.EMAIL_VERIFY_CODE_NOT_FOUND)
+        foundMember!!.password = recoverPasswordRequest.password
+        memberRepository.save(foundMember)
     }
 
     /**
@@ -226,7 +223,7 @@ class MemberService(
      */
     fun updateMember(memberUpdateRequest: MemberUpdateRequest): MemberUpdateResponse {
         val originalMember = memberRepository.findByLoginId(memberUpdateRequest.originalLoginId)
-        validateMember(originalMember)
+        validateExistMember(originalMember)
 
         memberUpdateRequest.loginId?.let {
             val encryptedLoginId = stringEncoder.encrypt(it, secretKey)
@@ -256,12 +253,16 @@ class MemberService(
         return MemberUpdateResponse(true)
     }
 
-    private fun validateMember(member: Member?) {
+    private fun validateExistMember(member: Member?) {
         if (member == null) throw InterruptServerException(errorCode = ErrorCode.MEMBER_NOT_FOUND)
     }
 
-    private fun validateVerifyCode(enteredVerifyCode: String, verifyCode: String) {
+    private fun validateCorrectVerifyCode(enteredVerifyCode: String, verifyCode: String) {
         if (enteredVerifyCode != verifyCode) throw InterruptServerException(errorCode = ErrorCode.INVALID_EMAIL_VERIFY_CODE)
+    }
+
+    private fun validateExistEmailVerifyCode(emailVerifyCode: EmailVerifyCode?) {
+        if (emailVerifyCode == null) throw InterruptServerException(errorCode = ErrorCode.EMAIL_VERIFY_CODE_NOT_FOUND)
     }
 
     private fun validateDuplicatedLoginId(foundMember: Member?) {
@@ -270,6 +271,10 @@ class MemberService(
 
     private fun validateVerifiedEmail(emailVerifyCode: EmailVerifyCode?) {
         if (emailVerifyCode == null || emailVerifyCode.isVerified.not()) throw InterruptServerException(errorCode = ErrorCode.EMAIL_NOT_VERIFIED)
+    }
+
+    private fun validateExistMemberRecover(emailVerifyCode: MemberRecover?) {
+        if (emailVerifyCode == null) throw InterruptServerException(errorCode = ErrorCode.EMAIL_VERIFY_CODE_NOT_FOUND)
     }
 
     private fun generateRandomCode(): String {
