@@ -260,7 +260,8 @@ class MemberService(
     }
 
     private fun validateVerifiedEmail(emailVerifyCode: EmailVerifyCode?) {
-        if (emailVerifyCode == null || emailVerifyCode.isVerified.not()) throw InterruptServerException(errorCode = ErrorCode.EMAIL_NOT_VERIFIED)
+        validateExistEmailVerifyCode(emailVerifyCode)
+        if (emailVerifyCode!!.isVerified.not()) throw InterruptServerException(errorCode = ErrorCode.EMAIL_NOT_VERIFIED)
     }
 
     private fun validateExistMemberRecover(emailVerifyCode: MemberRecover?) {
