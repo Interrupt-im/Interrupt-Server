@@ -222,22 +222,15 @@ class MemberService(
      * 회원 정보 수정
      */
     fun updateMember(memberUpdateRequest: MemberUpdateRequest): MemberUpdateResponse {
-        val originalMember = memberRepository.findByLoginId(memberUpdateRequest.originalLoginId)
-        validateExistMember(originalMember)
-
-        memberUpdateRequest.loginId?.let {
-            val encryptedLoginId = stringEncoder.encrypt(it, secretKey)
-            validateDuplicatedLoginId(memberRepository.findByLoginId(encryptedLoginId))
-
-            originalMember!!.loginId = encryptedLoginId
-        }
+        val foundMember = memberRepository.findByLoginId(memberUpdateRequest.loginId)
+        validateExistMember(foundMember)
 
         memberUpdateRequest.password?.let {
-            originalMember!!.password = stringEncoder.encrypt(it, secretKey)
+            foundMember!!.password = stringEncoder.encrypt(it, secretKey)
         }
 
         memberUpdateRequest.name?.let {
-            originalMember!!.name = stringEncoder.encrypt(it, secretKey)
+            foundMember!!.name = stringEncoder.encrypt(it, secretKey)
         }
 
         memberUpdateRequest.email?.let {
@@ -245,10 +238,10 @@ class MemberService(
             val emailVerifyCode = emailVerifyCodeRepository.findByUuid(encryptedEmail)
             validateVerifiedEmail(emailVerifyCode)
 
-            originalMember!!.email = encryptedEmail
+            foundMember!!.email = encryptedEmail
         }
 
-        memberRepository.save(originalMember!!)
+        memberRepository.save(foundMember!!)
 
         return MemberUpdateResponse(true)
     }
