@@ -12,7 +12,6 @@ import com.interrupt.server.member.entity.EmailVerifyCode
 import com.interrupt.server.member.repository.EmailVerifyCodeRepository
 import com.interrupt.server.email.service.EmailSendService
 import com.interrupt.server.member.dto.delete.MemberDeleteRequest
-import com.interrupt.server.member.dto.delete.MemberDeleteResponse
 import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRequest
 import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckResponse
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
@@ -23,7 +22,6 @@ import com.interrupt.server.member.dto.login.MemberLoginRequest
 import com.interrupt.server.member.dto.login.MemberLoginResponse
 import com.interrupt.server.member.dto.recover.*
 import com.interrupt.server.member.dto.register.MemberRegisterRequest
-import com.interrupt.server.member.dto.register.MemberRegisterResponse
 import com.interrupt.server.member.dto.update.MemberUpdateRequest
 import com.interrupt.server.member.dto.update.MemberUpdateResponse
 import com.interrupt.server.member.entity.Member
@@ -53,7 +51,7 @@ class MemberService(
      * 회원 가입
      */
     @Transactional
-    fun registerMember(memberRegisterRequest: MemberRegisterRequest): MemberRegisterResponse {
+    fun registerMember(memberRegisterRequest: MemberRegisterRequest) {
         val encryptedEmail = stringEncoder.encrypt(memberRegisterRequest.email, secretKey)
         val emailVerifyCode = emailVerifyCodeRepository.findByUuid(encryptedEmail)
         validateVerifiedEmail(emailVerifyCode)
@@ -69,8 +67,6 @@ class MemberService(
         }.toEntity()
 
         memberRepository.save(member)
-
-        return MemberRegisterResponse()
     }
 
     /**
@@ -135,16 +131,14 @@ class MemberService(
     /**
      * 회원 탈퇴
      */
-    fun deleteMember(memberDeleteRequest: MemberDeleteRequest): MemberDeleteResponse {
+    fun deleteMember(memberDeleteRequest: MemberDeleteRequest) {
         val encryptedLoginId = stringEncoder.encrypt(memberDeleteRequest.loginId, secretKey)
         val encryptedPassword = stringEncoder.encrypt(memberDeleteRequest.password, secretKey)
 
-        memberRepository.findByLoginIdAndPassword(encryptedLoginId, encryptedPassword)?.let {
-            it.deletedAt = LocalDateTime.now()
-            memberRepository.save(it)
-
-            return MemberDeleteResponse()
-        } ?: throw InterruptServerException(errorCode = ErrorCode.MEMBER_NOT_FOUND)
+        val foundMember = memberRepository.findByLoginIdAndPassword(encryptedLoginId, encryptedPassword)
+        validateMember(foundMember)
+        foundMember!!.deletedAt = LocalDateTime.now()
+        memberRepository.save(foundMember)
     }
 
     /**
