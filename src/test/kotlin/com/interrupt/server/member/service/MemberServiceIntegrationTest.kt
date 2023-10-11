@@ -51,11 +51,12 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
     }
 
     @Test
-    fun `회원 ID 와 비밀번호를 전달받아 로그인 로직을 수행한다`() {
+    fun `회원 ID 와 비밀번호를 전달받아 로그인 로직을 수행 후 회원 이름을 반환한다`() {
         // given
         val loginId = "test1"
         val password = "testPassword"
-        val memberRegisterRequest = MemberRegisterRequest(loginId, password, "testName", "test@mail.com")
+        val name = "testName"
+        val memberRegisterRequest = MemberRegisterRequest(loginId, password, name, "test@mail.com")
         val memberLoginRequest = MemberLoginRequest(loginId, password)
 
         memberService.registerMember(memberRegisterRequest)
@@ -64,7 +65,7 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
         val memberLoginResponse = memberService.login(memberLoginRequest)
 
         // then
-        assertThat(memberLoginResponse.loginId).isEqualTo(loginId)
+        assertThat(memberLoginResponse.name).isEqualTo(name)
     }
 
     @Test
@@ -92,11 +93,9 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
 
         memberService.registerMember(memberRegisterRequest)
 
-        // when
-        val memberDeleteResponse = memberService.deleteMember(memberDeleteRequest)
+        // when then
+        memberService.deleteMember(memberDeleteRequest)
 
-        // then
-        assertThat(memberDeleteResponse.loginId).isEqualTo(loginId)
     }
 
     @Test
