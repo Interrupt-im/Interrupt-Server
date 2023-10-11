@@ -186,6 +186,9 @@ class MemberService(
         val encryptedLoginId = stringEncoder.encrypt(recoverPasswordRequest.loginId, secretKey)
         val encryptedEmail = stringEncoder.encrypt(recoverPasswordRequest.email, secretKey)
 
+        val foundMember = memberRepository.findByLoginIdAndEmail(encryptedLoginId, encryptedEmail)
+        validateMember(foundMember)
+
         val verifyCode = generateRandomCode()
         val content = emailSendService.generateEmailTemplate(PASSWORD_RECOVER.template, mapOf(("recover" to "비밀번호"), ("code" to verifyCode)))
 
