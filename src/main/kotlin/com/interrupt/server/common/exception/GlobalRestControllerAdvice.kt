@@ -10,10 +10,10 @@ class GlobalRestControllerAdvice {
 
     @ExceptionHandler(InterruptServerException::class)
     fun globalServerExceptionHandler(e: InterruptServerException): ResponseEntity<BaseResponse<*>> =
-        ResponseEntity(BaseResponse(e.errorCode.status.value(), e.errorCode.status, e.errorCode.code), e.errorCode.status)
+        ResponseEntity(BaseResponse(e.errorCode.status.value(), e.errorCode.status, e.message), e.errorCode.status)
 
     @ExceptionHandler(Throwable::class)
     fun throwableHandler(t: Throwable): ResponseEntity<BaseResponse<*>> =
-        InterruptServerException(cause = t, errorCode = ErrorCode.INTERNAL_SEVER_ERROR).let { ResponseEntity(BaseResponse(it.errorCode.status.value(), it.errorCode.status, it.errorCode.code), it.errorCode.status) }
+        InterruptServerException(cause = t, errorCode = ErrorCode.INTERNAL_SEVER_ERROR).let { ResponseEntity(BaseResponse(it.errorCode.status.value(), it.errorCode.status, it.message), it.errorCode.status) }
 
 }

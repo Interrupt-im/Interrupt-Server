@@ -17,7 +17,6 @@ enum class ErrorCode(
     MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "일치하는 회원 정보를 찾을 수 없습니다.", "ME0006"),
 
     // COMMON
-    NOT_SALTED_STRING(HttpStatus.INTERNAL_SERVER_ERROR, "관리자에게 문의 바랍니다.", "IE0001"),
     INTERNAL_SEVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "관리자에게 문의 바랍니다.", "IE0002"),
     ;
 
