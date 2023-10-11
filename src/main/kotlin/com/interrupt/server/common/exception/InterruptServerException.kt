@@ -23,6 +23,6 @@ class InterruptServerException @JvmOverloads constructor(
     }
 
     override val message: String? = message
-        get() = if (field.isNullOrBlank()) errorCode.message else "${errorCode.message}, $field"
+        get() = if (field.isNullOrBlank()) errorCode.message else field
 
 }
