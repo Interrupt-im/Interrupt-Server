@@ -22,7 +22,6 @@ import com.interrupt.server.member.dto.login.MemberLoginResponse
 import com.interrupt.server.member.dto.recover.*
 import com.interrupt.server.member.dto.register.MemberRegisterRequest
 import com.interrupt.server.member.dto.update.MemberUpdateRequest
-import com.interrupt.server.member.dto.update.MemberUpdateResponse
 import com.interrupt.server.member.entity.Member
 import com.interrupt.server.member.entity.MemberRecover
 import com.interrupt.server.member.repository.MemberRecoverRepository
@@ -221,7 +220,7 @@ class MemberService(
     /**
      * 회원 정보 수정
      */
-    fun updateMember(memberUpdateRequest: MemberUpdateRequest): MemberUpdateResponse {
+    fun updateMember(memberUpdateRequest: MemberUpdateRequest) {
         val foundMember = memberRepository.findByLoginId(memberUpdateRequest.loginId)
         validateExistMember(foundMember)
 
@@ -242,8 +241,6 @@ class MemberService(
         }
 
         memberRepository.save(foundMember!!)
-
-        return MemberUpdateResponse(true)
     }
 
     private fun validateExistMember(member: Member?) {
