@@ -517,10 +517,11 @@ class MemberServiceTest {
         val newPassword = "newPassword"
         val newEmail = "newTest@test.com"
         val memberStub = Member(loginId, "password", "name", "test@test.com")
+        val emailVerifyCodeKey = "0000"
 
         every { memberRepository.findByLoginId(loginId) } returns memberStub
         every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
-        every { emailVerifyCodeRepository.findByUuid(newEmail) } returns EmailVerifyCode(newEmail, "000000", true)
+        every { emailVerifyCodeRepository.findByUuid(emailVerifyCodeKey) } returns EmailVerifyCode(newEmail, "000000", true)
 
         every { memberRepository.save(memberStub.also {
             it.password = newPassword
@@ -528,7 +529,7 @@ class MemberServiceTest {
         }) } answers { it.invocation.args[0] as Member }
 
         // when then
-        memberService.updateMember(MemberUpdateRequest(loginId, newPassword, email = newEmail))
+        memberService.updateMember(MemberUpdateRequest(loginId, newPassword, email = newEmail, emailVerifyCodeKey = emailVerifyCodeKey))
     }
 
     @Test
@@ -551,14 +552,15 @@ class MemberServiceTest {
         val newEmail1 = "newTest1@test.com"
         val newEmail2 = "newTest2@test.com"
         val memberStub = Member(loginId, "password", "name", "test@test.com")
+        val emailVerifyCodeKey = "0000"
 
         every { memberRepository.findByLoginId(loginId) } returns memberStub
         every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
-        every { emailVerifyCodeRepository.findByUuid(newEmail1) } returns EmailVerifyCode(newEmail1, "000000", false)
+        every { emailVerifyCodeRepository.findByUuid(emailVerifyCodeKey) } returns EmailVerifyCode(newEmail1, "000000", false)
         every { emailVerifyCodeRepository.findByUuid(newEmail2) } returns null
 
         // when then
-        assertThatThrownBy { memberService.updateMember(MemberUpdateRequest(loginId, email = newEmail1)) }
+        assertThatThrownBy { memberService.updateMember(MemberUpdateRequest(loginId, email = newEmail1, emailVerifyCodeKey = emailVerifyCodeKey)) }
             .isInstanceOf(InterruptServerException::class.java)
             .hasMessage(ErrorCode.EMAIL_NOT_VERIFIED.message)
         assertThatThrownBy { memberService.updateMember(MemberUpdateRequest(loginId, email = newEmail2)) }
