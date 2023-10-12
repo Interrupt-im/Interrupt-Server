@@ -50,8 +50,7 @@ class MemberService(
      */
     @Transactional
     fun registerMember(memberRegisterRequest: MemberRegisterRequest) {
-        val encryptedEmail = stringEncoder.encrypt(memberRegisterRequest.email, secretKey)
-        val emailVerifyCode = emailVerifyCodeRepository.findByUuid(encryptedEmail)
+        val emailVerifyCode = emailVerifyCodeRepository.findByUuid(memberRegisterRequest.emailVerifyCodeKey)
         validateVerifiedEmail(emailVerifyCode)
 
         val encryptedLoginId = stringEncoder.encrypt(memberRegisterRequest.loginId, secretKey)
@@ -61,7 +60,7 @@ class MemberService(
             it.loginId = encryptedLoginId
             it.password = stringEncoder.encrypt(it.password, secretKey)
             it.name = stringEncoder.encrypt(it.name, secretKey)
-            it.email = encryptedEmail
+            it.email = stringEncoder.encrypt(memberRegisterRequest.email, secretKey)
         }.toEntity()
 
         memberRepository.save(member)

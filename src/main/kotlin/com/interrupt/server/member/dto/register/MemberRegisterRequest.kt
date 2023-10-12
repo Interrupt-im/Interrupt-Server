@@ -6,7 +6,8 @@ data class MemberRegisterRequest(
     var loginId: String,
     var password: String,
     var name: String,
-    var email: String
+    var email: String,
+    val emailVerifyCodeKey: String,
 ) {
 
     fun toEntity(): Member =
