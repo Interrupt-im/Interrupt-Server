@@ -1,10 +1,11 @@
 package com.interrupt.server.member.dto.update
 
 data class MemberUpdateRequest(
-    var loginId: String,
-    var password: String? = null,
-    var name: String? = null,
-    var email: String? = null,
+    val loginId: String,
+    val password: String? = null,
+    val name: String? = null,
+    val email: String? = null,
+    val emailVerifyCodeKey: String? = null
 ) {
 
 }
