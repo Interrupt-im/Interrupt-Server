@@ -6,10 +6,15 @@ import com.interrupt.server.email.dto.EmailContent
 import com.interrupt.server.email.dto.EmailType
 import com.interrupt.server.email.entity.EmailMessage
 import com.interrupt.server.email.service.EmailSendService
+import com.interrupt.server.member.dto.delete.MemberDeleteRequest
 import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
+import com.interrupt.server.member.dto.emailverify.EmailVerifyRequest
+import com.interrupt.server.member.dto.login.MemberLoginRequest
+import com.interrupt.server.member.dto.recover.RecoverLoginIdRequest
 import com.interrupt.server.member.dto.register.MemberRegisterRequest
 import com.interrupt.server.member.entity.EmailVerifyCode
+import com.interrupt.server.member.entity.Member
 import com.interrupt.server.member.repository.EmailVerifyCodeRepository
 import com.interrupt.server.member.repository.MemberRecoverRepository
 import com.interrupt.server.member.repository.MemberRepository
@@ -45,7 +50,6 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
     fun `회원 가입 dto 를 통해 받은 정보로 회원 가입을 수행 한다`() {
         // given
         val email = "test@mail.com"
-        val emailVerifyCodeKey = "0000"
         val encryptedEmail = stringEncoder.encrypt(email, secretKey)
 
         val verifyCode = emailVerifyCodeRepository.save(EmailVerifyCode(encryptedEmail, "000000", true))
@@ -70,7 +74,7 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
     @Test
     fun `이메일 인증 코드 발송 요청을 받아 인증코드를 발송한다`() {
         // given
-        val email = "djawnstj44@naver.com"
+        val email = "test@test.com"
         val request = EmailVerificationApplyRequest(email)
 
         justRun { emailSendService.sendMail(EmailMessage(email, EmailContent(EmailType.MEMBER_REGISTER.subject, "testContent"))) }
@@ -80,6 +84,82 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
 
         // then
         assertThat(response.emailVerifyCodeKey).isNotNull()
+    }
+
+    @Test
+    fun `입력한 이메일 인증코드가 올바른지 검증한다`() {
+        // given
+        val email = "test@mail.com"
+        val encryptedEmail = stringEncoder.encrypt(email, secretKey)
+        val verifyCode = "000000"
+        val verifyCodeEntity = emailVerifyCodeRepository.save(EmailVerifyCode(encryptedEmail, verifyCode, false))
+
+        val request = EmailVerifyRequest(verifyCodeEntity.uuid, verifyCode)
+
+        // when then
+        memberService.validateEmailVerifyCode(request)
+    }
+
+    @Test
+    fun `로그인 정보를 받아 로그인을 수행한다`() {
+        // given
+        val loginId = "loginId"
+        val password = "password"
+        val name = "name"
+        val email = "test@test.com"
+        val encryptedLoginId = stringEncoder.encrypt(loginId, secretKey)
+        val encryptedPassword = stringEncoder.encrypt(password, secretKey)
+        val encryptedName = stringEncoder.encrypt(name, secretKey)
+        memberRepository.save(Member(encryptedLoginId, encryptedPassword, encryptedName, email))
+
+        val request = MemberLoginRequest(loginId, password)
+
+        // when
+        val response = memberService.login(request)
+
+        // then
+        assertThat(response.name).isEqualTo(name)
+    }
+
+    @Test
+    fun `회원 탈퇴를 수행한다`() {
+        // given
+        val loginId = "loginId"
+        val password = "password"
+        val name = "name"
+        val email = "test@test.com"
+        val encryptedLoginId = stringEncoder.encrypt(loginId, secretKey)
+        val encryptedPassword = stringEncoder.encrypt(password, secretKey)
+        val encryptedName = stringEncoder.encrypt(name, secretKey)
+        memberRepository.save(Member(encryptedLoginId, encryptedPassword, encryptedName, email))
+
+        val request = MemberDeleteRequest(loginId, password)
+
+        // when then
+        memberService.deleteMember(request)
+    }
+
+    @Test
+    fun `회원 ID 찾기를 위한 이메일 인증코드를 발송한다`() {
+        // given
+        val loginId = "loginId"
+        val password = "password"
+        val name = "홍길동"
+        val email = "test@test.com"
+        val encryptedLoginId = stringEncoder.encrypt(loginId, secretKey)
+        val encryptedPassword = stringEncoder.encrypt(password, secretKey)
+        val encryptedName = stringEncoder.encrypt(name, secretKey)
+        val encryptedEmail = stringEncoder.encrypt(email, secretKey)
+        memberRepository.save(Member(encryptedLoginId, encryptedPassword, encryptedName, encryptedEmail))
+
+        justRun { emailSendService.sendMail(EmailMessage(email, EmailContent(EmailType.LOGIN_ID_RECOVER.subject, "testContent"))) }
+        val request = RecoverLoginIdRequest(name, email)
+
+        // when
+        val response = memberService.applySendLoginIdRecoverVerifyCode(request)
+
+        // then
+        assertThat(response.memberRecoverKey)
     }
 
 }
