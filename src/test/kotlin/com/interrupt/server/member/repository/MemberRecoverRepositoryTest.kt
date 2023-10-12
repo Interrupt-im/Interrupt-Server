@@ -20,8 +20,25 @@ class MemberRecoverRepositoryTest: IntegrationTestSupport() {
         val savedMemberRecover = memberRecoverRepository.save(memberRecover)
 
         // then
-        Assertions.assertThat(savedMemberRecover).isEqualTo(memberRecover)
-        Assertions.assertThat(savedMemberRecover.uuid).isNotNull()
+        val foundVerifyCode = memberRecoverRepository.findByUuid(savedMemberRecover.uuid)
+        Assertions.assertThat(foundVerifyCode).isNotNull.isEqualTo(memberRecover).isEqualTo(savedMemberRecover)
+        Assertions.assertThat(foundVerifyCode!!.uuid).isNotNull()
+    }
+
+    @Test
+    fun `이미 uuid 가 존재하는 인증코드는 기존 저장을 덮어쓴다`() {
+        val memberRecover1 = MemberRecover("test@test.com", "test", "000000")
+        val savedMemberRecover = memberRecoverRepository.save(memberRecover1)
+
+        val memberRecover2 = MemberRecover("test@test.com", "test", "111111").apply { uuid = savedMemberRecover.uuid }
+
+        // when
+        memberRecoverRepository.save(memberRecover2)
+
+        // then
+        val updatedMemberRecover = memberRecoverRepository.findByUuid(memberRecover1.uuid)
+        Assertions.assertThat(updatedMemberRecover).isNotNull.isEqualTo(savedMemberRecover).isEqualTo(memberRecover1).isEqualTo(memberRecover2)
+        Assertions.assertThat(updatedMemberRecover!!.verifyCode).isEqualTo("111111")
     }
 
     @Test

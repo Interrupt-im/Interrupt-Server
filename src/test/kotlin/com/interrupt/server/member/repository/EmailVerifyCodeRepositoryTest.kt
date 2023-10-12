@@ -20,8 +20,24 @@ class EmailVerifyCodeRepositoryTest: IntegrationTestSupport() {
         val savedEmailVerifyCode = emailVerifyCodeRepository.save(verifyCode)
 
         // then
-        assertThat(savedEmailVerifyCode).isEqualTo(verifyCode)
-        assertThat(savedEmailVerifyCode.uuid).isNotNull()
+        val foundVerifyCode = emailVerifyCodeRepository.findByUuid(savedEmailVerifyCode.uuid)
+        assertThat(foundVerifyCode).isNotNull.isEqualTo(verifyCode)
+        assertThat(foundVerifyCode!!.uuid).isNotNull()
+    }
+    
+    @Test
+    fun `이미 uuid 가 존재하는 인증코드는 기존 저장을 덮어쓴다`() {
+        val verifyCode = EmailVerifyCode("test@test.com", "000000", false)
+        val savedEmailVerifyCode = emailVerifyCodeRepository.save(verifyCode)
+        savedEmailVerifyCode.isVerified = true
+
+        // when
+        emailVerifyCodeRepository.save(savedEmailVerifyCode)
+
+        // then
+        val updatedVerifyCode = emailVerifyCodeRepository.findByUuid(verifyCode.uuid)
+        assertThat(updatedVerifyCode).isNotNull.isEqualTo(verifyCode)
+        assertThat(updatedVerifyCode!!.isVerified).isTrue()
     }
 
     @Test
