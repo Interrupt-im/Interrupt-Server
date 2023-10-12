@@ -212,7 +212,7 @@ class MemberService(
         val foundMember = memberRepository.findByLoginId(foundMemberRecover.loginId)
         validateExistMember(foundMember)
 
-        foundMember!!.password = recoverPasswordRequest.password
+        foundMember!!.password = stringEncoder.encrypt(recoverPasswordRequest.newPassword, secretKey)
         memberRepository.save(foundMember)
     }
 
@@ -220,7 +220,8 @@ class MemberService(
      * 회원 정보 수정
      */
     fun updateMember(memberUpdateRequest: MemberUpdateRequest) {
-        val foundMember = memberRepository.findByLoginId(memberUpdateRequest.loginId)
+        val encryptedLoginId = stringEncoder.encrypt(memberUpdateRequest.loginId, secretKey)
+        val foundMember = memberRepository.findByLoginId(encryptedLoginId)
         validateExistMember(foundMember)
 
         memberUpdateRequest.password?.let {
@@ -233,7 +234,9 @@ class MemberService(
 
         memberUpdateRequest.email?.let {
             val encryptedEmail = stringEncoder.encrypt(it, secretKey)
-            val emailVerifyCode = emailVerifyCodeRepository.findByUuid(encryptedEmail)
+            val emailVerifyCode = memberUpdateRequest.emailVerifyCodeKey?.let { emailVerifyCodeKey->
+                emailVerifyCodeRepository.findByUuid(emailVerifyCodeKey)
+            }
             validateVerifiedEmail(emailVerifyCode)
 
             foundMember!!.email = encryptedEmail
