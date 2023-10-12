@@ -17,14 +17,23 @@ class EmailVerifyCodeRepository(
     }
 
     fun save(emailVerifyCode: EmailVerifyCode): EmailVerifyCode {
-        val uuid = generateMemberRecoverKey()
-        emailVerifyCode.uuid = uuid
-        emailVerifyRedisTemplate.opsForValue().set(generateKey(uuid), emailVerifyCode, EMAIL_VERIFY_CODE_TTL)
+        if (emailVerifyCode.isUuidInitialized()) updateInternal(emailVerifyCode)
+        else saveInternal(emailVerifyCode)
 
         return emailVerifyCode
     }
 
     fun findByUuid(uuid: String): EmailVerifyCode? = emailVerifyRedisTemplate.opsForValue().get(generateKey(uuid))
+
+    private fun saveInternal(emailVerifyCode: EmailVerifyCode) {
+        val uuid = generateMemberRecoverKey()
+        emailVerifyCode.uuid = uuid
+        emailVerifyRedisTemplate.opsForValue().set(generateKey(uuid), emailVerifyCode, EMAIL_VERIFY_CODE_TTL)
+    }
+
+    private fun updateInternal(emailVerifyCode: EmailVerifyCode) {
+        emailVerifyRedisTemplate.opsForValue().set(generateKey(emailVerifyCode.uuid), emailVerifyCode, EMAIL_VERIFY_CODE_TTL)
+    }
 
     private fun generateMemberRecoverKey(): String = UUID.randomUUID().toString()
 

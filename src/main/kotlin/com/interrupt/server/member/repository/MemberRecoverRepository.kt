@@ -17,14 +17,23 @@ class MemberRecoverRepository(
     }
 
     fun save(memberRecover: MemberRecover): MemberRecover {
-        val uuid = generateMemberRecoverKey()
-        memberRecover.uuid = uuid
-        memberRecoverRedisTemplate.opsForValue().set(generateKey(uuid), memberRecover, MEMBER_RECOVER_TTL)
+        if (memberRecover.isUuidInitialized()) updateInternal(memberRecover)
+        else saveInternal(memberRecover)
 
         return memberRecover
     }
 
     fun findByUuid(uuid: String): MemberRecover? = memberRecoverRedisTemplate.opsForValue().get(generateKey(uuid))
+
+    private fun saveInternal(memberRecover: MemberRecover) {
+        val uuid = generateMemberRecoverKey()
+        memberRecover.uuid = uuid
+        memberRecoverRedisTemplate.opsForValue().set(generateKey(uuid), memberRecover, MEMBER_RECOVER_TTL)
+    }
+
+    private fun updateInternal(memberRecover: MemberRecover) {
+        memberRecoverRedisTemplate.opsForValue().set(generateKey(memberRecover.uuid), memberRecover, MEMBER_RECOVER_TTL)
+    }
 
     private fun generateMemberRecoverKey(): String = UUID.randomUUID().toString()
 

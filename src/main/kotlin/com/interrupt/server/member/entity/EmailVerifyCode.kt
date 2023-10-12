@@ -1,14 +1,18 @@
 package com.interrupt.server.member.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.interrupt.server.common.redis.RedisEntity
 
 @RedisEntity
+@JsonIgnoreProperties(ignoreUnknown = true)
 class EmailVerifyCode(
     val email: String,
     val verifyCode: String,
     var isVerified: Boolean = false
 ) {
     lateinit var uuid :String
+
+    fun isUuidInitialized(): Boolean = (this::uuid.isInitialized)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -22,6 +26,5 @@ class EmailVerifyCode(
     override fun hashCode(): Int {
         return uuid.hashCode()
     }
-
 
 }
