@@ -62,8 +62,8 @@ class MemberServiceTest {
     @Test
     fun `회원 정보를 받아 회원 가입을 하는 단위 테스트`() {
         // given
-        val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com")
-        val verifyCode = EmailVerifyCode(memberRegisterRequest.email, "000000", true)
+        val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com", "0000")
+        val verifyCode = EmailVerifyCode(memberRegisterRequest.email, "000000", true).apply { uuid = memberRegisterRequest.emailVerifyCodeKey }
 
         every { emailVerifyCodeRepository.findByUuid(any<String>()) } returns verifyCode
         every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
@@ -84,8 +84,8 @@ class MemberServiceTest {
     @Test
     fun `인증이 완료되지 않은 이메일 주소 로 회원 가입을 시도할 때 적절한 예외를 반환한다`() {
         // given
-        val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com")
-        val verifyCode = EmailVerifyCode(memberRegisterRequest.email, "000000", false)
+        val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com", "0000")
+        val verifyCode = EmailVerifyCode(memberRegisterRequest.email, "000000", false).apply { uuid = memberRegisterRequest.emailVerifyCodeKey }
 
         every { emailVerifyCodeRepository.findByUuid(any<String>()) } returns verifyCode
         every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
@@ -105,7 +105,7 @@ class MemberServiceTest {
     @Test
     fun `인증 요청 내역이 없는 이메일 주소 로 회원 가입을 시도할 때 적절한 예외를 반환한다`() {
         // given
-        val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com")
+        val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com", "0000")
 
         every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
         every { emailVerifyCodeRepository.findByUuid(any<String>()) } returns null
@@ -122,8 +122,8 @@ class MemberServiceTest {
     @Test
     fun `이미 존재하는 ID 로 회원 가입을 시도할 때 적절한 에러를 발생 시키는 단위 테스트`() {
         // given
-        val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com")
-        val verifyCode = EmailVerifyCode(memberRegisterRequest.email, "000000", true)
+        val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com", "0000")
+        val verifyCode = EmailVerifyCode(memberRegisterRequest.email, "000000", true).apply { uuid = memberRegisterRequest.emailVerifyCodeKey }
 
         every { emailVerifyCodeRepository.findByUuid(any<String>()) } returns verifyCode
         every { stringEncoder.encrypt(any<String>(), any<String>()) } answers { it.invocation.args[0] as String }
