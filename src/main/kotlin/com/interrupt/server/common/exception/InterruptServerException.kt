@@ -16,7 +16,7 @@ class InterruptServerException @JvmOverloads constructor(
             """
                 server error
                 cause: $cause
-                message: $message
+                message: ${this.message}
                 errorCode: $errorCode
             """.trimIndent()
         }
