@@ -1,0 +1,11 @@
+### 회원 아이디 중복체크(성공)
+GET localhost:8080/api/v1/members/check-login-id?loginId=testtest
+
+### 회원 아이디 중복체크(입력 길이 검증 실패)
+GET localhost:8080/api/v1/members/check-login-id?loginId=testtesttesttesttesttesttesttesttesttesttesttest
+
+### 회원 아이디 중복체크(공백 입력 검증 실패)
+GET localhost:8080/api/v1/members/check-login-id
+
+### 회원 아이디 중복체크(영어/숫자 외 입력 검증 실패)
+GET localhost:8080/api/v1/members/check-login-id?loginId=가나다라마바사아자차카
