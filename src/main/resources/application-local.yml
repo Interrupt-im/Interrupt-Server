@@ -9,6 +9,11 @@ spring:
     username: sa
     password:
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   jpa:
     open-in-view: false
     hibernate:
@@ -21,6 +26,19 @@ spring:
   h2:
     console:
       enabled: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${mail.username}
+    password: ${mail.password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
 
 logging:
   #  pattern:
@@ -38,11 +56,3 @@ logging:
 
 security:
   encrypt-key: 7a3b15e8f2772c2a9f28d04996b9f35c
-  id-pre-salt: id-pre-salt
-  id-post-salt: id-post-salt
-  pw-pre-salt: pw-pre-salt
-  pw-post-salt: pw-post-salt
-  name-pre-salt: name-pre-salt
-  name-post-salt: name-post-salt
-  email-pre-salt: email-pre-salt
-  email-post-salt: email-post-salt

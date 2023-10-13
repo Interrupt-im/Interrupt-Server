@@ -13,13 +13,13 @@ import jakarta.persistence.UniqueConstraint
 )
 class Member(
     @field:Column(name = "login_id", nullable = false, unique = true)
-    val loginId: String,
+    var loginId: String,
     @field:Column(name = "password", nullable = false)
-    val password: String,
+    var password: String,
     @field:Column(name = "name", nullable = false)
-    val name: String,
+    var name: String,
     @field:Column(name = "email", nullable = false)
-    val email: String
+    var email: String
 ): SoftDeleteBaseEntity() {
 
 }
