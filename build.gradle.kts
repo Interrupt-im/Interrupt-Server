@@ -37,6 +37,9 @@ dependencies {
     // Spring Web
     implementation("org.springframework.boot:spring-boot-starter-web")
 
+    // Validation
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
     // JPA
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
