@@ -22,7 +22,6 @@ class InterruptServerException @JvmOverloads constructor(
         }
     }
 
-    override val message: String? = message
-        get() = if (field.isNullOrBlank()) errorCode.message else field
+    override val message: String = message ?: errorCode.message
 
 }
