@@ -2,7 +2,7 @@ package com.interrupt.server.common.exception
 
 import com.interrupt.server.common.api.ExceptionResponse
 import org.springframework.http.ResponseEntity
-import org.springframework.validation.FieldError
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -23,12 +23,17 @@ class GlobalRestControllerAdvice {
                         ex.errorCode.status.value(),
                         ex.errorCode,
                         ex.message,
-                        e.bindingResult.allErrors
-                            .filterIsInstance<FieldError>()
-                            .associate { it.field to it.defaultMessage }
+                        e.bindingResult.fieldErrors.associate { it.field to it.defaultMessage }
                     ),
                     ex.errorCode.status)
             }
+
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun httpMessageNotReadableExceptionHandler(e: HttpMessageNotReadableException): ResponseEntity<ExceptionResponse<*>> =
+        InterruptServerException(ErrorCode.NO_CONTENT_HTTP_BODY.message, e, ErrorCode.NO_CONTENT_HTTP_BODY)
+            .let { ResponseEntity(ExceptionResponse(it.errorCode.status.value(), it.errorCode, it.message, null), it.errorCode.status) }
+
+
     @ExceptionHandler(Throwable::class)
     fun throwableHandler(t: Throwable): ResponseEntity<ExceptionResponse<*>> =
         InterruptServerException(cause = t, errorCode = ErrorCode.INTERNAL_SEVER_ERROR)
