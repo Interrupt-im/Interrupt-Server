@@ -437,7 +437,7 @@ class MemberServiceTest {
         val request = RecoverPasswordRequest("testLoginId", "test@test.com")
 
         every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
-        every { memberRepository.findByLoginIdAndEmail(any<String>(), any<String>()) } returns Member(request.loginId, "password", "name", request.email)
+        every { memberRepository.findByLoginIdAndEmail(any<String>(), any<String>()) } returns Member(request.loginId!!, "password", "name", request.email!!)
         every { emailSendService.generateEmailTemplate(EmailType.PASSWORD_RECOVER.template, any<Map<String, Any>>()) } returns "contents"
         justRun { emailSendService.sendMail(any<EmailMessage>()) }
         every { memberRecoverRepository.save(any<MemberRecover>()) } answers { (it.invocation.args[0] as MemberRecover).apply { uuid = "emailVerifyCodeKey" } }
@@ -541,7 +541,8 @@ class MemberServiceTest {
         }) } answers { it.invocation.args[0] as Member }
 
         // when then
-        memberService.updateMember(MemberUpdateRequest(loginId, newPassword, email = newEmail, emailVerifyCodeKey = emailVerifyCodeKey))
+        val request = MemberUpdateRequest(newPassword, email = newEmail, emailVerifyCodeKey = emailVerifyCodeKey).apply { this.loginId = loginId }
+        memberService.updateMember(request)
     }
 
     @Test
@@ -565,17 +566,18 @@ class MemberServiceTest {
         val newEmail2 = "newTest2@test.com"
         val memberStub = Member(loginId, "password", "name", "test@test.com")
         val emailVerifyCodeKey = "0000"
+        val emailVerifyCodeKey2 = "1111"
 
         every { memberRepository.findByLoginId(loginId) } returns memberStub
         every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
-        every { emailVerifyCodeRepository.findByUuid(emailVerifyCodeKey) } returns EmailVerifyCode(newEmail1, "000000", false)
-        every { emailVerifyCodeRepository.findByUuid(newEmail2) } returns null
+        every { emailVerifyCodeRepository.findByUuid(emailVerifyCodeKey) } returns EmailVerifyCode(newEmail1, emailVerifyCodeKey, false)
+        every { emailVerifyCodeRepository.findByUuid(emailVerifyCodeKey2) } returns null
 
         // when then
         assertThatThrownBy { memberService.updateMember(MemberUpdateRequest(email = newEmail1, emailVerifyCodeKey = emailVerifyCodeKey).apply { this.loginId = loginId }) }
             .isInstanceOf(InterruptServerException::class.java)
             .hasMessage(ErrorCode.EMAIL_NOT_VERIFIED.message)
-        assertThatThrownBy { memberService.updateMember(MemberUpdateRequest(email = newEmail2, emailVerifyCodeKey = emailVerifyCodeKey).apply { this.loginId = loginId }) }
+        assertThatThrownBy { memberService.updateMember(MemberUpdateRequest(email = newEmail2, emailVerifyCodeKey = emailVerifyCodeKey2).apply { this.loginId = loginId }) }
             .isInstanceOf(InterruptServerException::class.java)
             .hasMessage(ErrorCode.EMAIL_VERIFY_CODE_NOT_FOUND.message)
     }
