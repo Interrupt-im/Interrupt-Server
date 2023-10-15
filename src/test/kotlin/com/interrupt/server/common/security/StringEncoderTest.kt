@@ -16,8 +16,8 @@ class StringEncoderTest {
         val str2 = "테스트 문자열"
 
         // when
-        val encryptStr1 = stringEncoder.encrypt(str1, secretKey)
-        val encryptStr2 = stringEncoder.encrypt(str2, secretKey)
+        val encryptStr1 = stringEncoder.encrypt(str1)
+        val encryptStr2 = stringEncoder.encrypt(str2)
 
         // then
         assertThat(encryptStr1).isEqualTo("ZIwG/E8s+H9P8FQpsMM+Bw==")
@@ -31,8 +31,8 @@ class StringEncoderTest {
         val str2 = "9w34K9euYplUfRTGEExDjqNj6UVwc4Yt/3WsMOCkCe0="
 
         // when
-        val decryptedStr1 = stringEncoder.decrypt(str1, secretKey)
-        val decryptedStr2 = stringEncoder.decrypt(str2, secretKey)
+        val decryptedStr1 = stringEncoder.decrypt(str1)
+        val decryptedStr2 = stringEncoder.decrypt(str2)
 
         // then
         assertThat(decryptedStr1).isEqualTo("testString")
@@ -44,12 +44,12 @@ class StringEncoderTest {
         // given
         val str1 = "testString"
         val str2 = "테스트 문자열"
-        val encryptStr1 = stringEncoder.encrypt(str1, secretKey)
-        val encryptStr2 = stringEncoder.encrypt(str2, secretKey)
+        val encryptStr1 = stringEncoder.encrypt(str1)
+        val encryptStr2 = stringEncoder.encrypt(str2)
 
         // when
-        val decryptStr1 = stringEncoder.decrypt(encryptStr1, secretKey)
-        val decryptStr2 = stringEncoder.decrypt(encryptStr2, secretKey)
+        val decryptStr1 = stringEncoder.decrypt(encryptStr1)
+        val decryptStr2 = stringEncoder.decrypt(encryptStr2)
 
         // then
         assertThat(decryptStr1).isEqualTo(str1)
