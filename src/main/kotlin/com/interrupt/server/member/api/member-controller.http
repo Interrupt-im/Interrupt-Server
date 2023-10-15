@@ -1,11 +1,33 @@
-### 회원 아이디 중복체크(성공)
+### 회원 아이디 중복체크
 GET localhost:8080/api/v1/members/check-login-id?loginId=testtest
 
-### 회원 아이디 중복체크(입력 길이 검증 실패)
-GET localhost:8080/api/v1/members/check-login-id?loginId=testtesttesttesttesttesttesttesttesttesttesttest
+### 회원 가입
+POST localhost:8080/api/v1/members
+Content-Type: application/json
 
-### 회원 아이디 중복체크(공백 입력 검증 실패)
-GET localhost:8080/api/v1/members/check-login-id
+{
+  "loginId":  "testLoginId",
+  "password":  "qweasd123",
+  "name":  "홍길동",
+  "email":  "djawnstj44@naver.com",
+  "emailVerifyCodeKey": "4b6ffeb0-016c-4764-aaa0-91ad7e74cbb8"
+}
 
-### 회원 아이디 중복체크(영어/숫자 외 입력 검증 실패)
-GET localhost:8080/api/v1/members/check-login-id?loginId=가나다라마바사아자차카
+### 회원 정보 수정
+PATCH localhost:8080/api/v1/members/testLoginId
+Content-Type: application/json
+
+{
+  "password":  "qweasd123",
+  "name":  "홍길동",
+  "email":  "test@test.com",
+  "emailVerifyCodeKey": "111111"
+}
+
+### 회원 탈퇴
+DELETE localhost:8080/api/v1/members/testLoginId
+Content-Type: application/json
+
+{
+  "password":  "qweasd123"
+}
