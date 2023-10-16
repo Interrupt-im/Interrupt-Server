@@ -5,6 +5,9 @@ plugins {
 
     id("org.springframework.boot") version "3.1.4"
     id("io.spring.dependency-management") version "1.1.3"
+
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
+
     kotlin("jvm") version kotlinVersion
     kotlin("kapt") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
@@ -79,6 +82,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.6.0")
+
+    // RestDoc
+    testImplementation("org.springframework.restdocs:spring-restdocs-asciidoctor")
+   	testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
 
 }
 
