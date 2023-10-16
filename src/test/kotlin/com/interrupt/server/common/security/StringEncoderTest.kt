@@ -1,13 +1,13 @@
 package com.interrupt.server.common.security
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.test.util.ReflectionTestUtils
 
 class StringEncoderTest {
 
-    private val stringEncoder: StringEncoder = StringEncoder()
-
-    private val secretKey = "2b7e151628aed2a6abf7158809cf4f3c"
 
     @Test
     fun `주어진 문자열을 암호화`() {
@@ -54,6 +54,17 @@ class StringEncoderTest {
         // then
         assertThat(decryptStr1).isEqualTo(str1)
         assertThat(decryptStr2).isEqualTo(str2)
+    }
+
+    companion object {
+
+        private val stringEncoder: StringEncoder = StringEncoder()
+
+        @JvmStatic
+        @BeforeAll
+        fun setUp() {
+            ReflectionTestUtils.setField(stringEncoder, "secretKey", "2b7e151628aed2a6abf7158809cf4f3c")
+        }
     }
 
 }

@@ -59,7 +59,7 @@ class MemberControllerDocsTest: RestDocsSupport() {
         result
             .andDo(print())
             .andExpect(status().isOk())
-            .andDo(document("auth-check-login-id-duplication",
+            .andDo(document("check-login-id-duplication",
                 preprocessRequest(prettyPrint()),
                 preprocessResponse(prettyPrint()),
                 queryParameters(
