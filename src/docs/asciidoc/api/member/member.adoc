@@ -1,0 +1,10 @@
+[[check-login-id-duplication]]
+=== 회원 ID 중복 체크
+
+==== HTTP Request
+include::{snippets}/check-login-id-duplication/http-request.adoc[]
+include::{snippets}/check-login-id-duplication/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/check-login-id-duplication/http-response.adoc[]
+include::{snippets}/check-login-id-duplication/response-fields.adoc[]
