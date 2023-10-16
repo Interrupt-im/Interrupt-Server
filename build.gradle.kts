@@ -25,6 +25,8 @@ noArg {
     annotation("com.interrupt.server.common.redis.RedisEntity")
 }
 
+val asciidoctorExt by configurations.creating
+
 group = "com.interrupt"
 version = "0.0.1-SNAPSHOT"
 
@@ -84,7 +86,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.6.0")
 
     // RestDoc
-    testImplementation("org.springframework.restdocs:spring-restdocs-asciidoctor")
+    asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
    	testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
 
 }
@@ -98,4 +100,29 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+val snippetDir = file("build/generated-snippets")
+
+tasks.test {
+    outputs.dir(snippetDir)
+}
+
+tasks.asciidoctor {
+    inputs.dir(snippetDir)
+    configurations("asciidoctorExt")
+
+    sources {
+        include("**/index.adoc")
+    }
+
+    baseDirFollowsSourceFile()
+    dependsOn(tasks.test)
+}
+
+tasks.bootJar {
+    dependsOn("asciidoctor")
+    from(tasks.getByName("asciidoctor")) {
+        into("static/docs")
+    }
 }
