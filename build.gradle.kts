@@ -102,6 +102,12 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "com.interrupt.server.InterruptServerApplication"
+    }
+}
+
 val snippetDir = file("build/generated-snippets")
 
 tasks.test {
@@ -121,6 +127,9 @@ tasks.asciidoctor {
 }
 
 tasks.bootJar {
+    from(tasks["jar"]) {
+        enabled = true
+    }
     dependsOn("asciidoctor")
     from(tasks.getByName("asciidoctor")) {
         into("static/docs")
