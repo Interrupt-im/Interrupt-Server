@@ -1,11 +1,20 @@
 package com.interrupt.server.docs
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.mockk.MockKAnnotations
+import io.mockk.clearAllMocks
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.restdocs.RestDocumentationContextProvider
 import org.springframework.restdocs.RestDocumentationExtension
+import org.springframework.restdocs.headers.HeaderDescriptor
+import org.springframework.restdocs.headers.HeaderDocumentation.headerWithName
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration
+import org.springframework.restdocs.operation.preprocess.OperationRequestPreprocessor
+import org.springframework.restdocs.operation.preprocess.OperationResponsePreprocessor
+import org.springframework.restdocs.operation.preprocess.Preprocessors.*
 import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation
@@ -20,6 +29,19 @@ abstract class RestDocsSupport {
     protected val objectMapper = ObjectMapper()
 
     companion object {
+
+        @BeforeAll
+        @JvmStatic
+        fun setUpAll() {
+            MockKAnnotations.init(this)
+        }
+
+        @AfterAll
+        @JvmStatic
+        fun tearDownAll() {
+            clearAllMocks()
+        }
+
         @JvmStatic
         protected val BASE_RESPONSE_DOCS_DESCRIPTORS = listOf(
             PayloadDocumentation.fieldWithPath("statusCode").type(JsonFieldType.NUMBER)
@@ -45,4 +67,21 @@ abstract class RestDocsSupport {
     }
 
     protected abstract fun initController(): Any
+
+    protected fun getDocumentRequest(): OperationRequestPreprocessor =
+        preprocessRequest(
+            modifyUris()
+                .scheme("https")
+                .host("api.interrupt.com")
+                .removePort(),
+            prettyPrint()
+        )
+
+    protected fun getDocumentResponse(): OperationResponsePreprocessor =
+        preprocessResponse(prettyPrint())
+
+    protected fun header(): Array<HeaderDescriptor> =
+        arrayOf(headerWithName("x-api-key").description("Api Key"))
+
+
 }
