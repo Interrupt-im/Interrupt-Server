@@ -1,7 +1,6 @@
 package com.interrupt.server.member.dto.update
 
 import jakarta.validation.constraints.Email
-import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 
 data class MemberUpdateRequest(
@@ -10,7 +9,6 @@ data class MemberUpdateRequest(
     var name: String? = null,
     @field:Email(message = "올바른 이메일 형식이 아닙니다.")
     var email: String? = null,
-    @field:NotBlank(message = "관리자에게 문의 바랍니다.")
     val emailVerifyCodeKey: String?,
 ) {
     lateinit var loginId: String

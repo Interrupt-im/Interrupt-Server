@@ -27,8 +27,8 @@ class MemberController(
 
     @PatchMapping("/api/v1/members/{loginId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun updateMember(@PathVariable("loginId") loginId: String, @RequestBody @Valid request: MemberUpdateRequest): BaseResponse<*> =
-        BaseResponse(statusCode = HttpStatus.NO_CONTENT.value(), data = memberService.updateMember(request.apply { this.loginId = loginId }))
+    fun updateMember(@PathVariable("loginId") loginId: String, @RequestBody @Valid request: MemberUpdateRequest) =
+        memberService.updateMember(request.apply { this.loginId = loginId })
 
     @DeleteMapping("/api/v1/members/{loginId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
