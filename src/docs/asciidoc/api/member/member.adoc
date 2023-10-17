@@ -8,3 +8,29 @@ include::{snippets}/check-login-id-duplication/query-parameters.adoc[]
 ==== HTTP Response
 include::{snippets}/check-login-id-duplication/http-response.adoc[]
 include::{snippets}/check-login-id-duplication/response-fields.adoc[]
+
+---
+
+[[sign-in]]
+=== 회원 가입
+
+==== HTTP Request
+include::{snippets}/sign-in/http-request.adoc[]
+include::{snippets}/sign-in/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/sign-in/http-response.adoc[]
+include::{snippets}/sign-in/response-fields.adoc[]
+
+---
+
+[[update-member]]
+=== 회원 정보 수정
+
+==== HTTP Request
+include::{snippets}/update-member/http-request.adoc[]
+include::{snippets}/update-member/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/update-member/http-response.adoc[]
+include::{snippets}/update-member/response-fields.adoc[]

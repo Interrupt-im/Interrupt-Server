@@ -1,15 +1,14 @@
-==== Request Fields
+==== Query Parameters
 |===
-|Name|Type|Optional|Description|Validation
+|Name|Optional|Description|Validation
 
-{{#fields}}
+{{#parameters}}
 
-|{{#tableCellContent}}`+{{path}}+`{{/tableCellContent}}
-|{{#tableCellContent}}`+{{type}}+`{{/tableCellContent}}
+|{{#tableCellContent}}`+{{name}}+`{{/tableCellContent}}
 |{{#tableCellContent}}{{#optional}}O{{/optional}}{{/tableCellContent}}
 |{{#tableCellContent}}{{description}}{{/tableCellContent}}
 |{{#tableCellContent}}{{constraints}}{{/tableCellContent}}
 
-{{/fields}}
+{{/parameters}}
 
 |===
