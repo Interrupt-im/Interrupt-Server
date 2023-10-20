@@ -26,7 +26,7 @@ class AuthController(
     fun validateEmailVerifyCode(@RequestBody @Valid request: EmailVerifyRequest) =
         memberService.validateEmailVerifyCode(request)
 
-    @PostMapping("/api/v1/auth")
+    @PostMapping("/api/v1/auth/login")
     fun login(@RequestBody @Valid request: MemberLoginRequest): BaseResponse<MemberLoginResponse> =
         BaseResponse(data = memberService.login(request))
 
@@ -35,14 +35,14 @@ class AuthController(
         BaseResponse(data = memberService.applySendLoginIdRecoverVerifyCode(request))
 
     @GetMapping("/api/v1/auth/recovery/login-id/verification")
-    fun validateLoginIdRecoverVerifyCode(@RequestBody @Valid request: VerifyRecoverLoginIdRequest): BaseResponse<VerifyRecoverLoginIdResponse> =
+    fun validateLoginIdRecoverVerifyCode(@Valid request: VerifyRecoverLoginIdRequest): BaseResponse<VerifyRecoverLoginIdResponse> =
         BaseResponse(data = memberService.validateLoginIdRecoverVerifyCode(request))
 
     @PostMapping("/api/v1/auth/recovery/password/verify-code")
     fun applySendPasswordRecoverVerifyCode(@RequestBody @Valid request: RecoverPasswordRequest): BaseResponse<RecoverPasswordResponse> =
         BaseResponse(data = memberService.applySendPasswordRecoverVerifyCode(request))
 
-    @PutMapping("/api/v1/auth/recovery/password/verification")
+    @PutMapping("/api/v1/auth/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun validatePasswordRecoverVerifyCode(@RequestBody @Valid request: VerifyRecoverPasswordRequest) =
         memberService.validatePasswordRecoverVerifyCode(request)
