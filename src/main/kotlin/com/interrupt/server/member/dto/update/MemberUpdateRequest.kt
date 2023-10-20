@@ -11,5 +11,4 @@ data class MemberUpdateRequest(
     var email: String? = null,
     val emailVerifyCodeKey: String?,
 ) {
-    lateinit var loginId: String
 }

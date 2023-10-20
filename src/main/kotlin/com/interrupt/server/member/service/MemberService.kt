@@ -124,8 +124,8 @@ class MemberService(
     /**
      * 회원 탈퇴
      */
-    fun deleteMember(memberDeleteRequest: MemberDeleteRequest) {
-        val encryptedLoginId = stringEncoder.encrypt(memberDeleteRequest.loginId)
+    fun deleteMember(loginId: String, memberDeleteRequest: MemberDeleteRequest) {
+        val encryptedLoginId = stringEncoder.encrypt(loginId)
         val encryptedPassword = stringEncoder.encrypt(memberDeleteRequest.password!!)
 
         val foundMember = memberRepository.findByLoginIdAndPassword(encryptedLoginId, encryptedPassword)
@@ -216,8 +216,8 @@ class MemberService(
     /**
      * 회원 정보 수정
      */
-    fun updateMember(memberUpdateRequest: MemberUpdateRequest) {
-        val encryptedLoginId = stringEncoder.encrypt(memberUpdateRequest.loginId)
+    fun updateMember(loginId: String, memberUpdateRequest: MemberUpdateRequest) {
+        val encryptedLoginId = stringEncoder.encrypt(loginId)
         val foundMember = memberRepository.findByLoginId(encryptedLoginId)
         validateExistMember(foundMember)
 

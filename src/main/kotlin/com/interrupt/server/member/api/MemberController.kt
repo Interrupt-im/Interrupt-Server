@@ -28,11 +28,11 @@ class MemberController(
     @PatchMapping("/api/v1/members/{loginId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun updateMember(@PathVariable("loginId") loginId: String, @RequestBody @Valid request: MemberUpdateRequest) =
-        memberService.updateMember(request.apply { this.loginId = loginId })
+        memberService.updateMember(loginId, request)
 
     @DeleteMapping("/api/v1/members/{loginId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun foo(@PathVariable("loginId") loginId: String, @RequestBody @Valid request: MemberDeleteRequest): BaseResponse<*> =
-        BaseResponse(statusCode = HttpStatus.NO_CONTENT.value(), data = memberService.deleteMember(request.apply { this.loginId = loginId }))
+    fun deleteMEmber(@PathVariable("loginId") loginId: String, @RequestBody @Valid request: MemberDeleteRequest) =
+        memberService.deleteMember(loginId, request)
 
 }
