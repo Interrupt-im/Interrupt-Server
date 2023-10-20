@@ -302,7 +302,7 @@ class MemberServiceTest {
         // given
         val loginId = "test1"
         val password = "testPassword"
-        val memberDeleteRequest = MemberDeleteRequest(password).apply { this.loginId = loginId }
+        val memberDeleteRequest = MemberDeleteRequest(password)
 
         val savedMemberStub = Member(
             loginId,
@@ -318,7 +318,7 @@ class MemberServiceTest {
         every { memberRepository.save(any<Member>()) } returns savedMemberStub.also { it.deletedAt = LocalDateTime.now() }
 
         // when then
-        memberService.deleteMember(memberDeleteRequest)
+        memberService.deleteMember(loginId, memberDeleteRequest)
     }
 
     @Test
@@ -326,7 +326,7 @@ class MemberServiceTest {
         // given
         val loginId = "test1"
         val password = "testPassword"
-        val memberDeleteRequest = MemberDeleteRequest(password).apply { this.loginId = loginId }
+        val memberDeleteRequest = MemberDeleteRequest(password)
 
         every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
@@ -334,7 +334,7 @@ class MemberServiceTest {
         every { memberRepository.findByLoginIdAndPassword(loginId, password) } returns null
 
         // when
-        val result = assertThatThrownBy { memberService.deleteMember(memberDeleteRequest) }
+        val result = assertThatThrownBy { memberService.deleteMember(loginId, memberDeleteRequest) }
 
         // then
         result.isInstanceOf(InterruptServerException::class.java)
@@ -541,8 +541,8 @@ class MemberServiceTest {
         }) } answers { it.invocation.args[0] as Member }
 
         // when then
-        val request = MemberUpdateRequest(newPassword, email = newEmail, emailVerifyCodeKey = emailVerifyCodeKey).apply { this.loginId = loginId }
-        memberService.updateMember(request)
+        val request = MemberUpdateRequest(newPassword, email = newEmail, emailVerifyCodeKey = emailVerifyCodeKey)
+        memberService.updateMember(loginId, request)
     }
 
     @Test
@@ -553,7 +553,7 @@ class MemberServiceTest {
         every { memberRepository.findByLoginId(loginId) } returns null
 
         // when then
-        assertThatThrownBy { memberService.updateMember(MemberUpdateRequest(emailVerifyCodeKey = "0000").apply { this.loginId = loginId }) }
+        assertThatThrownBy { memberService.updateMember(loginId, MemberUpdateRequest(emailVerifyCodeKey = "0000")) }
             .isInstanceOf(InterruptServerException::class.java)
             .hasMessage(ErrorCode.MEMBER_NOT_FOUND.message)
     }
@@ -574,10 +574,10 @@ class MemberServiceTest {
         every { emailVerifyCodeRepository.findByUuid(emailVerifyCodeKey2) } returns null
 
         // when then
-        assertThatThrownBy { memberService.updateMember(MemberUpdateRequest(email = newEmail1, emailVerifyCodeKey = emailVerifyCodeKey).apply { this.loginId = loginId }) }
+        assertThatThrownBy { memberService.updateMember(loginId, MemberUpdateRequest(email = newEmail1, emailVerifyCodeKey = emailVerifyCodeKey)) }
             .isInstanceOf(InterruptServerException::class.java)
             .hasMessage(ErrorCode.EMAIL_NOT_VERIFIED.message)
-        assertThatThrownBy { memberService.updateMember(MemberUpdateRequest(email = newEmail2, emailVerifyCodeKey = emailVerifyCodeKey2).apply { this.loginId = loginId }) }
+        assertThatThrownBy { memberService.updateMember(loginId, MemberUpdateRequest(email = newEmail2, emailVerifyCodeKey = emailVerifyCodeKey2)) }
             .isInstanceOf(InterruptServerException::class.java)
             .hasMessage(ErrorCode.EMAIL_VERIFY_CODE_NOT_FOUND.message)
     }

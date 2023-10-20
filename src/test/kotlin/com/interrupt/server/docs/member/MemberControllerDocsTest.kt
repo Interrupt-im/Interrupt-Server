@@ -3,6 +3,7 @@ package com.interrupt.server.docs.member
 import com.interrupt.server.docs.ConstrainedFields
 import com.interrupt.server.docs.RestDocsSupport
 import com.interrupt.server.member.api.MemberController
+import com.interrupt.server.member.dto.delete.MemberDeleteRequest
 import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRequest
 import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckResponse
 import com.interrupt.server.member.dto.register.MemberRegisterRequest
@@ -12,12 +13,11 @@ import io.mockk.*
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.*
 import org.springframework.restdocs.request.RequestDocumentation.pathParameters
 import org.springframework.restdocs.request.RequestDocumentation.queryParameters
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -60,7 +60,7 @@ class MemberControllerDocsTest: RestDocsSupport() {
 
     @Test
     fun `회원 가입 API`() {
-        val request = MemberRegisterRequest("testLoginId", "password123", "홍길동", "test@test.com", "000000")
+        val request = MemberRegisterRequest("testLoginId", "password123", "홍길동", "test@test.com", "0000")
         val fields = ConstrainedFields(request::class.java)
 
         justRun { memberService.registerMember(any<MemberRegisterRequest>()) }
@@ -94,13 +94,13 @@ class MemberControllerDocsTest: RestDocsSupport() {
 
     @Test
     fun `회원 수정 API`() {
-        val request = MemberUpdateRequest("password123", "홍길동", "test@test.com", "000000").apply { this.loginId = "loginId" }
+        val request = MemberUpdateRequest("password123", "홍길동", "test@test.com", "0000")
         val fields = ConstrainedFields(request::class.java)
 
-        justRun { memberService.updateMember(any<MemberUpdateRequest>()) }
+        justRun { memberService.updateMember(any<String>(), any<MemberUpdateRequest>()) }
 
         val result = mockMvc.perform(
-            RestDocumentationRequestBuilders.patch("/api/v1/members/{loginId}", "loginId")
+            patch("/api/v1/members/{loginId}", "loginId")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON))
 
@@ -125,6 +125,35 @@ class MemberControllerDocsTest: RestDocsSupport() {
                     fields.withPath("emailVerifyCodeKey").type(JsonFieldType.STRING)
                         .optional()
                         .description("이메일 인증 키"),
+                ),
+            ))
+    }
+
+    @Test
+    fun `회원 탈퇴 API`() {
+        val request = MemberDeleteRequest("password123")
+        val fields = ConstrainedFields(request::class.java)
+
+        justRun { memberService.deleteMember(any<String>(), any<MemberDeleteRequest>()) }
+
+        val result = mockMvc.perform(
+            delete("/api/v1/members/{loginId}", "loginId")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+
+        result
+            .andDo(print())
+            .andExpect(status().isNoContent)
+            .andDo(document("delete-member",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    fields.withName("loginId").description("회원 ID")),
+                requestFields(
+                    fields.withPath("password").type(JsonFieldType.STRING)
+                        .optional()
+                        .description("비밀번호"),
                 ),
             ))
     }
