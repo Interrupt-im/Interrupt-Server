@@ -14,4 +14,12 @@ endif::[]
 
 include::api/member/member.adoc[]
 
----
+[[Auth-API]]
+== Auth-API
+
+include::api/auth/auth.adoc[]
+
+[[Error]]
+== Error Response
+
+include::api/error/error.adoc[]
