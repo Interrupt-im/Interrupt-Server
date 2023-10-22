@@ -1,6 +1,7 @@
 package com.interrupt.server
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.interrupt.server.auth.api.AuthController
 import com.interrupt.server.common.exception.ErrorCode
 import com.interrupt.server.member.api.MemberController
 import com.interrupt.server.member.service.MemberService
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @WebMvcTest(controllers = [
     MemberController::class,
+    AuthController::class,
 ])
 @MockkBean(JpaMetamodelMappingContext::class)
 abstract class ControllerTestSupport {

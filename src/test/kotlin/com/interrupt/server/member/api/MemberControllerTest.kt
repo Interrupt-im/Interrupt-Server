@@ -159,7 +159,7 @@ class MemberControllerTest: ControllerTestSupport() {
     }
 
     @Test
-    fun `회원 가입 시 비밀번호는 영문과 숫자는 모두 포함되어야 한다`() {
+    fun `회원 가입 시 비밀번호 는 영문과 숫자가 모두 포함되어야 한다`() {
         // given
         val request = MemberRegisterRequest("회원Id", "password!", "홍길동", "email@domain.com", "0000")
 
@@ -317,7 +317,7 @@ class MemberControllerTest: ControllerTestSupport() {
     }
 
     @Test
-    fun `회원 탈퇴 시 비밀번호는 영문과 숫자는 모두 포함되어야 한다`() {
+    fun `회원 탈퇴 시 비밀번호 는 영문과 숫자가 모두 포함되어야 한다`() {
         // given
         val request = MemberDeleteRequest("newPassword!")
 
