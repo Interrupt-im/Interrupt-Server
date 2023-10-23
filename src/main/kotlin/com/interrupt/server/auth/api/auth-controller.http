@@ -52,8 +52,8 @@ Content-Type: application/json
   "email": "djawnstj44@naver.com"
 }
 
-### 회원 비밀번호 찾기 이메일 인증코드 요청
-POST http://localhost:8080/api/v1/auth/recovery/password/verification
+### 회원 비밀번호 찾기 이메일 인증코드 확인
+PUT http://localhost:8080/api/v1/auth/member/memberId/password
 Content-Type: application/json
 
 {
