@@ -1,0 +1,49 @@
+[[check-login-id-duplication]]
+=== 회원 ID 중복 체크
+
+==== HTTP Request
+include::{snippets}/check-login-id-duplication/http-request.adoc[]
+include::{snippets}/check-login-id-duplication/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/check-login-id-duplication/http-response.adoc[]
+include::{snippets}/check-login-id-duplication/response-fields.adoc[]
+
+'''
+
+[[sign-in]]
+=== 회원 가입
+
+==== HTTP Request
+include::{snippets}/sign-in/http-request.adoc[]
+include::{snippets}/sign-in/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/sign-in/http-response.adoc[]
+include::{snippets}/sign-in/response-fields.adoc[]
+
+'''
+
+[[update-member]]
+=== 회원 정보 수정
+
+==== HTTP Request
+include::{snippets}/update-member/http-request.adoc[]
+include::{snippets}/update-member/path-parameters.adoc[]
+include::{snippets}/update-member/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/update-member/http-response.adoc[]
+
+'''
+
+[[delete-member]]
+=== 회원 탈퇴
+
+==== HTTP Request
+include::{snippets}/delete-member/http-request.adoc[]
+include::{snippets}/delete-member/path-parameters.adoc[]
+include::{snippets}/delete-member/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/delete-member/http-response.adoc[]

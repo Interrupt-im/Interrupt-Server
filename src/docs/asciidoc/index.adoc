@@ -1,0 +1,25 @@
+ifndef::snippets[]
+:snippets: ../../build/generated-snippets
+endif::[]
+= Interrupt HTTP API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels:2
+:sectlinks:
+
+[[Member-API]]
+== Member-API
+
+include::api/member/member.adoc[]
+
+[[Auth-API]]
+== Auth-API
+
+include::api/auth/auth.adoc[]
+
+[[Error]]
+== Error Response
+
+include::api/error/error.adoc[]

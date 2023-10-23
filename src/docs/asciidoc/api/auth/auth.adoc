@@ -1,0 +1,78 @@
+[[apply-email-verify-code]]
+=== 이메일 인증 코드 요청
+
+==== HTTP Request
+include::{snippets}/apply-email-verify-code/http-request.adoc[]
+include::{snippets}/apply-email-verify-code/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/apply-email-verify-code/http-response.adoc[]
+include::{snippets}/apply-email-verify-code/response-fields.adoc[]
+
+'''
+=== 이메일 인증 코드 확인
+
+==== HTTP Request
+include::{snippets}/validate-email-verify-code/http-request.adoc[]
+include::{snippets}/validate-email-verify-code/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/validate-email-verify-code/http-response.adoc[]
+
+'''
+=== 로그인
+
+==== HTTP Request
+include::{snippets}/login/http-request.adoc[]
+include::{snippets}/login/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/login/http-response.adoc[]
+include::{snippets}/login/response-fields.adoc[]
+
+'''
+=== 회원 ID 찾기 이메일 인증 코드 요청
+
+==== HTTP Request
+include::{snippets}/apply-login-id-recover-verify-code/http-request.adoc[]
+include::{snippets}/apply-login-id-recover-verify-code/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/apply-login-id-recover-verify-code/http-response.adoc[]
+include::{snippets}/apply-login-id-recover-verify-code/response-fields.adoc[]
+
+'''
+=== 회원 ID 찾기 이메일 인증 코드 확인
+
+==== HTTP Request
+include::{snippets}/recover-login-id/http-request.adoc[]
+include::{snippets}/recover-login-id/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/recover-login-id/http-response.adoc[]
+include::{snippets}/recover-login-id/response-fields.adoc[]
+
+'''
+=== 비밀번호 찾기 이메일 인증 코드 요청
+
+==== HTTP Request
+include::{snippets}/apply-password-recover-verify-code/http-request.adoc[]
+include::{snippets}/apply-password-recover-verify-code/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/apply-password-recover-verify-code/http-response.adoc[]
+include::{snippets}/apply-password-recover-verify-code/response-fields.adoc[]
+
+'''
+
+'''
+=== 비밀번호 수정
+
+==== HTTP Request
+include::{snippets}/recover-password/http-request.adoc[]
+include::{snippets}/recover-password/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/recover-password/http-response.adoc[]
+
+'''

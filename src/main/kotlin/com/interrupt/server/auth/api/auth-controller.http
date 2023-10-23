@@ -1,0 +1,63 @@
+### 이메일 인증코드 요청
+POST http://localhost:8080/api/v1/auth/verify-code
+Content-Type: application/json
+
+{
+  "email": "djawnstj44@naver.com"
+}
+
+### 이메일 인증코드 확인
+POST http://localhost:8080/api/v1/auth/verification/verify-code
+Content-Type: application/json
+
+{
+  "email": "djawnstj44@naver.com",
+  "emailVerifyCodeKey": "4b6ffeb0-016c-4764-aaa0-91ad7e74cbb8",
+  "verifyCode": "750957"
+}
+
+### 로그인
+POST http://localhost:8080/api/v1/auth
+Content-Type: application/json
+
+{
+  "loginId": "testLoginId",
+  "password": "qweasd123"
+}
+
+### 회원 ID 찾기 이메일 인증코드 요청
+POST http://localhost:8080/api/v1/auth/recovery/login-id/verify-code
+Content-Type: application/json
+
+{
+  "name": "홍길동",
+  "email": "djawnstj44@naver.com"
+}
+
+### 회원 ID 찾기 이메일 인증코드 요청
+GET http://localhost:8080/api/v1/auth/recovery/login-id/verification
+Content-Type: application/json
+
+{
+  "memberRecoverKey": "85071cd3-8a8e-4396-b3e5-4af70529a1ba",
+  "verifyCode": "285725"
+}
+
+### 회원 비밀번호 찾기 이메일 인증코드 요청
+POST http://localhost:8080/api/v1/auth/recovery/password/verify-code
+Content-Type: application/json
+
+{
+  "loginId": "testLoginId",
+  "email": "djawnstj44@naver.com"
+}
+
+### 회원 비밀번호 찾기 이메일 인증코드 요청
+POST http://localhost:8080/api/v1/auth/recovery/password/verification
+Content-Type: application/json
+
+{
+  "memberRecoverKey": "a5f35120-4a35-4ba4-bc89-89f0751edf2a",
+  "verifyCode": "830973",
+  "newPassword": "newPassword123!"
+}

@@ -5,6 +5,9 @@ plugins {
 
     id("org.springframework.boot") version "3.1.4"
     id("io.spring.dependency-management") version "1.1.3"
+
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
+
     kotlin("jvm") version kotlinVersion
     kotlin("kapt") version kotlinVersion
     kotlin("plugin.spring") version kotlinVersion
@@ -22,6 +25,8 @@ noArg {
     annotation("com.interrupt.server.common.redis.RedisEntity")
 }
 
+val asciidoctorExt by configurations.creating
+
 group = "com.interrupt"
 version = "0.0.1-SNAPSHOT"
 
@@ -36,6 +41,9 @@ repositories {
 dependencies {
     // Spring Web
     implementation("org.springframework.boot:spring-boot-starter-web")
+
+    // Validation
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
     // JPA
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -77,6 +85,10 @@ dependencies {
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.6.0")
 
+    // RestDoc
+    asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
+   	testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+
 }
 
 tasks.withType<KotlinCompile> {
@@ -88,4 +100,38 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "com.interrupt.server.InterruptServerApplication"
+    }
+}
+
+val snippetDir = file("build/generated-snippets")
+
+tasks.test {
+    outputs.dir(snippetDir)
+}
+
+tasks.asciidoctor {
+    inputs.dir(snippetDir)
+    configurations("asciidoctorExt")
+
+    sources {
+        include("**/index.adoc")
+    }
+
+    baseDirFollowsSourceFile()
+    dependsOn(tasks.test)
+}
+
+tasks.bootJar {
+    from(tasks["jar"]) {
+        enabled = true
+    }
+    dependsOn("asciidoctor")
+    from(tasks.getByName("asciidoctor")) {
+        into("static/docs")
+    }
 }
