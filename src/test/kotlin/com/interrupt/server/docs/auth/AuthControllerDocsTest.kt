@@ -19,7 +19,7 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.*
-import org.springframework.restdocs.request.RequestDocumentation.queryParameters
+import org.springframework.restdocs.request.RequestDocumentation.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -139,7 +139,7 @@ class AuthControllerDocsTest: RestDocsSupport() {
                 RecoverLoginIdResponse("0000")
 
         val result = mockMvc.perform(
-            post("/api/v1/auth/recovery/login-id/verify-code")
+            post("/api/v1/auth/login-id/recovery/verify-code")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -175,7 +175,7 @@ class AuthControllerDocsTest: RestDocsSupport() {
                 VerifyRecoverLoginIdResponse("memberId")
 
         val result = mockMvc.perform(
-            get("/api/v1/auth/recovery/login-id/verification")
+            get("/api/v1/auth/login-id")
                 .param("memberRecoverKey", request.memberRecoverKey)
                 .param("verifyCode", request.verifyCode)
         )
@@ -209,7 +209,7 @@ class AuthControllerDocsTest: RestDocsSupport() {
                 RecoverPasswordResponse("0000")
 
         val result = mockMvc.perform(
-            post("/api/v1/auth/recovery/password/verify-code")
+            post("/api/v1/auth/password/recovery/verify-code")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -244,7 +244,7 @@ class AuthControllerDocsTest: RestDocsSupport() {
         justRun { memberService.validatePasswordRecoverVerifyCode(request) }
 
         val result = mockMvc.perform(
-            put("/api/v1/auth/password")
+            put("/api/v1/auth/member/{loginId}/password", "memberId")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -256,12 +256,15 @@ class AuthControllerDocsTest: RestDocsSupport() {
                 "recover-password",
                 getDocumentRequest(),
                 getDocumentResponse(),
+                pathParameters(
+                    fields.withName("loginId").description("회원 ID")
+                ),
                 requestFields(
                     fields.withPath("memberRecoverKey").type(JsonFieldType.STRING)
                         .description("회원 정보 찾기 인증 키"),
                     fields.withPath("verifyCode").type(JsonFieldType.STRING)
                         .description("이메일 인증 코드"),
-                    fields.withPath("newPassword").type(JsonFieldType.STRING)
+                    fields.withPath("password").type(JsonFieldType.STRING)
                         .description("변경 비밀번호")
                 )
             ))
