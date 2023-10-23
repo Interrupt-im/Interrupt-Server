@@ -26,7 +26,6 @@ import com.interrupt.server.member.entity.Member
 import com.interrupt.server.member.entity.MemberRecover
 import com.interrupt.server.member.repository.MemberRecoverRepository
 import com.interrupt.server.member.repository.MemberRepository
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -209,7 +208,7 @@ class MemberService(
         val foundMember = memberRepository.findByLoginId(foundMemberRecover.loginId)
         validateExistMember(foundMember)
 
-        foundMember!!.password = stringEncoder.encrypt(recoverPasswordRequest.newPassword!!)
+        foundMember!!.password = stringEncoder.encrypt(recoverPasswordRequest.password!!)
         memberRepository.save(foundMember)
     }
 

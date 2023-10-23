@@ -64,12 +64,11 @@ include::{snippets}/apply-password-recover-verify-code/http-response.adoc[]
 include::{snippets}/apply-password-recover-verify-code/response-fields.adoc[]
 
 '''
-
-'''
 === 비밀번호 수정
 
 ==== HTTP Request
 include::{snippets}/recover-password/http-request.adoc[]
+include::{snippets}/delete-member/path-parameters.adoc[]
 include::{snippets}/recover-password/request-fields.adoc[]
 
 ==== HTTP Response
