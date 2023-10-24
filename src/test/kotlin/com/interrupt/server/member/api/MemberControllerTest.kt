@@ -36,7 +36,7 @@ class MemberControllerTest: ControllerTestSupport() {
     @Test
     fun `아이디 중복 확인 시 회원 Id 는 필수 값 이다`() {
         // given
-        val request = LoginIdDuplicateCheckRequest("")
+        val request = LoginIdDuplicateCheckRequest(null)
 
         // when then
         mockMvc.perform(
@@ -62,14 +62,14 @@ class MemberControllerTest: ControllerTestSupport() {
     @Test
     fun `아이디 중복 확인 시 회원 Id 는 영문 또는 숫자로 이루어져야 한다`() {
         // given
-        val request = LoginIdDuplicateCheckRequest("회원Id")
+        val request = LoginIdDuplicateCheckRequest("회원아이디123")
 
         // when then
         mockMvc.perform(
             get("/api/v1/members/check-login-id")
                 .param("loginId", request.loginId))
             .andDo(print())
-            .isInvalidInputValueResponse("loginId", "아이디는 8자 이상 20자 이하로 설정해야 합니다.")
+            .isInvalidInputValueResponse("loginId", "아이디는 영어(필수)와 숫자로 설정해야 합니다.")
     }
 
     @Test

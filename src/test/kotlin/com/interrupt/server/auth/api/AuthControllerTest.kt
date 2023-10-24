@@ -65,7 +65,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `이메일 인증 코드 확인`() {
         // given
-        val request = EmailVerifyRequest("email@domail.com", "000000", "0000")
+        val request = EmailVerifyRequest("email@domail.com", "0000", "000000")
 
         justRun { memberService.validateEmailVerifyCode(request) }
 
@@ -109,7 +109,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `이메일 인증 코드 확인 시 이메일 인증 코드는 필수 값 이다`() {
         // given
-        val request = EmailVerifyRequest("email@domail.com", "", "0000")
+        val request = EmailVerifyRequest("email@domail.com", "0000", null)
 
         justRun { memberService.validateEmailVerifyCode(request) }
 
@@ -119,13 +119,13 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("emailVerifyCodeKey", "이메일 인증코드 값은 필수 입니다.")
+            .isInvalidInputValueResponse("verifyCode", "이메일 인증코드 값은 필수 입니다.")
     }
 
     @Test
     fun `이메일 인증 코드 확인 시 이메일 인증 코드는 6자 이다`() {
         // given
-        val request = EmailVerifyRequest("email@domail.com", "00000", "00000")
+        val request = EmailVerifyRequest("email@domail.com", "0000", "00000")
 
         justRun { memberService.validateEmailVerifyCode(request) }
 
@@ -135,13 +135,13 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("emailVerifyCodeKey", "이메일 인증코드는 6자리 입니다.")
+            .isInvalidInputValueResponse("verifyCode", "이메일 인증코드는 6자리 입니다.")
     }
 
     @Test
     fun `이메일 인증 코드 확인 시 이메일 인증 코드는 숫자로만 이루어져야 한다`() {
         // given
-        val request = EmailVerifyRequest("email@domail.com", "11111q", "0000")
+        val request = EmailVerifyRequest("email@domail.com", "0000", "11111q")
 
         justRun { memberService.validateEmailVerifyCode(request) }
 
@@ -151,7 +151,7 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("emailVerifyCodeKey", "이메일 인증코드는 숫자만으로 입력하셔야 합니다.")
+            .isInvalidInputValueResponse("verifyCode", "이메일 인증코드는 숫자만으로 입력하셔야 합니다.")
     }
 
     @Test
@@ -175,7 +175,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `로그인 시 회원 ID 는 필수 값 이다`() {
         // given
-        val request = MemberLoginRequest("", "ward123!")
+        val request = MemberLoginRequest(null, "ward123!")
 
         // when then
         mockMvc.perform(
@@ -217,7 +217,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `로그인 시 비밀번호 는 필수 값 이다`() {
         // given
-        val request = MemberLoginRequest("memberId", "")
+        val request = MemberLoginRequest("memberId", null)
 
         // when then
         mockMvc.perform(
@@ -337,7 +337,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `회원 ID 찾기 이메일 인증 코드 확인 시 이메일 인증 코드 값은 필수이다`() {
         // given
-        val request = VerifyRecoverLoginIdRequest("0000", "")
+        val request = VerifyRecoverLoginIdRequest("0000", null)
 
         // when then
         mockMvc.perform(
@@ -396,7 +396,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `비밀번호 찾기 이메일 인증 코드 발송 요청 시 회원 ID 값은 필수이다`() {
             // given
-        val request = RecoverPasswordRequest("", "email@domain.com")
+        val request = RecoverPasswordRequest(null, "email@domain.com")
 
             // when then
             mockMvc.perform(
@@ -424,7 +424,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `비밀번호 찾기 이메일 인증 코드 발송 요청 시 회원 ID 값은 영문 또는 숫자로 이루어져야 한다`() {
             // given
-        val request = RecoverPasswordRequest("회원ID", "email@domain.com")
+        val request = RecoverPasswordRequest("회원아이디123", "email@domain.com")
 
             // when then
             mockMvc.perform(
