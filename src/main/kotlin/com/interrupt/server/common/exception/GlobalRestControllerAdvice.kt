@@ -1,6 +1,7 @@
 package com.interrupt.server.common.exception
 
 import com.interrupt.server.common.api.ExceptionResponse
+import jakarta.validation.ConstraintViolationException
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.HttpRequestMethodNotSupportedException
@@ -27,6 +28,20 @@ class GlobalRestControllerAdvice {
                         e.bindingResult.fieldErrors.associate { it.field to it.defaultMessage }
                     ),
                     ex.errorCode.status)
+            }
+
+    @ExceptionHandler(ConstraintViolationException::class)
+    fun constraintViolationException(e: ConstraintViolationException): ResponseEntity<ExceptionResponse<*>> =
+        InterruptServerException(ErrorCode.INVALID_INPUT_VALUE.message, e, ErrorCode.INVALID_INPUT_VALUE)
+            .let { ex ->
+                ResponseEntity(
+                    ExceptionResponse(
+                    ex.errorCode.status.value(),
+                    ex.errorCode,
+                    ex.message,
+                    e.constraintViolations.associate { (it.propertyPath.last()) to it.message }
+                ),
+                ex.errorCode.status)
             }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
