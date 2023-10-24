@@ -43,7 +43,7 @@ class MemberControllerTest: ControllerTestSupport() {
             get("/api/v1/members/check-login-id")
                 .param("loginId", request.loginId))
             .andDo(print())
-            .isInvalidInputValueResponse("loginId")
+            .isInvalidInputValueResponse("loginId", "아이디 값은 필수 입니다.")
     }
 
     @Test
@@ -56,7 +56,7 @@ class MemberControllerTest: ControllerTestSupport() {
             get("/api/v1/members/check-login-id")
                 .param("loginId", request.loginId))
             .andDo(print())
-            .isInvalidInputValueResponse("loginId")
+            .isInvalidInputValueResponse("loginId", "아이디는 8자 이상 20자 이하로 설정해야 합니다.")
     }
 
     @Test
@@ -69,7 +69,7 @@ class MemberControllerTest: ControllerTestSupport() {
             get("/api/v1/members/check-login-id")
                 .param("loginId", request.loginId))
             .andDo(print())
-            .isInvalidInputValueResponse("loginId")
+            .isInvalidInputValueResponse("loginId", "아이디는 8자 이상 20자 이하로 설정해야 합니다.")
     }
 
     @Test
@@ -99,7 +99,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("loginId")
+            .isInvalidInputValueResponse("loginId", "아이디 값은 필수 입니다.")
     }
 
     @Test
@@ -113,13 +113,13 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("loginId")
+            .isInvalidInputValueResponse("loginId", "아이디는 8자 이상 20자 이하로 설정해야 합니다.")
     }
 
     @Test
     fun `회원 가입 시 회원 Id 는 영문 또는 숫자로 이루어져야 한다`() {
         // given
-        val request = MemberRegisterRequest("회원Id", "password123!", "홍길동", "email@domain.com", "0000")
+        val request = MemberRegisterRequest("회원아이디123", "password123!", "홍길동", "email@domain.com", "0000")
 
         // when then
         mockMvc.perform(
@@ -127,7 +127,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("loginId")
+            .isInvalidInputValueResponse("loginId", "아이디는 영어(필수)와 숫자로 설정해야 합니다.")
     }
 
     @Test
@@ -141,7 +141,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호 값은 필수 입니다.")
     }
 
     @Test
@@ -155,7 +155,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호는 8자 이상 20자 이하로 설정해야 합니다.")
     }
 
     @Test
@@ -169,7 +169,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호는 영어(필수), 숫자(필수), 특수문자(선택)로 설정해야 합니다.")
     }
 
     @Test
@@ -183,7 +183,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("name")
+            .isInvalidInputValueResponse("name", "이름 값은 필수 입니다.")
     }
 
     @Test
@@ -197,7 +197,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("email")
+            .isInvalidInputValueResponse("email", "이메일 값은 필수 입니다.")
     }
 
     @Test
@@ -211,7 +211,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("email")
+            .isInvalidInputValueResponse("email", "올바른 이메일 형식으로 입력하셔야 합니다.")
     }
 
     @Test
@@ -241,7 +241,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호는 8자 이상 20자 이하로 설정해야 합니다.")
     }
 
     @Test
@@ -255,7 +255,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호는 영어(필수), 숫자(필수), 특수문자(선택)로 설정해야 합니다.")
     }
 
     @Test
@@ -269,7 +269,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("email")
+            .isInvalidInputValueResponse("email", "올바른 이메일 형식으로 입력하셔야 합니다.")
     }
     
     @Test
@@ -299,7 +299,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호 값은 필수 입니다.")
     }
 
     @Test
@@ -313,7 +313,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호는 8자 이상 20자 이하로 설정해야 합니다.")
     }
 
     @Test
@@ -327,7 +327,7 @@ class MemberControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호는 영어(필수), 숫자(필수), 특수문자(선택)로 설정해야 합니다.")
     }
 
 }

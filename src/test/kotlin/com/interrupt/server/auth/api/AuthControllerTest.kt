@@ -45,7 +45,7 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("email")
+            .isInvalidInputValueResponse("email", "이메일 값은 필수 입니다.")
     }
 
     @Test
@@ -59,7 +59,7 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("email")
+            .isInvalidInputValueResponse("email", "올바른 이메일 형식으로 입력하셔야 합니다.")
     }
 
     @Test
@@ -89,7 +89,7 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("email")
+            .isInvalidInputValueResponse("email", "이메일 값은 필수 입니다.")
     }
 
     @Test
@@ -103,11 +103,11 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("email")
+            .isInvalidInputValueResponse("email", "올바른 이메일 형식으로 입력하셔야 합니다.")
     }
 
     @Test
-    fun `이메일 인증 코드 확인 시 이메일 인증 코드는 필수 값 이디`() {
+    fun `이메일 인증 코드 확인 시 이메일 인증 코드는 필수 값 이다`() {
         // given
         val request = EmailVerifyRequest("email@domail.com", "", "0000")
 
@@ -119,7 +119,39 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("emailVerifyCodeKey")
+            .isInvalidInputValueResponse("emailVerifyCodeKey", "이메일 인증코드 값은 필수 입니다.")
+    }
+
+    @Test
+    fun `이메일 인증 코드 확인 시 이메일 인증 코드는 6자 이다`() {
+        // given
+        val request = EmailVerifyRequest("email@domail.com", "00000", "00000")
+
+        justRun { memberService.validateEmailVerifyCode(request) }
+
+        // when then
+        mockMvc.perform(
+            post("/api/v1/auth/verification/verify-code")
+                .content(objectMapper.writeValueAsBytes(request))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .isInvalidInputValueResponse("emailVerifyCodeKey", "이메일 인증코드는 6자리 입니다.")
+    }
+
+    @Test
+    fun `이메일 인증 코드 확인 시 이메일 인증 코드는 숫자로만 이루어져야 한다`() {
+        // given
+        val request = EmailVerifyRequest("email@domail.com", "11111q", "0000")
+
+        justRun { memberService.validateEmailVerifyCode(request) }
+
+        // when then
+        mockMvc.perform(
+            post("/api/v1/auth/verification/verify-code")
+                .content(objectMapper.writeValueAsBytes(request))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .isInvalidInputValueResponse("emailVerifyCodeKey", "이메일 인증코드는 숫자만으로 입력하셔야 합니다.")
     }
 
     @Test
@@ -151,7 +183,7 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("loginId")
+            .isInvalidInputValueResponse("loginId", "아이디 값은 필수 입니다.")
     }
 
     @Test
@@ -165,13 +197,13 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("loginId")
+            .isInvalidInputValueResponse("loginId", "아이디는 8자 이상 20자 이하로 설정해야 합니다.")
     }
 
     @Test
     fun `로그인 시 회원 ID 는 영문 또는 숫자로 이루어져야 한다`() {
         // given
-        val request = MemberLoginRequest("회원ID", "ward123!")
+        val request = MemberLoginRequest("회원아이디123", "ward123!")
 
         // when then
         mockMvc.perform(
@@ -179,7 +211,7 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("loginId")
+            .isInvalidInputValueResponse("loginId", "아이디는 영어(필수)와 숫자로 설정해야 합니다.")
     }
 
     @Test
@@ -193,7 +225,7 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호 값은 필수 입니다.")
     }
 
     @Test
@@ -207,7 +239,7 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호는 8자 이상 20자 이하로 설정해야 합니다.")
     }
 
     @Test
@@ -221,7 +253,7 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호는 영어(필수), 숫자(필수), 특수문자(선택)로 설정해야 합니다.")
     }
 
     @Test
@@ -252,7 +284,7 @@ class AuthControllerTest: ControllerTestSupport() {
                     .content(objectMapper.writeValueAsString(request))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .isInvalidInputValueResponse("name")
+                .isInvalidInputValueResponse("name", "이름 값은 필수 입니다.")
     }
 
     @Test
@@ -266,7 +298,7 @@ class AuthControllerTest: ControllerTestSupport() {
                     .content(objectMapper.writeValueAsString(request))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .isInvalidInputValueResponse("email")
+                .isInvalidInputValueResponse("email", "이메일 값은 필수 입니다.")
     }
 
     @Test
@@ -280,7 +312,7 @@ class AuthControllerTest: ControllerTestSupport() {
                     .content(objectMapper.writeValueAsString(request))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .isInvalidInputValueResponse("email")
+                .isInvalidInputValueResponse("email", "올바른 이메일 형식으로 입력하셔야 합니다.")
     }
 
     @Test
@@ -313,7 +345,35 @@ class AuthControllerTest: ControllerTestSupport() {
                 .param("memberRecoverKey", request.memberRecoverKey)
                 .param("verifyCode", request.verifyCode))
             .andDo(print())
-            .isInvalidInputValueResponse("verifyCode")
+            .isInvalidInputValueResponse("verifyCode", "이메일 인증코드 값은 필수 입니다.")
+    }
+
+    @Test
+    fun `회원 ID 찾기 이메일 인증 코드 확인 시 이메일 인증 코드 값은 6자 이다`() {
+        // given
+        val request = VerifyRecoverLoginIdRequest("0000", "00000")
+
+        // when then
+        mockMvc.perform(
+            get("/api/v1/auth/login-id")
+                .param("memberRecoverKey", request.memberRecoverKey)
+                .param("verifyCode", request.verifyCode))
+            .andDo(print())
+            .isInvalidInputValueResponse("verifyCode", "이메일 인증코드는 6자리 입니다.")
+    }
+
+    @Test
+    fun `회원 ID 찾기 이메일 인증 코드 확인 시 이메일 인증 코드 값은 숫자로만 이루어져야 한다`() {
+        // given
+        val request = VerifyRecoverLoginIdRequest("0000", "11111q")
+
+        // when then
+        mockMvc.perform(
+            get("/api/v1/auth/login-id")
+                .param("memberRecoverKey", request.memberRecoverKey)
+                .param("verifyCode", request.verifyCode))
+            .andDo(print())
+            .isInvalidInputValueResponse("verifyCode", "이메일 인증코드는 숫자만으로 입력하셔야 합니다.")
     }
 
     @Test
@@ -344,7 +404,7 @@ class AuthControllerTest: ControllerTestSupport() {
                     .content(objectMapper.writeValueAsString(request))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .isInvalidInputValueResponse("loginId")
+                .isInvalidInputValueResponse("loginId", "아이디 값은 필수 입니다.")
     }
 
     @Test
@@ -358,7 +418,7 @@ class AuthControllerTest: ControllerTestSupport() {
                     .content(objectMapper.writeValueAsString(request))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .isInvalidInputValueResponse("loginId")
+                .isInvalidInputValueResponse("loginId", "아이디는 8자 이상 20자 이하로 설정해야 합니다.")
     }
 
     @Test
@@ -372,7 +432,7 @@ class AuthControllerTest: ControllerTestSupport() {
                     .content(objectMapper.writeValueAsString(request))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .isInvalidInputValueResponse("loginId")
+                .isInvalidInputValueResponse("loginId", "아이디는 영어(필수)와 숫자로 설정해야 합니다.")
     }
 
     @Test
@@ -386,7 +446,7 @@ class AuthControllerTest: ControllerTestSupport() {
                     .content(objectMapper.writeValueAsString(request))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .isInvalidInputValueResponse("email")
+                .isInvalidInputValueResponse("email", "이메일 값은 필수 입니다.")
     }
 
     @Test
@@ -400,7 +460,7 @@ class AuthControllerTest: ControllerTestSupport() {
                     .content(objectMapper.writeValueAsString(request))
                     .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .isInvalidInputValueResponse("email")
+                .isInvalidInputValueResponse("email", "올바른 이메일 형식으로 입력하셔야 합니다.")
     }
 
     @Test
@@ -422,7 +482,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `비밀번호 찾기 이메일 인증 코드 확인 시 이메일 인증 코드 값은 필수이다`() {
         // given
-        val request = VerifyRecoverPasswordRequest("0000", "", "word123!")
+        val request = VerifyRecoverPasswordRequest("0000", null, "word123!")
 
         // when then
         mockMvc.perform(
@@ -430,13 +490,41 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("verifyCode")
+            .isInvalidInputValueResponse("verifyCode", "이메일 인증코드 값은 필수 입니다.")
+    }
+
+    @Test
+    fun `비밀번호 찾기 이메일 인증 코드 확인 시 이메일 인증 코드 값은 6자 이다`() {
+        // given
+        val request = VerifyRecoverPasswordRequest("0000", "00000", "word123!")
+
+        // when then
+        mockMvc.perform(
+            put("/api/v1/auth/member/{loginId}/password", "memberId")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .isInvalidInputValueResponse("verifyCode", "이메일 인증코드는 6자리 입니다.")
+    }
+
+    @Test
+    fun `비밀번호 찾기 이메일 인증 코드 확인 시 이메일 인증 코드 값은 숫자로만 이루어져야 한다`() {
+        // given
+        val request = VerifyRecoverPasswordRequest("0000", "11111q", "word123!")
+
+        // when then
+        mockMvc.perform(
+            put("/api/v1/auth/member/{loginId}/password", "memberId")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .isInvalidInputValueResponse("verifyCode", "이메일 인증코드는 숫자만으로 입력하셔야 합니다.")
     }
 
     @Test
     fun `비밀번호 찾기 이메일 인증 코드 확인 시 비밀번호 값은 필수이다`() {
         // given
-        val request = VerifyRecoverPasswordRequest("0000", "000000", "")
+        val request = VerifyRecoverPasswordRequest("0000", "000000", null)
 
         // when then
         mockMvc.perform(
@@ -444,7 +532,7 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호 값은 필수 입니다.")
     }
 
     @Test
@@ -458,7 +546,7 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호는 8자 이상 20자 이하로 설정해야 합니다.")
     }
 
     @Test
@@ -472,7 +560,7 @@ class AuthControllerTest: ControllerTestSupport() {
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .isInvalidInputValueResponse("password")
+            .isInvalidInputValueResponse("password", "비밀번호는 영어(필수), 숫자(필수), 특수문자(선택)로 설정해야 합니다.")
     }
 
 }
