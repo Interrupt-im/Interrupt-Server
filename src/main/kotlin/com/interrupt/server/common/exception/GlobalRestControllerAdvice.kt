@@ -3,6 +3,7 @@ package com.interrupt.server.common.exception
 import com.interrupt.server.common.api.ExceptionResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -33,6 +34,10 @@ class GlobalRestControllerAdvice {
         InterruptServerException(ErrorCode.NO_CONTENT_HTTP_BODY.message, e, ErrorCode.NO_CONTENT_HTTP_BODY)
             .let { ResponseEntity(ExceptionResponse(it.errorCode.status.value(), it.errorCode, it.message, null), it.errorCode.status) }
 
+    @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
+    fun httpRequestMethodNotSupportedExceptionHandler(e: HttpRequestMethodNotSupportedException): ResponseEntity<ExceptionResponse<*>> =
+        InterruptServerException(ErrorCode.NOT_SUPPORTED_METHOD.message, e, ErrorCode.NOT_SUPPORTED_METHOD)
+            .let { ResponseEntity(ExceptionResponse(it.errorCode.status.value(), it.errorCode, it.message, null), it.errorCode.status) }
 
     @ExceptionHandler(Throwable::class)
     fun throwableHandler(t: Throwable): ResponseEntity<ExceptionResponse<*>> =
