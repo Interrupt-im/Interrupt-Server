@@ -1,15 +1,21 @@
 package com.interrupt.server.member.dto.recover
 
+import com.interrupt.server.member.validation.annotation.email.EmailValidation
+import com.interrupt.server.member.validation.annotation.loginid.LoginIdValidation
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
 
 data class RecoverPasswordRequest(
-    @field:NotBlank(message = "아이디를 입력하지 않았습니다.")
-    @field:Pattern(regexp = "(?=.*[a-zA-Z])[a-zA-Z0-9]{8,20}\$", message = "8자 이상 20자 이하의 영어, 숫자 값을 입력해주세요.")
+    @LoginIdValidation
+    @field:NotBlank(message = "아이디 값은 필수 입니다.")
+    @field:Pattern(regexp = "^(?=.*[a-zA-Z])[a-zA-Z0-9]+\$", message = "아이디는 영어(필수)와 숫자로 설정해야 합니다.")
+    @field:Size(min = 8, max = 20, message = "아이디는 8자 이상 20자 이하로 설정해야 합니다.")
     val loginId: String?,
-    @field:NotBlank(message = "이메일을 입력하지 않았습니다.")
-    @field:Email(message = "올바른 이메일 형식이 아닙니다.")
+    @EmailValidation
+    @field:NotBlank(message = "이메일 값은 필수 입니다.")
+    @field:Email(message = "올바른 이메일 형식으로 입력하셔야 합니다.")
     val email: String?
 ) {
 

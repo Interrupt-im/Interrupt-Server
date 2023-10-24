@@ -44,12 +44,12 @@ abstract class ControllerTestSupport {
         this.andExpect(status().isCreated)
             .baseResponse(HttpStatus.CREATED)
 
-    protected fun ResultActions.isInvalidInputValueResponse(invalidParam: String): ResultActions =
+    protected fun ResultActions.isInvalidInputValueResponse(invalidParam: String, message: String): ResultActions =
         this.andExpect(status().isBadRequest)
             .andExpect(jsonPath("$.statusCode").value(ErrorCode.INVALID_INPUT_VALUE.status.value()))
             .andExpect(jsonPath("$.errorCode").value(ErrorCode.INVALID_INPUT_VALUE.name))
             .andExpect(jsonPath("$.message").value(ErrorCode.INVALID_INPUT_VALUE.message))
             .andExpect(jsonPath("$.data").isNotEmpty)
-            .andExpect(jsonPath("$.data.$invalidParam").isString)
+            .andExpect(jsonPath("$.data.$invalidParam").value(message))
 
 }
