@@ -480,6 +480,38 @@ class AuthControllerTest: ControllerTestSupport() {
     }
 
     @Test
+    fun `비밀번호 찾기 이메일 인증 코드 확인 시 회원 ID 는 8~20자로 이루어져아 한다`() {
+        // given
+        val request = VerifyRecoverPasswordRequest("0000", "000000", "newP123!")
+
+        justRun { memberService.validatePasswordRecoverVerifyCode(request) }
+
+        // when then
+        mockMvc.perform(
+            put("/api/v1/auth/member/{loginId}/password", "loginId")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .isInvalidInputValueResponse("loginId", "아이디는 8자 이상 20자 이하로 설정해야 합니다.")
+    }
+
+    @Test
+    fun `비밀번호 찾기 이메일 인증 코드 확인 시 회원 ID 는 영문 또는 숫자로 이루어져야 한다`() {
+        // given
+        val request = VerifyRecoverPasswordRequest("0000", "000000", "newP123!")
+
+        justRun { memberService.validatePasswordRecoverVerifyCode(request) }
+
+        // when then
+        mockMvc.perform(
+            put("/api/v1/auth/member/{loginId}/password", "회원아이디123")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .isInvalidInputValueResponse("loginId", "아이디는 영어(필수)와 숫자로 설정해야 합니다.")
+    }
+
+    @Test
     fun `비밀번호 찾기 이메일 인증 코드 확인 시 이메일 인증 코드 값은 필수이다`() {
         // given
         val request = VerifyRecoverPasswordRequest("0000", null, "word123!")
