@@ -1,6 +1,7 @@
 package com.interrupt.server.docs.member
 
 import com.interrupt.server.docs.ConstrainedFields
+import com.interrupt.server.docs.ConstrainedPath
 import com.interrupt.server.docs.RestDocsSupport
 import com.interrupt.server.member.api.MemberController
 import com.interrupt.server.member.dto.delete.MemberDeleteRequest
@@ -96,6 +97,7 @@ class MemberControllerDocsTest: RestDocsSupport() {
     fun `회원 수정 API`() {
         val request = MemberUpdateRequest("password123", "홍길동", "test@test.com", "0000")
         val fields = ConstrainedFields(request::class.java)
+        val paths = ConstrainedPath(MemberController::updateMember)
 
         justRun { memberService.updateMember(any<String>(), any<MemberUpdateRequest>()) }
 
@@ -111,7 +113,7 @@ class MemberControllerDocsTest: RestDocsSupport() {
                 getDocumentRequest(),
                 getDocumentResponse(),
                 pathParameters(
-                    fields.withName("loginId").description("회원 ID")),
+                    paths.withName("loginId").description("회원 ID")),
                 requestFields(
                     fields.withPath("password").type(JsonFieldType.STRING)
                         .optional()
@@ -133,6 +135,7 @@ class MemberControllerDocsTest: RestDocsSupport() {
     fun `회원 탈퇴 API`() {
         val request = MemberDeleteRequest("password123")
         val fields = ConstrainedFields(request::class.java)
+        val paths = ConstrainedPath(MemberController::deleteMember)
 
         justRun { memberService.deleteMember(any<String>(), any<MemberDeleteRequest>()) }
 
@@ -149,7 +152,7 @@ class MemberControllerDocsTest: RestDocsSupport() {
                 getDocumentRequest(),
                 getDocumentResponse(),
                 pathParameters(
-                    fields.withName("loginId").description("회원 ID")),
+                    paths.withName("loginId").description("회원 ID")),
                 requestFields(
                     fields.withPath("password").type(JsonFieldType.STRING)
                         .optional()

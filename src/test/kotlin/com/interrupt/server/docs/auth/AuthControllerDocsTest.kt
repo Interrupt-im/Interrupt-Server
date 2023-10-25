@@ -2,6 +2,7 @@ package com.interrupt.server.docs.auth
 
 import com.interrupt.server.auth.api.AuthController
 import com.interrupt.server.docs.ConstrainedFields
+import com.interrupt.server.docs.ConstrainedPath
 import com.interrupt.server.docs.RestDocsSupport
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyResponse
@@ -240,6 +241,7 @@ class AuthControllerDocsTest: RestDocsSupport() {
     fun `비밀번호 찾기 이메일 인증 코드 확인 API`() {
         val request = VerifyRecoverPasswordRequest("0000", "000000", "newPassword123")
         val fields = ConstrainedFields(request::class.java)
+        val paths = ConstrainedPath(AuthController::validatePasswordRecoverVerifyCode)
 
         justRun { memberService.validatePasswordRecoverVerifyCode(request) }
 
@@ -257,7 +259,7 @@ class AuthControllerDocsTest: RestDocsSupport() {
                 getDocumentRequest(),
                 getDocumentResponse(),
                 pathParameters(
-                    fields.withName("loginId").description("회원 ID")
+                    paths.withName("loginId").description("회원 ID")
                 ),
                 requestFields(
                     fields.withPath("memberRecoverKey").type(JsonFieldType.STRING)

@@ -91,7 +91,7 @@ class MemberControllerTest: ControllerTestSupport() {
     @Test
     fun `회원 가입 시 회원 Id 는 필수 값 이다`() {
         // given
-        val request = MemberRegisterRequest("", "word123!", "홍길동", "email@domain.com", "0000")
+        val request = MemberRegisterRequest(null, "word123!", "홍길동", "email@domain.com", "0000")
 
         // when then
         mockMvc.perform(
@@ -133,7 +133,7 @@ class MemberControllerTest: ControllerTestSupport() {
     @Test
     fun `회원 가입 시 비밀번호는 필수 값 이다`() {
         // given
-        val request = MemberRegisterRequest("memberId", "", "홍길동", "email@domain.com", "0000")
+        val request = MemberRegisterRequest("memberId", null, "홍길동", "email@domain.com", "0000")
 
         // when then
         mockMvc.perform(
@@ -323,7 +323,7 @@ class MemberControllerTest: ControllerTestSupport() {
     @Test
     fun `회원 탈퇴 시 비밀번호는 필수 값 이다`() {
         // given
-        val request = MemberDeleteRequest("")
+        val request = MemberDeleteRequest(null)
 
         // when then
         mockMvc.perform(
