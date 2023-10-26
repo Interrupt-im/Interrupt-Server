@@ -15,7 +15,6 @@ spring:
       port: 6379
 
   jpa:
-    open-in-view: false
     hibernate:
       ddl-auto: create
     properties:
@@ -23,9 +22,14 @@ spring:
         show_sql: false
         format_sql: true
         highlight_sql: true
+    defer-datasource-initialization: true
   h2:
     console:
       enabled: true
+
+  sql:
+    init:
+      mode: EMBEDDED
 
   mail:
     host: smtp.gmail.com
