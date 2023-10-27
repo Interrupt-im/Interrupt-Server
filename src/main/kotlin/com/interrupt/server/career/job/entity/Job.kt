@@ -12,7 +12,7 @@ class Job(
     @field:Column(name = "name", nullable = false, unique = true)
     var name: String,
     @field:ManyToOne(fetch = FetchType.LAZY)
-    @field:JoinColumn(name = "job_group_id")
+    @field:JoinColumn(name = "job_group_id", nullable = false)
     var jobGroup: JobGroup
 ): SoftDeleteBaseEntity() {
 }
