@@ -18,10 +18,6 @@ class Career(
     @field:OneToOne
     @field:JoinColumn(name = "member_id")
     val member: Member? = null,
-    @field:OneToMany(mappedBy = "career")
-    val jobList: MutableList<CareerJob> = mutableListOf(),
-    @field:OneToMany(mappedBy = "career")
-    val skillList: MutableList<CareerSkill> = mutableListOf(),
     @field:Column(name = "career_start_date")
     val careerStartDate: LocalDate,
     @field:Column(name = "career_end_date", nullable = true)
