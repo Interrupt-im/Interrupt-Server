@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface CareerSkillGroupRepository: JpaRepository<SkillGroup, Long> {
+interface SkillGroupRepository: JpaRepository<SkillGroup, Long> {
 }

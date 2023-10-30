@@ -2,26 +2,29 @@ package com.interrupt.server.job.service
 
 import com.interrupt.server.job.dto.JobDto
 import com.interrupt.server.job.dto.JobGroupDto
-import com.interrupt.server.job.repository.CareerJobQueryRepository
+import com.interrupt.server.job.dto.MemberJobDto
+import com.interrupt.server.job.repository.JobQueryRepository
 import com.interrupt.server.job.repository.JobGroupRedisRepository
+import com.interrupt.server.job.repository.MemberJobRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Transactional
-class CareerJobService(
-    private val careerJobQueryRepository: CareerJobQueryRepository,
-    private val jobGroupRedisRepository: JobGroupRedisRepository
+@Transactional(readOnly = true)
+class JobService(
+    private val jobQueryRepository: JobQueryRepository,
+    private val jobGroupRedisRepository: JobGroupRedisRepository,
+    private val memberJobRepository: MemberJobRepository,
 ) {
 
     /**
      * 직무 리스트 조회
      */
-    fun getJobList(): Any {
+    fun getJobList(): List<JobGroupDto> {
         val jobGroupList = jobGroupRedisRepository.findAll()
 
         if (jobGroupList.isEmpty()) {
-            return careerJobQueryRepository.findJobDtoList()
+            return jobQueryRepository.findJobDtoList()
                 .groupBy(JobDto::jobGroup)
                 .map { (jobGroupDto, jobDtoList) ->
                     JobGroupDto(jobGroupDto.id, jobGroupDto.name)
@@ -30,6 +33,14 @@ class CareerJobService(
         }
 
         return jobGroupList
+    }
+
+    /**
+     * 회원 별 기술 등록
+     */
+    fun registerMemberJob(memberJobDtos: List<MemberJobDto>) {
+        val entities = memberJobDtos.map { it.toEntity() }
+        memberJobRepository.saveAll(entities)
     }
 
 }

@@ -7,11 +7,11 @@ import com.interrupt.server.skill.entity.SkillGroup
 import org.springframework.stereotype.Repository
 
 @Repository
-class CareerSkillQueryRepository(
-   private val careerSkillRepository: CareerSkillRepository
+class SkillQueryRepository(
+   private val skillRepository: SkillRepository
 ) {
 
-    fun findJobDtoList(): List<SkillDto> = careerSkillRepository.findAll {
+    fun findJobDtoList(): List<SkillDto> = skillRepository.findAll {
         select(
             new(
                 SkillDto::class,

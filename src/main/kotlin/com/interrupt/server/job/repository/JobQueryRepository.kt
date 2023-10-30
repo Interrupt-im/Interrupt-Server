@@ -7,11 +7,11 @@ import com.interrupt.server.job.entity.JobGroup
 import org.springframework.stereotype.Repository
 
 @Repository
-class CareerJobQueryRepository(
-   private val careerJobRepository: CareerJobRepository
+class JobQueryRepository(
+   private val jobRepository: JobRepository
 ) {
 
-    fun findJobDtoList(): List<JobDto> = careerJobRepository.findAll {
+    fun findJobDtoList(): List<JobDto> = jobRepository.findAll {
         select(
             new(
                 JobDto::class,

@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface CareerSkillRepository : JpaRepository<Skill, Long>, KotlinJdslJpqlExecutor {
+interface SkillRepository : JpaRepository<Skill, Long>, KotlinJdslJpqlExecutor {
 }
