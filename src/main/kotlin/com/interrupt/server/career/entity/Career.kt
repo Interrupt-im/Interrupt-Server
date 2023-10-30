@@ -2,12 +2,7 @@ package com.interrupt.server.career.entity
 
 import com.interrupt.server.common.entity.SoftDeleteBaseEntity
 import com.interrupt.server.member.entity.Member
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToMany
-import jakarta.persistence.OneToOne
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.LocalDate
 
 @Entity
@@ -15,9 +10,11 @@ import java.time.LocalDate
     name = "career"
 )
 class Career(
-    @field:OneToOne
+    @field:ManyToOne
     @field:JoinColumn(name = "member_id")
     val member: Member? = null,
+    @field:Column(name = "title")
+    val title: String,
     @field:Column(name = "career_start_date")
     val careerStartDate: LocalDate,
     @field:Column(name = "career_end_date", nullable = true)
