@@ -1,6 +1,6 @@
-package com.interrupt.server.career.skill.repository
+package com.interrupt.server.skill.repository
 
-import com.interrupt.server.career.skill.dto.SkillGroupDto
+import com.interrupt.server.skill.dto.SkillGroupDto
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 import java.time.Duration
@@ -28,6 +28,6 @@ class SkillGroupRedisRepository(
             skillGroupRedisTemplate.opsForValue().multiGet(it).orEmpty()
         }
 
-    private fun generateKey(key: String): String = "${KEY_PREFIX}:$key"
+    private fun generateKey(key: String): String = "$KEY_PREFIX:$key"
 
 }
