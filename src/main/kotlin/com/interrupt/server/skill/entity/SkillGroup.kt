@@ -1,4 +1,4 @@
-package com.interrupt.server.career.job.entity
+package com.interrupt.server.skill.entity
 
 import com.interrupt.server.common.entity.SoftDeleteBaseEntity
 import jakarta.persistence.Column
@@ -8,10 +8,10 @@ import jakarta.persistence.UniqueConstraint
 
 @Entity
 @Table(
-    name = "job_group",
-    uniqueConstraints = [UniqueConstraint(name = "uk_job_group_name", columnNames = ["name"])]
+    name = "skill_group",
+    uniqueConstraints = [UniqueConstraint(name = "uk_skill_group_name", columnNames = ["name"])]
 )
-class JobGroup(
+class SkillGroup(
     @field:Column(name = "name", nullable = false, unique = true)
     var name :String,
 ): SoftDeleteBaseEntity() {

@@ -1,6 +1,6 @@
-package com.interrupt.server.career.job.repository
+package com.interrupt.server.job.repository
 
-import com.interrupt.server.career.job.dto.JobGroupDto
+import com.interrupt.server.job.dto.JobGroupDto
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 import java.time.Duration
@@ -28,6 +28,6 @@ class JobGroupRedisRepository(
             jobGroupRedisTemplate.opsForValue().multiGet(it).orEmpty()
         }
 
-    private fun generateKey(key: String): String = "${KEY_PREFIX}:$key"
+    private fun generateKey(key: String): String = "$KEY_PREFIX:$key"
 
 }

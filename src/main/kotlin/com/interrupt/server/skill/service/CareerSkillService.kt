@@ -1,9 +1,9 @@
-package com.interrupt.server.career.skill.service
+package com.interrupt.server.skill.service
 
-import com.interrupt.server.career.skill.dto.SkillDto
-import com.interrupt.server.career.skill.dto.SkillGroupDto
-import com.interrupt.server.career.skill.repository.CareerSkillQueryRepository
-import com.interrupt.server.career.skill.repository.SkillGroupRedisRepository
+import com.interrupt.server.skill.dto.SkillDto
+import com.interrupt.server.skill.dto.SkillGroupDto
+import com.interrupt.server.skill.repository.CareerSkillQueryRepository
+import com.interrupt.server.skill.repository.SkillGroupRedisRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

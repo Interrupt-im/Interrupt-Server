@@ -1,6 +1,6 @@
-package com.interrupt.server.career.job.dto
+package com.interrupt.server.job.dto
 
-import com.interrupt.server.career.job.entity.Job
+import com.interrupt.server.job.entity.Job
 import com.interrupt.server.common.annotation.RedisEntity
 
 @RedisEntity

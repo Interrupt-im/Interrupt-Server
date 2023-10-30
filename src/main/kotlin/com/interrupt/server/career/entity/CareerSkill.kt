@@ -1,6 +1,6 @@
 package com.interrupt.server.career.entity
 
-import com.interrupt.server.career.skill.entity.Skill
+import com.interrupt.server.skill.entity.Skill
 import com.interrupt.server.common.entity.SoftDeleteBaseEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.JoinColumn

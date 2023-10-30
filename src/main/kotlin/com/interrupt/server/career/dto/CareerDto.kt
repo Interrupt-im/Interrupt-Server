@@ -1,7 +1,7 @@
 package com.interrupt.server.career.dto
 
 import com.interrupt.server.career.entity.Career
-import com.interrupt.server.career.skill.dto.SkillDto
+import com.interrupt.server.skill.dto.SkillDto
 import com.interrupt.server.member.dto.MemberDto
 import java.time.LocalDate
 

@@ -24,8 +24,8 @@ class Career(
     val skillList: MutableList<CareerSkill> = mutableListOf(),
     @field:Column(name = "career_start_date")
     val careerStartDate: LocalDate,
-    @field:Column(name = "career_end_date")
-    val careerEndDate: LocalDate,
+    @field:Column(name = "career_end_date", nullable = true)
+    val careerEndDate: LocalDate? = null,
     @field:Column(name = "is_public")
     val isPublic: Boolean = true,
 ): SoftDeleteBaseEntity() {

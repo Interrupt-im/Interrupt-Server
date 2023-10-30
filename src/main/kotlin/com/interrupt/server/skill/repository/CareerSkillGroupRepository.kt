@@ -1,6 +1,6 @@
-package com.interrupt.server.career.skill.repository
+package com.interrupt.server.skill.repository
 
-import com.interrupt.server.career.skill.entity.SkillGroup
+import com.interrupt.server.skill.entity.SkillGroup
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

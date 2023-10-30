@@ -1,9 +1,9 @@
-package com.interrupt.server.career.skill.repository
+package com.interrupt.server.skill.repository
 
-import com.interrupt.server.career.job.dto.JobGroupDto
-import com.interrupt.server.career.skill.dto.SkillDto
-import com.interrupt.server.career.skill.entity.Skill
-import com.interrupt.server.career.skill.entity.SkillGroup
+import com.interrupt.server.job.dto.JobGroupDto
+import com.interrupt.server.skill.dto.SkillDto
+import com.interrupt.server.skill.entity.Skill
+import com.interrupt.server.skill.entity.SkillGroup
 import org.springframework.stereotype.Repository
 
 @Repository

@@ -1,18 +1,18 @@
-package com.interrupt.server.career.job.entity
+package com.interrupt.server.skill.entity
 
 import com.interrupt.server.common.entity.SoftDeleteBaseEntity
 import jakarta.persistence.*
 
 @Entity
 @Table(
-    name = "job",
-    uniqueConstraints = [UniqueConstraint(name = "uk_job_name", columnNames = ["name"])]
+    name = "skill",
+    uniqueConstraints = [UniqueConstraint(name = "uk_skill_name", columnNames = ["name"])]
 )
-class Job(
+class Skill(
     @field:Column(name = "name", nullable = false, unique = true)
     var name: String,
     @field:ManyToOne(fetch = FetchType.LAZY)
-    @field:JoinColumn(name = "job_group_id", nullable = false)
-    var jobGroup: JobGroup
+    @field:JoinColumn(name = "skill_group_id", nullable = false)
+    var skillGroup: SkillGroup
 ): SoftDeleteBaseEntity() {
 }

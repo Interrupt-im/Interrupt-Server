@@ -1,6 +1,6 @@
-package com.interrupt.server.career.skill.dto
+package com.interrupt.server.skill.dto
 
-import com.interrupt.server.career.skill.entity.SkillGroup
+import com.interrupt.server.skill.entity.SkillGroup
 import com.interrupt.server.common.annotation.RedisEntity
 
 @RedisEntity

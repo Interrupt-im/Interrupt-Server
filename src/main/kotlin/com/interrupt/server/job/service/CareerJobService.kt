@@ -1,9 +1,9 @@
-package com.interrupt.server.career.job.service
+package com.interrupt.server.job.service
 
-import com.interrupt.server.career.job.dto.JobDto
-import com.interrupt.server.career.job.dto.JobGroupDto
-import com.interrupt.server.career.job.repository.CareerJobQueryRepository
-import com.interrupt.server.career.job.repository.JobGroupRedisRepository
+import com.interrupt.server.job.dto.JobDto
+import com.interrupt.server.job.dto.JobGroupDto
+import com.interrupt.server.job.repository.CareerJobQueryRepository
+import com.interrupt.server.job.repository.JobGroupRedisRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

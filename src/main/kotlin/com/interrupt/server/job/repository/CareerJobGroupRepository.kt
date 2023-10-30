@@ -1,6 +1,6 @@
-package com.interrupt.server.career.job.repository
+package com.interrupt.server.job.repository
 
-import com.interrupt.server.career.job.entity.JobGroup
+import com.interrupt.server.job.entity.JobGroup
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
