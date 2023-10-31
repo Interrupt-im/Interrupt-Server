@@ -27,6 +27,11 @@ class CareerQueryRepository(
     private val jobRepository: JobRepository
 ) {
 
+    data class TestDTO(
+        val name: String,
+        val year: Long
+    )
+
     fun foo(): Any {
 
         /*
@@ -43,23 +48,69 @@ class CareerQueryRepository(
             group by m.id;
         */
         return careerRepository.findAll {
-            selectDistinct(
-                entity(Career::class)
+            select(
+//                entity(Member::class)
+                new(
+                    TestDTO::class,
+                    path(Career::member)(Member::name),
+                    sum(
+                        caseWhen(path(Career::careerEndDate).isNotNull()).then(
+                            customExpression(
+                                Int::class,
+                                "DATEDIFF({0}, {1})",
+                                (path(Career::careerEndDate)),
+                                path(Career::careerStartDate)
+                            )
+                        ).`else`(
+                            customExpression(
+                                Int::class,
+                                "DATEDIFF(CURRENT_DATE, {0})",
+                                path(Career::careerStartDate)
+                            )
+                        )
+                    )
+                )
+
             ).from(
+//                entity(Career::class),
+//                fetchJoin(Member::class).on(path(Member::id).equal(path(Career::member)(Member::id)))
+
                 entity(Member::class),
-                fetchJoin(entity(MemberJob::class)).on(path(Member::id).equal(path(MemberJob::member).path(Member::id))),
-                fetchJoin(Job::class).on(path(Job::id).equal(path(MemberJob::job).path(Job::id))),
-                fetchJoin(JobGroup::class).on(path(JobGroup::id).equal(path(Job::jobGroup).path(JobGroup::id))),
-                fetchJoin(entity(MemberSkill::class)).on(path(Member::id).equal(path(MemberSkill::member).path(Member::id))),
-                fetchJoin(Skill::class).on(path(Skill::id).equal(path(MemberSkill::skill).path(Skill::id))),
-                fetchJoin(SkillGroup::class).on(path(SkillGroup::id).equal(path(Skill::skillGroup).path(SkillGroup::id))),
-                fetchJoin(Career::class).on(path(Member::id).equal(path(Career::member).path(Member::id)))
-            ).orderBy(
-                path(Career::member).path(Member::id).asc()
+                fetchJoin(entity(MemberJob::class)).on(path(Member::id).equal(path(MemberJob::member)(Member::id))),
+//                fetchJoin(Job::class).on(path(Job::id).equal(path(MemberJob::job)(Job::id))),
+//                fetchJoin(JobGroup::class).on(path(JobGroup::id).equal(path(Job::jobGroup)(JobGroup::id))),
+//                fetchJoin(entity(MemberSkill::class)).on(path(Member::id).equal(path(MemberSkill::member)(Member::id))),
+//                fetchJoin(Skill::class).on(path(Skill::id).equal(path(MemberSkill::skill)(Skill::id))),
+//                fetchJoin(SkillGroup::class).on(path(SkillGroup::id).equal(path(Skill::skillGroup)(SkillGroup::id))),
+                join(Career::class).on(path(Member::id).equal(path(Career::member)(Member::id)))
+            )
+                .groupBy(
+                path(Member::id)
+            )
+                .having(
+                sum(
+                    caseWhen(path(Career::careerEndDate).isNotNull()).then(
+                        customExpression(
+                            Int::class,
+                            "DATEDIFF({0}, {1})",
+                            (path(Career::careerEndDate)),
+                            path(Career::careerStartDate)
+                        )
+                    ).`else`(
+                        customExpression(
+                            Int::class,
+                            "DATEDIFF(CURRENT_DATE, {0})",
+                            path(Career::careerStartDate)
+                        )
+                    )
+                ).div(365).between(1L, 2L)
+            )
+                .orderBy(
+                path(Career::member)(Member::id).asc()
             )
         }.let {
             println("success")
-            it.forEach { println("${it?.id}: ${it?.title}, ${it?.member?.name}") }
+//            it.forEach { println("${it?.id}: ${it?.title}, ${it?.member?.name}") }
 
             return@let it
         }
@@ -71,6 +122,10 @@ class CareerQueryRepository(
         createTW()
     }
 
+    /**
+     * 경력(현재 경력 제외) - 364 / 1년차
+     * 경력(현재 경력 포함) - 364 + 303 = 667 / 2년차
+     */
     private fun createJS() {
         val job = jobRepository.findByIdOrNull(2)
         val skills = skillRepository.findAllById(listOf(1, 2, 9))
@@ -89,6 +144,10 @@ class CareerQueryRepository(
         careerRepository.saveAll(listOf(career1, career2))
     }
 
+    /**
+     * 경력(현재 경력 제외) - 0 / 0년차
+     * 경력(현재 경력 포함) - 627 / 2년차
+     */
     private fun createSM() {
         val jobs = jobRepository.findAllById(listOf(1, 4))
         val skills = skillRepository.findAllById(listOf(3, 4))
@@ -107,6 +166,10 @@ class CareerQueryRepository(
         careerRepository.saveAll(listOf(career1))
     }
 
+    /**
+     * 경력(현재 경력 제외) - 2344 / 7년차
+     * 경력(현재 경력 포함) - 2344 + 30 = 2374 / 7년차
+     */
     private fun createTW() {
         val jobs = jobRepository.findAllById(listOf(3, 5))
         val skills = skillRepository.findAllById(listOf(3, 6))
