@@ -22,7 +22,10 @@ spring:
         show_sql: false
         format_sql: true
         highlight_sql: true
+        dialect: org.hibernate.dialect.MySQL57Dialect
+        storage_engine: innodb
     defer-datasource-initialization: true
+
   h2:
     console:
       enabled: true
