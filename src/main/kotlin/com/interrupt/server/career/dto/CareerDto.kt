@@ -9,7 +9,7 @@ data class CareerDto(
     val member: MemberDto,
     val title: String,
     val careerStartDate: LocalDate,
-    val careerEndDate: LocalDate,
+    val careerEndDate: LocalDate? = null,
     val isPublic: Boolean = true,
 ) {
 
@@ -22,6 +22,7 @@ data class CareerDto(
     )
 
     companion object {
+        fun of(career: Career): CareerDto = CareerDto(career.id, MemberDto.of(career.member), career.title, career.careerStartDate, career.careerEndDate)
     }
 
 }
