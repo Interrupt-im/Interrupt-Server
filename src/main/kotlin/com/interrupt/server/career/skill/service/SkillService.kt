@@ -1,6 +1,6 @@
 package com.interrupt.server.career.skill.service
 
-import com.interrupt.server.member.repository.MemberSkillRepository
+import com.interrupt.server.career.skill.repository.MemberSkillRepository
 import com.interrupt.server.career.skill.dto.MemberSkillDto
 import com.interrupt.server.career.skill.dto.SkillDto
 import com.interrupt.server.career.skill.dto.SkillGroupDto

@@ -1,4 +1,4 @@
-package com.interrupt.server.member.repository
+package com.interrupt.server.career.skill.repository
 
 import com.interrupt.server.career.skill.entity.MemberSkill
 import org.springframework.data.jpa.repository.JpaRepository
