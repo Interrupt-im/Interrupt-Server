@@ -12,7 +12,7 @@ import java.time.LocalDate
 class Career(
     @field:ManyToOne
     @field:JoinColumn(name = "member_id")
-    val member: Member? = null,
+    val member: Member,
     @field:Column(name = "title")
     val title: String,
     @field:Column(name = "career_start_date")
