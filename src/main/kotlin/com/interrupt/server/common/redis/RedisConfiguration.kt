@@ -1,7 +1,7 @@
 package com.interrupt.server.common.redis
 
-import com.interrupt.server.job.dto.JobGroupDto
-import com.interrupt.server.skill.dto.SkillGroupDto
+import com.interrupt.server.career.job.dto.JobGroupDto
+import com.interrupt.server.career.skill.dto.SkillGroupDto
 import com.interrupt.server.member.entity.EmailVerifyCode
 import com.interrupt.server.member.entity.MemberRecover
 import io.lettuce.core.RedisURI
