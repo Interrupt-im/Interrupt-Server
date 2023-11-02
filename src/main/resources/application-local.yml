@@ -4,7 +4,7 @@ spring:
       on-profile: local
 
   datasource:
-    url: jdbc:h2:mem:~/interrupt
+    url: jdbc:h2:mem:~/interrupt?MODE=MySQL;
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -22,7 +22,7 @@ spring:
         show_sql: false
         format_sql: true
         highlight_sql: true
-        dialect: org.hibernate.dialect.MySQL57Dialect
+#        dialect: org.hibernate.dialect.MySQL5Dialect
         storage_engine: innodb
     defer-datasource-initialization: true
 
