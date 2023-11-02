@@ -1,6 +1,7 @@
 package com.interrupt.server.career.service
 
 import com.interrupt.server.career.dto.CareerDto
+import com.interrupt.server.career.entity.Career
 import com.interrupt.server.career.repository.CareerQueryRepository
 import com.interrupt.server.career.repository.CareerRepository
 import com.interrupt.server.common.exception.ErrorCode
@@ -19,7 +20,7 @@ class CareerService(
      * 회원 별 경력 등록
      */
     fun registerMemberCareers(careerDtos: List<CareerDto>) {
-        val sortedCareerDtos = careerDtos.sortedBy { it.careerStartDate }
+        val sortedCareerDtos = getSortedCareerList(careerDtos)
 
         validateCareers(sortedCareerDtos)
 
@@ -32,9 +33,32 @@ class CareerService(
      * 회원 별 경력 수정
      */
     fun updateMemberCareers(memberId: Long, careerDtos: List<CareerDto>) {
+        val sortedCareerDtos = getSortedCareerList(careerDtos)
+
+        validateCareers(sortedCareerDtos)
+
         val careers = careerQueryRepository.findAllByMemberId(memberId)
 
-        val careerDtos = careers.map { CareerDto.of(it) }
+        val (toUpdateCareers, toDeleteCareers) = divideUpdateOrDeleteCareers(careers, careerDtos)
+
+        updateCareers(toUpdateCareers, careerDtos)
+
+        careerRepository.saveAll(toUpdateCareers)
+        careerRepository.deleteAll(toDeleteCareers)
+    }
+
+    private fun getSortedCareerList(careerDtos: List<CareerDto>): List<CareerDto> = careerDtos.sortedBy { it.careerStartDate }
+
+    private fun divideUpdateOrDeleteCareers(careers: List<Career>, careerDtos: List<CareerDto>) =
+        careers.partition { career ->
+            career.id in careerDtos.map { it.id }.toSet()
+        }
+
+    private fun updateCareers(toUpdateCareers: List<Career>, careerDtos: List<CareerDto>) {
+        toUpdateCareers.forEach { career ->
+            val toUpdateCareerDto = careerDtos.find { it.id == career.id }
+            career.update(toUpdateCareerDto?.title, toUpdateCareerDto?.careerStartDate, toUpdateCareerDto?.careerEndDate, toUpdateCareerDto?.isPublic)
+        }
     }
 
     /*
