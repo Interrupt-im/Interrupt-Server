@@ -14,14 +14,22 @@ class Career(
     @field:JoinColumn(name = "member_id")
     val member: Member,
     @field:Column(name = "title")
-    val title: String,
+    var title: String,
     @field:Column(name = "career_start_date")
     @field:Temporal(TemporalType.DATE)
-    val careerStartDate: LocalDate,
+    var careerStartDate: LocalDate,
     @field:Column(name = "career_end_date", nullable = true)
     @field:Temporal(TemporalType.DATE)
-    val careerEndDate: LocalDate? = null,
+    var careerEndDate: LocalDate? = null,
     @field:Column(name = "is_public")
-    val isPublic: Boolean = true,
+    var isPublic: Boolean = true,
 ): SoftDeleteBaseEntity() {
+
+    fun update(title: String? = null, careerStartDate: LocalDate? = null, careerEndDate: LocalDate? = null, isPublic: Boolean? = null) {
+        title?.let { this.title = it }
+        careerStartDate?.let { this.careerStartDate = it }
+        careerEndDate?.let { this.careerEndDate = it }
+        isPublic?.let { this.isPublic = it }
+    }
+
 }
