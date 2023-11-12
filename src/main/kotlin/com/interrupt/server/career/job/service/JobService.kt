@@ -29,7 +29,9 @@ class JobService(
                 .map { (jobGroupDto, jobDtoList) ->
                     JobGroupDto(jobGroupDto.id, jobGroupDto.name)
                         .apply { jobList.addAll(jobDtoList) }
-                }.also { jobGroupRedisRepository.saveAll(it) }
+                }
+                .sortedBy { it.id }
+                .also { jobGroupRedisRepository.saveAll(it) }
         }
 
         return jobGroupList

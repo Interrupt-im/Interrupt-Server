@@ -29,7 +29,9 @@ class SkillService(
                 .map { (skillGroupDto, skillDtoList) ->
                     SkillGroupDto(skillGroupDto.id, skillGroupDto.name)
                         .apply { skillList.addAll(skillDtoList) }
-                }.also { skillGroupRedisRepository.saveAll(it) }
+                }
+                .sortedBy { it.id }
+                .also { skillGroupRedisRepository.saveAll(it) }
         }
 
         return skillGroupList
