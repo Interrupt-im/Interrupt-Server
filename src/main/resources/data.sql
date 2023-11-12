@@ -1,6 +1,6 @@
 -- job
 insert into job_group(name, created_at, modified_at)
-values ('개발', now(), now());
+values ('웹 개발', now(), now());
 
 insert into job(name, job_group_id, created_at, modified_at)
 values ('프론트엔드 개발자', 1, now(), now());
