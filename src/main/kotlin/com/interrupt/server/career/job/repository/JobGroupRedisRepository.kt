@@ -24,8 +24,12 @@ class JobGroupRedisRepository(
     }
 
     fun findAll(): List<JobGroupDto> =
-        jobGroupRedisTemplate.keys("$KEY_PREFIX*").let {
-            jobGroupRedisTemplate.opsForValue().multiGet(it).orEmpty()
+        jobGroupRedisTemplate.keys("$KEY_PREFIX*").let { keys ->
+            jobGroupRedisTemplate
+                .opsForValue()
+                .multiGet(keys)
+                .orEmpty()
+                .sortedBy { it.id }
         }
 
     private fun generateKey(key: String): String = "$KEY_PREFIX:$key"
