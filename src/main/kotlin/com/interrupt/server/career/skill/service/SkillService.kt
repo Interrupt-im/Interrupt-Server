@@ -24,7 +24,7 @@ class SkillService(
         val skillGroupList = skillGroupRedisRepository.findAll()
 
         if (skillGroupList.isEmpty()) {
-            return skillQueryRepository.findJobDtoList()
+            return skillQueryRepository.findSkillDtoList()
                 .groupBy(SkillDto::skillGroup)
                 .map { (skillGroupDto, skillDtoList) ->
                     SkillGroupDto(skillGroupDto.id, skillGroupDto.name)
