@@ -24,7 +24,7 @@ class SkillGroupRedisRepository(
     }
 
     fun findAll(): List<SkillGroupDto> =
-        skillGroupRedisTemplate.keys("*").let {
+        skillGroupRedisTemplate.keys("$KEY_PREFIX*").let {
             skillGroupRedisTemplate.opsForValue().multiGet(it).orEmpty()
         }
 
