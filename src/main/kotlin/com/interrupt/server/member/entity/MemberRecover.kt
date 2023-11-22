@@ -1,7 +1,7 @@
 package com.interrupt.server.member.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.interrupt.server.common.redis.RedisEntity
+import com.interrupt.server.common.annotation.RedisEntity
 
 @RedisEntity
 @JsonIgnoreProperties(ignoreUnknown = true)

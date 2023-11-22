@@ -22,7 +22,7 @@ allOpen {
 
 noArg {
     annotation("jakarta.persistence.Entity")
-    annotation("com.interrupt.server.common.redis.RedisEntity")
+    annotation("com.interrupt.server.common.annotation.RedisEntity")
 }
 
 val asciidoctorExt by configurations.creating
@@ -88,6 +88,11 @@ dependencies {
     // RestDoc
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
    	testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+
+    // Kotlin JDSL
+    implementation("com.linecorp.kotlin-jdsl:jpql-dsl:3.0.0")
+    implementation("com.linecorp.kotlin-jdsl:jpql-render:3.0.0")
+    implementation("com.linecorp.kotlin-jdsl:spring-data-jpa-support:3.0.0")
 
 }
 

@@ -14,7 +14,13 @@ enum class ErrorCode(
     EMAIL_VERIFY_CODE_NOT_FOUND(HttpStatus.BAD_REQUEST, "이메일을 인증할 수 없습니다. 다시 시도해 주세요.", "ME0003"),
     INVALID_EMAIL_VERIFY_CODE(HttpStatus.BAD_REQUEST, "이메일 인증 코드를 잘못 입력하였습니다.", "ME0004"),
     EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "인증된 이메일이 아닙니다.", "ME0005"),
-    MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "일치하는 회원 정보를 찾을 수 없습니다.", "ME0006"),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "일치하는 회원 정보를 찾을 수 없습니다.", "ME0006"),
+
+    // CAREER
+    INVALID_ONGOING_CAREER_NUMBER(HttpStatus.BAD_REQUEST, "현재 진행중인 경력은 한개 이하여야 합니다.", "CE0001"),
+    INVALID_ONGOING_CAREER_INDEX(HttpStatus.BAD_REQUEST, "현재 진행중인 경력의 날짜는 가장 마지막 순서여야 합니다.", "CE0002"),
+    INVALID_CAREER_PERIOD(HttpStatus.BAD_REQUEST, "경력 입력이 올바르지 않습니다. 시작일과 종료일을 올바르게 입력하여 주세요.", "CE0003"),
+    OVERLAPPED_CAREER_PERIOD(HttpStatus.BAD_REQUEST, "기간이 겹치는 경력이 존재합니다.", "CE0004"),
 
     // INPUT VALIDATION
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "입력값이 올바르지 않습니다.", "VE0001"),

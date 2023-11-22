@@ -1,5 +1,7 @@
 package com.interrupt.server.common.redis
 
+import com.interrupt.server.career.job.dto.JobGroupDto
+import com.interrupt.server.career.skill.dto.SkillGroupDto
 import com.interrupt.server.member.entity.EmailVerifyCode
 import com.interrupt.server.member.entity.MemberRecover
 import io.lettuce.core.RedisURI
@@ -42,6 +44,24 @@ class RedisConfiguration(
             connectionFactory = redisConnectionFactory
             keySerializer = StringRedisSerializer()
             valueSerializer = Jackson2JsonRedisSerializer(MemberRecover::class.java)
+        }
+    }
+
+    @Bean(name = ["jobGroupRedisTemplate"])
+    fun jobGroupRedisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, JobGroupDto> {
+        return RedisTemplate<String, JobGroupDto>().apply {
+            connectionFactory = redisConnectionFactory
+            keySerializer = StringRedisSerializer()
+            valueSerializer = Jackson2JsonRedisSerializer(JobGroupDto::class.java)
+        }
+    }
+
+    @Bean(name = ["skillGroupRedisTemplate"])
+    fun skillGroupRedisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, SkillGroupDto> {
+        return RedisTemplate<String, SkillGroupDto>().apply {
+            connectionFactory = redisConnectionFactory
+            keySerializer = StringRedisSerializer()
+            valueSerializer = Jackson2JsonRedisSerializer(SkillGroupDto::class.java)
         }
     }
 
