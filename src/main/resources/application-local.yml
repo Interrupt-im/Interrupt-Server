@@ -4,17 +4,13 @@ spring:
       on-profile: local
 
   datasource:
-    url: jdbc:h2:mem:~/interrupt?MODE=MySQL;
+    url: jdbc:h2:mem:~/interrupt
     driver-class-name: org.h2.Driver
     username: sa
     password:
 
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: create
     properties:
@@ -22,30 +18,9 @@ spring:
         show_sql: false
         format_sql: true
         highlight_sql: true
-#        dialect: org.hibernate.dialect.MySQL5Dialect
-        storage_engine: innodb
-    defer-datasource-initialization: true
-
   h2:
     console:
       enabled: true
-
-  sql:
-    init:
-      mode: EMBEDDED
-
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${mail.username}
-    password: ${mail.password}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          timeout: 5000
-          starttls:
-            enable: true
 
 logging:
   #  pattern:
@@ -60,6 +35,3 @@ logging:
         orm:
           jpa: debug
         transaction: debug
-
-security:
-  encrypt-key: 7a3b15e8f2772c2a9f28d04996b9f35c
