@@ -64,8 +64,8 @@ dependencies {
     testImplementation("com.ninja-squad:springmockk:4.0.2")
 
     // 시큐리티
-//    implementation("org.springframework.boot:spring-boot-starter-security")
-//    testImplementation("org.springframework.security:spring-security-test")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    testImplementation("org.springframework.security:spring-security-test")
 
     // 로깅
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
@@ -93,6 +93,11 @@ dependencies {
     implementation("com.linecorp.kotlin-jdsl:jpql-dsl:3.0.0")
     implementation("com.linecorp.kotlin-jdsl:jpql-render:3.0.0")
     implementation("com.linecorp.kotlin-jdsl:spring-data-jpa-support:3.0.0")
+
+    // JWT
+    implementation("io.jsonwebtoken:jjwt-api:0.12.3")
+    implementation("io.jsonwebtoken:jjwt-impl:0.12.3")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.3")
 
 }
 
