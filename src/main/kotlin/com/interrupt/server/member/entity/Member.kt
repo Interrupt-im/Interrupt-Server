@@ -1,10 +1,7 @@
 package com.interrupt.server.member.entity
 
 import com.interrupt.server.common.entity.SoftDeleteBaseEntity
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Table
-import jakarta.persistence.UniqueConstraint
+import jakarta.persistence.*
 
 @Entity
 @Table(
@@ -19,7 +16,10 @@ class Member(
     @field:Column(name = "name", nullable = false)
     var name: String,
     @field:Column(name = "email", nullable = false)
-    var email: String
+    var email: String,
+    @field:Column(name = "role", nullable = false)
+    @field:Enumerated(EnumType.STRING)
+    val role: MemberRole = MemberRole.USER
 ): SoftDeleteBaseEntity() {
 
 }
