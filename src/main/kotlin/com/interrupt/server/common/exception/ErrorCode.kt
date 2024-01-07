@@ -8,6 +8,9 @@ enum class ErrorCode(
     val code: String,
 ) {
 
+    // SECURITY
+    SUSPICIOUS_ACTIVITY_DETECTED(HttpStatus.FORBIDDEN, "정상적인 요청이 아닙니다.", "SE0001"),
+
     // MEMBER
     DUPLICATED_REGISTER_LOGIN_ID(HttpStatus.CONFLICT, "이미 존재하는 아이디 입니다.", "ME0001"),
     FAILED_LOGIN(HttpStatus.BAD_REQUEST, "아이디 또는 비밀번호를 확인해 주세요.", "ME0002"),
