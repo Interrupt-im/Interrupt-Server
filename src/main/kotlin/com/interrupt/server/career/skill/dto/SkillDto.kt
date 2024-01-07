@@ -1,7 +1,7 @@
 package com.interrupt.server.career.skill.dto
 
 import com.interrupt.server.career.skill.entity.Skill
-import com.interrupt.server.common.annotation.RedisEntity
+import com.interrupt.server.common.redis.RedisEntity
 
 @RedisEntity
 data class SkillDto(
