@@ -9,7 +9,7 @@ interface MemberRepository: JpaRepository<Member, Long> {
 
     fun findByLoginId(loginId: String): Member?
 
-    fun findByLoginIdAndPassword(loginId: String, password: String): Member?
+    fun findByLoginIdAndLoginPassword(loginId: String, password: String): Member?
 
     fun findByNameAndEmail(name: String, email: String): Member?
 
