@@ -1,11 +1,14 @@
 package com.interrupt.server.auth.api
 
+import com.interrupt.server.auth.dto.request.TokenRefreshRequest
+import com.interrupt.server.auth.dto.response.TokenRefreshResponse
+import com.interrupt.server.auth.service.AuthenticationService
 import com.interrupt.server.common.api.BaseResponse
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyResponse
 import com.interrupt.server.member.dto.emailverify.EmailVerifyRequest
-import com.interrupt.server.member.dto.login.MemberLoginRequest
-import com.interrupt.server.member.dto.login.MemberLoginResponse
+import com.interrupt.server.member.dto.login.SignInRequest
+import com.interrupt.server.member.dto.login.SignInResponse
 import com.interrupt.server.member.dto.recover.*
 import com.interrupt.server.member.service.MemberService
 import com.interrupt.server.member.validation.annotation.loginid.LoginIdValidation
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @Validated
 class AuthController(
+    private val authService: AuthenticationService,
     private val memberService: MemberService,
 ) {
 
@@ -32,8 +36,12 @@ class AuthController(
         memberService.validateEmailVerifyCode(request)
 
     @PostMapping("/api/v1/auth/login")
-    fun login(@RequestBody @Valid request: MemberLoginRequest): BaseResponse<MemberLoginResponse> =
-        BaseResponse(data = memberService.login(request))
+    fun login(@RequestBody @Valid request: SignInRequest): BaseResponse<SignInResponse> =
+        BaseResponse(data = authService.login(request))
+
+    @PostMapping("/api/v1/auth/refresh")
+    fun refreshToken(@RequestBody request: TokenRefreshRequest): BaseResponse<TokenRefreshResponse> =
+        BaseResponse(data = authService.refreshToken(request))
 
     @PostMapping("/api/v1/auth/login-id/recovery/verify-code")
     fun applySendLoginIdRecoverVerifyCode(@RequestBody @Valid request: RecoverLoginIdRequest): BaseResponse<RecoverLoginIdResponse> =

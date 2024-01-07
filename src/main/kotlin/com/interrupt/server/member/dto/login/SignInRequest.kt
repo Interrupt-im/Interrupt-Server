@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 
-data class MemberLoginRequest(
+data class SignInRequest(
     @LoginIdValidation
     @field:NotBlank(message = "아이디 값은 필수 입니다.")
     @field:Pattern(regexp = "^(?=.*[a-zA-Z])[a-zA-Z0-9]+\$", message = "아이디는 영어(필수)와 숫자로 설정해야 합니다.")
