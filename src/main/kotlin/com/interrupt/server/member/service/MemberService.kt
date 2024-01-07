@@ -17,8 +17,6 @@ import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRe
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyResponse
 import com.interrupt.server.member.dto.emailverify.EmailVerifyRequest
-import com.interrupt.server.member.dto.login.MemberLoginRequest
-import com.interrupt.server.member.dto.login.MemberLoginResponse
 import com.interrupt.server.member.dto.recover.*
 import com.interrupt.server.member.dto.register.MemberRegisterRequest
 import com.interrupt.server.member.dto.update.MemberUpdateRequest
@@ -106,28 +104,13 @@ class MemberService(
     }
 
     /**
-     * 로그인
-     */
-    fun login(memberLoginRequest: MemberLoginRequest): MemberLoginResponse {
-        val encryptedLoginId = stringEncoder.encrypt(memberLoginRequest.loginId!!)
-        val encryptedPassword = stringEncoder.encrypt(memberLoginRequest.password!!)
-
-        memberRepository.findByLoginIdAndPassword(encryptedLoginId, encryptedPassword)?.let {
-            return MemberLoginResponse.of(it).also { response ->
-                response.name = stringEncoder.decrypt(response.name)
-            }
-
-        } ?: throw InterruptServerException(errorCode = ErrorCode.FAILED_LOGIN)
-    }
-
-    /**
      * 회원 탈퇴
      */
     fun deleteMember(loginId: String, memberDeleteRequest: MemberDeleteRequest) {
         val encryptedLoginId = stringEncoder.encrypt(loginId)
         val encryptedPassword = stringEncoder.encrypt(memberDeleteRequest.password!!)
 
-        val foundMember = memberRepository.findByLoginIdAndPassword(encryptedLoginId, encryptedPassword)
+        val foundMember = memberRepository.findByLoginIdAndLoginPassword(encryptedLoginId, encryptedPassword)
         validateExistMember(foundMember)
         foundMember!!.deletedAt = LocalDateTime.now()
         memberRepository.save(foundMember)
@@ -208,7 +191,7 @@ class MemberService(
         val foundMember = memberRepository.findByLoginId(foundMemberRecover.loginId)
         validateExistMember(foundMember)
 
-        foundMember!!.password = stringEncoder.encrypt(recoverPasswordRequest.password!!)
+        foundMember!!.loginPassword = stringEncoder.encrypt(recoverPasswordRequest.password!!)
         memberRepository.save(foundMember)
     }
 
@@ -221,7 +204,7 @@ class MemberService(
         validateExistMember(foundMember)
 
         memberUpdateRequest.password?.let {
-            foundMember!!.password = stringEncoder.encrypt(it)
+            foundMember!!.loginPassword = stringEncoder.encrypt(it)
         }
 
         memberUpdateRequest.name?.let {
