@@ -18,7 +18,7 @@ class GlobalRestControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun methodArgumentNotValidExceptionHandler(e: MethodArgumentNotValidException): ResponseEntity<ExceptionResponse<*>> =
-        InterruptServerException(ErrorCode.INVALID_INPUT_VALUE.message, e, ErrorCode.INVALID_INPUT_VALUE)
+        InterruptServerException(ErrorCode.INVALID_INPUT_VALUE, ErrorCode.INVALID_INPUT_VALUE.message, e,)
             .let { ex ->
                 ResponseEntity(
                     ExceptionResponse(
@@ -32,26 +32,26 @@ class GlobalRestControllerAdvice {
 
     @ExceptionHandler(ConstraintViolationException::class)
     fun constraintViolationException(e: ConstraintViolationException): ResponseEntity<ExceptionResponse<*>> =
-        InterruptServerException(ErrorCode.INVALID_INPUT_VALUE.message, e, ErrorCode.INVALID_INPUT_VALUE)
+        InterruptServerException(ErrorCode.INVALID_INPUT_VALUE, ErrorCode.INVALID_INPUT_VALUE.message, e)
             .let { ex ->
                 ResponseEntity(
                     ExceptionResponse(
-                    ex.errorCode.status.value(),
-                    ex.errorCode,
-                    ex.message,
-                    e.constraintViolations.associate { (it.propertyPath.last()) to it.message }
+                        ex.errorCode.status.value(),
+                        ex.errorCode,
+                        ex.message,
+                        e.constraintViolations.associate { (it.propertyPath.last()) to it.message }
                 ),
                 ex.errorCode.status)
             }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
     fun httpMessageNotReadableExceptionHandler(e: HttpMessageNotReadableException): ResponseEntity<ExceptionResponse<*>> =
-        InterruptServerException(ErrorCode.NO_CONTENT_HTTP_BODY.message, e, ErrorCode.NO_CONTENT_HTTP_BODY)
+        InterruptServerException(ErrorCode.NO_CONTENT_HTTP_BODY, ErrorCode.NO_CONTENT_HTTP_BODY.message, e)
             .let { ResponseEntity(ExceptionResponse(it.errorCode.status.value(), it.errorCode, it.message, null), it.errorCode.status) }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
     fun httpRequestMethodNotSupportedExceptionHandler(e: HttpRequestMethodNotSupportedException): ResponseEntity<ExceptionResponse<*>> =
-        InterruptServerException(ErrorCode.NOT_SUPPORTED_METHOD.message, e, ErrorCode.NOT_SUPPORTED_METHOD)
+        InterruptServerException(ErrorCode.NOT_SUPPORTED_METHOD, ErrorCode.NOT_SUPPORTED_METHOD.message, e)
             .let { ResponseEntity(ExceptionResponse(it.errorCode.status.value(), it.errorCode, it.message, null), it.errorCode.status) }
 
     @ExceptionHandler(Throwable::class)
