@@ -30,7 +30,7 @@ class MemberRepositoryTest: IntegrationTestSupport() {
             .isNotNull
             .isEqualTo(member)
             .extracting("id", "loginId", "password", "name", "email","deletedAt")
-            .contains(member.id, member.loginId, member.password, member.name, member.email, null)
+            .contains(member.id, member.loginId, member.loginPassword, member.name, member.email, null)
         assertThat(foundMember!!.createdAt).isBeforeOrEqualTo(now)
         assertThat(foundMember!!.modifiedAt).isBeforeOrEqualTo(now)
     }
@@ -55,7 +55,7 @@ class MemberRepositoryTest: IntegrationTestSupport() {
         memberRepository.save(member)
 
         // when
-        val foundMember = memberRepository.findByLoginIdAndPassword(member.loginId, member.password)
+        val foundMember = memberRepository.findByLoginIdAndLoginPassword(member.loginId, member.loginPassword)
         val now = LocalDateTime.now()
 
         // then
@@ -63,7 +63,7 @@ class MemberRepositoryTest: IntegrationTestSupport() {
             .isNotNull
             .isEqualTo(member)
             .extracting("id", "loginId", "password", "name", "email","deletedAt")
-            .contains(member.id, member.loginId, member.password, member.name, member.email, null)
+            .contains(member.id, member.loginId, member.loginPassword, member.name, member.email, null)
         assertThat(foundMember!!.createdAt).isBeforeOrEqualTo(now)
         assertThat(foundMember!!.modifiedAt).isBeforeOrEqualTo(now)
     }
@@ -74,7 +74,7 @@ class MemberRepositoryTest: IntegrationTestSupport() {
         val member = Member("test1", "testPassword", "testName", "test@mail.com")
 
         // when
-        val foundMember = memberRepository.findByLoginIdAndPassword(member.loginId, member.password)
+        val foundMember = memberRepository.findByLoginIdAndLoginPassword(member.loginId, member.loginPassword)
 
         // then
         assertThat(foundMember).isNull()
@@ -96,7 +96,7 @@ class MemberRepositoryTest: IntegrationTestSupport() {
             .isNotNull
             .isEqualTo(member)
             .extracting("id", "loginId", "password", "name", "email","deletedAt")
-            .contains(member.id, member.loginId, member.password, member.name, member.email, null)
+            .contains(member.id, member.loginId, member.loginPassword, member.name, member.email, null)
         assertThat(foundMember!!.createdAt).isBeforeOrEqualTo(now)
         assertThat(foundMember!!.modifiedAt).isBeforeOrEqualTo(now)
     }
@@ -107,7 +107,7 @@ class MemberRepositoryTest: IntegrationTestSupport() {
         val member = Member("test1", "testPassword", "testName", "test@mail.com")
 
         // when
-        val foundMember = memberRepository.findByNameAndEmail(member.name, member.password)
+        val foundMember = memberRepository.findByNameAndEmail(member.name, member.loginPassword)
 
         // then
         assertThat(foundMember).isNull()
@@ -129,7 +129,7 @@ class MemberRepositoryTest: IntegrationTestSupport() {
             .isNotNull
             .isEqualTo(member)
             .extracting("id", "loginId", "password", "name", "email","deletedAt")
-            .contains(member.id, member.loginId, member.password, member.name, member.email, null)
+            .contains(member.id, member.loginId, member.loginPassword, member.name, member.email, null)
         assertThat(foundMember!!.createdAt).isBeforeOrEqualTo(now)
         assertThat(foundMember!!.modifiedAt).isBeforeOrEqualTo(now)
     }
@@ -140,7 +140,7 @@ class MemberRepositoryTest: IntegrationTestSupport() {
         val member = Member("test1", "testPassword", "testName", "test@mail.com")
 
         // when
-        val foundMember = memberRepository.findByLoginIdAndEmail(member.loginId, member.password)
+        val foundMember = memberRepository.findByLoginIdAndEmail(member.loginId, member.loginPassword)
 
         // then
         assertThat(foundMember).isNull()
