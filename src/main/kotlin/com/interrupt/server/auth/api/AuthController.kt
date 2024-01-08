@@ -1,14 +1,14 @@
 package com.interrupt.server.auth.api
 
-import com.interrupt.server.auth.dto.request.TokenRefreshRequest
-import com.interrupt.server.auth.dto.response.TokenRefreshResponse
+import com.interrupt.server.auth.dto.refresh.TokenRefreshRequest
+import com.interrupt.server.auth.dto.refresh.TokenRefreshResponse
 import com.interrupt.server.auth.service.AuthenticationService
 import com.interrupt.server.common.api.BaseResponse
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyResponse
 import com.interrupt.server.member.dto.emailverify.EmailVerifyRequest
-import com.interrupt.server.member.dto.login.SignInRequest
-import com.interrupt.server.member.dto.login.SignInResponse
+import com.interrupt.server.auth.dto.login.SignInRequest
+import com.interrupt.server.auth.dto.login.SignInResponse
 import com.interrupt.server.member.dto.recover.*
 import com.interrupt.server.member.service.MemberService
 import com.interrupt.server.member.validation.annotation.loginid.LoginIdValidation
