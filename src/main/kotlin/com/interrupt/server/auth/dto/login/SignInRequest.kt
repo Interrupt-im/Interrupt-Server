@@ -1,4 +1,4 @@
-package com.interrupt.server.member.dto.login
+package com.interrupt.server.auth.dto.login
 
 import com.interrupt.server.member.validation.annotation.loginid.LoginIdValidation
 import com.interrupt.server.member.validation.annotation.password.PasswordValidation

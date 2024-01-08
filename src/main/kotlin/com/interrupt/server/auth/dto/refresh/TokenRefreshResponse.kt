@@ -1,4 +1,4 @@
-package com.interrupt.server.auth.dto.response
+package com.interrupt.server.auth.dto.refresh
 
 data class TokenRefreshResponse(
     val accessToken: String,
