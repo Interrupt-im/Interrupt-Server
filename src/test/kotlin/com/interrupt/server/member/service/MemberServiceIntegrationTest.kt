@@ -10,7 +10,7 @@ import com.interrupt.server.member.dto.delete.MemberDeleteRequest
 import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerifyRequest
-import com.interrupt.server.member.dto.login.MemberLoginRequest
+import com.interrupt.server.member.dto.login.SignInRequest
 import com.interrupt.server.member.dto.recover.RecoverLoginIdRequest
 import com.interrupt.server.member.dto.recover.RecoverPasswordRequest
 import com.interrupt.server.member.dto.recover.VerifyRecoverLoginIdRequest
@@ -28,9 +28,7 @@ import io.mockk.justRun
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 @Transactional
 class MemberServiceIntegrationTest: IntegrationTestSupport() {
@@ -108,27 +106,6 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
             .extracting("email", "verifyCode", "isVerified")
             .contains(encryptedEmail, verifyCode, true)
 
-    }
-
-    @Test
-    fun `로그인 정보를 받아 로그인을 수행한다`() {
-        // given
-        val loginId = "loginId"
-        val password = "password"
-        val name = "name"
-        val email = "test@test.com"
-        val encryptedLoginId = stringEncoder.encrypt(loginId)
-        val encryptedPassword = stringEncoder.encrypt(password)
-        val encryptedName = stringEncoder.encrypt(name)
-        memberRepository.save(Member(encryptedLoginId, encryptedPassword, encryptedName, email))
-
-        val request = MemberLoginRequest(loginId, password)
-
-        // when
-        val response = memberService.login(request)
-
-        // then
-        assertThat(response.name).isEqualTo(name)
     }
 
     @Test
@@ -244,7 +221,7 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
         memberService.validatePasswordRecoverVerifyCode(request)
 
         // then
-        assertThat(savedMember.password).isEqualTo(stringEncoder.encrypt(newPassword))
+        assertThat(savedMember.loginPassword).isEqualTo(stringEncoder.encrypt(newPassword))
     }
 
     @Test

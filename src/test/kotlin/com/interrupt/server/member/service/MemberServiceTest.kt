@@ -10,7 +10,7 @@ import com.interrupt.server.member.dto.delete.MemberDeleteRequest
 import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerifyRequest
-import com.interrupt.server.member.dto.login.MemberLoginRequest
+import com.interrupt.server.member.dto.login.SignInRequest
 import com.interrupt.server.member.dto.recover.RecoverLoginIdRequest
 import com.interrupt.server.member.dto.recover.RecoverPasswordRequest
 import com.interrupt.server.member.dto.recover.VerifyRecoverLoginIdRequest
@@ -29,7 +29,6 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.springframework.test.util.ReflectionTestUtils
 import java.time.LocalDateTime
 
 class MemberServiceTest {
@@ -251,53 +250,6 @@ class MemberServiceTest {
     }
 
     @Test
-    fun `회원 ID 와 비밀번호를 전달받아 로그인 로직을 수행 후 회원 이름을 반환한다`() {
-        // given
-        val loginId = "test1"
-        val password = "testPassword"
-        val name = "testName"
-        val memberLoginRequest = MemberLoginRequest(loginId, password)
-
-        val savedMemberStub = Member(
-            loginId,
-            password,
-            name,
-            "test@mail.com"
-        )
-
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
-        every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
-
-        every { memberRepository.findByLoginIdAndPassword(loginId, password) } returns savedMemberStub
-
-        // when
-        val memberLoginResponse = memberService.login(memberLoginRequest)
-
-        // then
-        assertThat(memberLoginResponse.name).isEqualTo(name)
-    }
-
-    @Test
-    fun `존재하지 않는 회원 ID 와 비밀번호로 로그인을 시도하면 적절한 예외를 반환`() {
-        // given
-        val loginId = "test1"
-        val password = "testPassword"
-        val memberLoginRequest = MemberLoginRequest(loginId, password)
-
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
-        every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
-
-        every { memberRepository.findByLoginIdAndPassword(loginId, password) } returns null
-
-        // when
-        val result = assertThatThrownBy { memberService.login(memberLoginRequest) }
-
-        // then
-        result.isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.FAILED_LOGIN.message)
-    }
-
-    @Test
     fun `회원 정보를 받아 해당되는 회원 탈퇴 비지니스 로직을 수행한다`() {
         // given
         val loginId = "test1"
@@ -314,7 +266,7 @@ class MemberServiceTest {
         every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
 
-        every { memberRepository.findByLoginIdAndPassword(loginId, password) } returns savedMemberStub
+        every { memberRepository.findByLoginIdAndLoginPassword(loginId, password) } returns savedMemberStub
         every { memberRepository.save(any<Member>()) } returns savedMemberStub.also { it.deletedAt = LocalDateTime.now() }
 
         // when then
@@ -331,7 +283,7 @@ class MemberServiceTest {
         every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
 
-        every { memberRepository.findByLoginIdAndPassword(loginId, password) } returns null
+        every { memberRepository.findByLoginIdAndLoginPassword(loginId, password) } returns null
 
         // when
         val result = assertThatThrownBy { memberService.deleteMember(loginId, memberDeleteRequest) }
@@ -478,7 +430,7 @@ class MemberServiceTest {
         every { memberRecoverRepository.findByUuid(memberRecoverKey) } returns MemberRecover("test@test.com", loginId, verifyCode)
         every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { memberRepository.findByLoginId(loginId) } returns memberStub
-        every { memberRepository.save(memberStub.apply { password = newPassword }) } answers { it.invocation.args[0] as Member }
+        every { memberRepository.save(memberStub.apply { loginPassword = newPassword }) } answers { it.invocation.args[0] as Member }
 
         // when then
         memberService.validatePasswordRecoverVerifyCode(VerifyRecoverPasswordRequest(memberRecoverKey, verifyCode, newPassword))
@@ -536,7 +488,7 @@ class MemberServiceTest {
         every { emailVerifyCodeRepository.findByUuid(emailVerifyCodeKey) } returns EmailVerifyCode(newEmail, "000000", true)
 
         every { memberRepository.save(memberStub.also {
-            it.password = newPassword
+            it.loginPassword = newPassword
             it.email = newEmail
         }) } answers { it.invocation.args[0] as Member }
 
