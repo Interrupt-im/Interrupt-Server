@@ -10,7 +10,6 @@ import com.interrupt.server.member.dto.delete.MemberDeleteRequest
 import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerifyRequest
-import com.interrupt.server.member.dto.login.SignInRequest
 import com.interrupt.server.member.dto.recover.RecoverLoginIdRequest
 import com.interrupt.server.member.dto.recover.RecoverPasswordRequest
 import com.interrupt.server.member.dto.recover.VerifyRecoverLoginIdRequest
