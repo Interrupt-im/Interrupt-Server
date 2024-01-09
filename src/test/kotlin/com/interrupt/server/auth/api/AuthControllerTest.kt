@@ -4,13 +4,14 @@ import com.interrupt.server.ControllerTestSupport
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyResponse
 import com.interrupt.server.member.dto.emailverify.EmailVerifyRequest
-import com.interrupt.server.member.dto.login.MemberLoginRequest
-import com.interrupt.server.member.dto.login.MemberLoginResponse
+import com.interrupt.server.auth.dto.login.SignInRequest
+import com.interrupt.server.auth.dto.login.SignInResponse
 import com.interrupt.server.member.dto.recover.*
 import io.mockk.every
 import io.mockk.justRun
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -155,12 +156,14 @@ class AuthControllerTest: ControllerTestSupport() {
     }
 
     @Test
+    @WithMockUser
     fun `로그인`() {
         // given
-        val request = MemberLoginRequest("memberId", "ward123!")
-        val name = "홍길동"
+        val request = SignInRequest("memberId", "password123!")
+        val accessToken = "accessToken"
+        val refreshToken = "refreshToken"
 
-        every { memberService.login(request) } returns MemberLoginResponse(name)
+        every { authService.login(request) } returns SignInResponse(accessToken, refreshToken)
 
         // when then
         mockMvc.perform(
@@ -169,13 +172,14 @@ class AuthControllerTest: ControllerTestSupport() {
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
             .isOkBaseResponse()
-            .andExpect(jsonPath("$.data.name").value(name))
+            .andExpect(jsonPath("$.data.accessToken").value(accessToken))
+            .andExpect(jsonPath("$.data.refreshToken").value(refreshToken))
     }
 
     @Test
     fun `로그인 시 회원 ID 는 필수 값 이다`() {
         // given
-        val request = MemberLoginRequest(null, "ward123!")
+        val request = SignInRequest(null, "ward123!")
 
         // when then
         mockMvc.perform(
@@ -189,7 +193,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `로그인 시 회원 ID 는 8~20자로 이루어져아 한다`() {
         // given
-        val request = MemberLoginRequest("loginId", "ward123!")
+        val request = SignInRequest("loginId", "ward123!")
 
         // when then
         mockMvc.perform(
@@ -203,7 +207,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `로그인 시 회원 ID 는 영문 또는 숫자로 이루어져야 한다`() {
         // given
-        val request = MemberLoginRequest("회원아이디123", "ward123!")
+        val request = SignInRequest("회원아이디123", "ward123!")
 
         // when then
         mockMvc.perform(
@@ -217,7 +221,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `로그인 시 비밀번호 는 필수 값 이다`() {
         // given
-        val request = MemberLoginRequest("memberId", null)
+        val request = SignInRequest("memberId", null)
 
         // when then
         mockMvc.perform(
@@ -231,7 +235,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `로그인 시 비밀번호 는 8~20자로 이루어져아 한다`() {
         // given
-        val request = MemberLoginRequest("memberId", "word123")
+        val request = SignInRequest("memberId", "word123")
 
         // when then
         mockMvc.perform(
@@ -245,7 +249,7 @@ class AuthControllerTest: ControllerTestSupport() {
     @Test
     fun `로그인 시 비밀번호 는 영문과 숫자가 모두 포함되어야 한다`() {
         // given
-        val request = MemberLoginRequest("memberId", "password")
+        val request = SignInRequest("memberId", "password")
 
         // when then
         mockMvc.perform(
