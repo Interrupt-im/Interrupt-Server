@@ -2,6 +2,7 @@ package com.interrupt.server.auth.service
 
 import com.interrupt.server.auth.config.JwtProperties
 import com.interrupt.server.auth.dto.login.SignInRequest
+import com.interrupt.server.auth.dto.refresh.TokenRefreshRequest
 import com.interrupt.server.auth.entity.AuthenticationCredentials
 import com.interrupt.server.auth.entity.Credentials
 import com.interrupt.server.auth.entity.Identifier
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.userdetails.UserDetails
 
 class AuthenticationServiceTest {
 
@@ -60,6 +62,51 @@ class AuthenticationServiceTest {
         assertThat(response)
             .extracting("accessToken", "refreshToken")
             .contains(accessToken, refreshToken)
+    }
+
+    @Test
+    fun `refreshToken 을 받아 토큰을 재발급 한다`() {
+        // given
+        val originAccessToken = "originAccessToken"
+        val originRefreshToken = "originRefreshToken"
+        val request = TokenRefreshRequest(originRefreshToken)
+        val member = mockk<Member>()
+        val loginId = "loginId"
+        val originAuthenticationCredentials: AuthenticationCredentials = mockk()
+        val originCredentials: Credentials = mockk()
+        val newAuthenticationCredentials = mockk<AuthenticationCredentials>()
+        val newIdentifier = mockk<Identifier>()
+        val newCredentials = mockk<Credentials>()
+        val expiration: Long = 1000L
+
+        val newAccessToken = "newAccessToken"
+        val newRefreshToken = "newRefreshToken"
+
+        every { jwtService.extractUsername(any<String>()) } returns loginId
+        every { jwtService.extractJti(any<String>()) } returns "key"
+        every { memberQueryRepository.findByLoginId(any<String>()) } returns member
+        every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
+        every { originAuthenticationCredentials.credentials } returns originCredentials
+        every { originCredentials.refreshToken } returns originRefreshToken
+        every { jwtService.isTokenValid(any<String>(), any<UserDetails>()) } returns true
+        every { originCredentials.accessToken } returns originAccessToken
+        every { jwtService.checkTokenExpiredByTokenString(any<String>()) } returns true
+        every { member.loginId } returns loginId
+        every { tokenRedisRepository.deleteById(any<String>()) } returns true
+        every { jwtService.generateAuthenticationCredentials(any<Member>()) } returns newAuthenticationCredentials
+        every { newAuthenticationCredentials.identifier } returns newIdentifier
+        every { newIdentifier.public } returns "newKey"
+        every { jwtProperties.refreshTokenExpiration } returns expiration
+        justRun { tokenRedisRepository.save(any<TokenCache>()) }
+        every { newAuthenticationCredentials.credentials } returns Credentials(newAccessToken, newRefreshToken)
+
+        // when
+        val result = authService.refreshToken(request)
+
+        // then
+        assertThat(result)
+            .extracting("accessToken", "refreshToken")
+            .contains(newAccessToken, newRefreshToken)
     }
 
 }
