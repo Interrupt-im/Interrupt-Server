@@ -8,12 +8,15 @@ import com.interrupt.server.auth.entity.Credentials
 import com.interrupt.server.auth.entity.Identifier
 import com.interrupt.server.auth.entity.TokenCache
 import com.interrupt.server.auth.repository.TokenRedisRepository
+import com.interrupt.server.common.exception.ErrorCode
+import com.interrupt.server.common.exception.InterruptServerException
 import com.interrupt.server.member.entity.Member
 import com.interrupt.server.member.repository.MemberRepository
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -70,13 +73,12 @@ class AuthenticationServiceTest {
         val originAccessToken = "originAccessToken"
         val originRefreshToken = "originRefreshToken"
         val request = TokenRefreshRequest(originRefreshToken)
-        val member = mockk<Member>()
         val loginId = "loginId"
+        val member = mockk<Member>()
         val originAuthenticationCredentials: AuthenticationCredentials = mockk()
         val originCredentials: Credentials = mockk()
         val newAuthenticationCredentials = mockk<AuthenticationCredentials>()
         val newIdentifier = mockk<Identifier>()
-        val newCredentials = mockk<Credentials>()
         val expiration: Long = 1000L
 
         val newAccessToken = "newAccessToken"
@@ -107,6 +109,53 @@ class AuthenticationServiceTest {
         assertThat(result)
             .extracting("accessToken", "refreshToken")
             .contains(newAccessToken, newRefreshToken)
+    }
+
+    @Test
+    fun `전달 받은 refreshToken 과 토큰에 포함된 jtl 로 저장소에서 찾은 refreshToken 이 다른 경우 예외를 반환한다`() {
+        // given
+        val originRefreshToken = "originRefreshToken"
+        val request = TokenRefreshRequest(originRefreshToken)
+        val loginId = "loginId"
+        val member = mockk<Member>()
+        val originAuthenticationCredentials: AuthenticationCredentials = mockk()
+        val originCredentials: Credentials = mockk()
+
+        every { jwtService.extractUsername(any<String>()) } returns loginId
+        every { jwtService.extractJti(any<String>()) } returns "key"
+        every { memberQueryRepository.findByLoginId(any<String>()) } returns member
+        every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
+        every { originAuthenticationCredentials.credentials } returns originCredentials
+        every { originCredentials.refreshToken } returns "invalidRefreshToken"
+
+        // when then
+        assertThatThrownBy { authService.refreshToken(request) }
+            .isInstanceOf(InterruptServerException::class.java)
+            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
+    }
+
+    @Test
+    fun `전달 받은 refreshToken 이 유효하지 않다면 예외를 반환한다`() {
+        // given
+        val originRefreshToken = "originRefreshToken"
+        val request = TokenRefreshRequest(originRefreshToken)
+        val loginId = "loginId"
+        val member = mockk<Member>()
+        val originAuthenticationCredentials: AuthenticationCredentials = mockk()
+        val originCredentials: Credentials = mockk()
+
+        every { jwtService.extractUsername(any<String>()) } returns loginId
+        every { jwtService.extractJti(any<String>()) } returns "key"
+        every { memberQueryRepository.findByLoginId(any<String>()) } returns member
+        every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
+        every { originAuthenticationCredentials.credentials } returns originCredentials
+        every { originCredentials.refreshToken } returns originRefreshToken
+        every { jwtService.isTokenValid(originRefreshToken, any<UserDetails>()) } returns false
+
+        // when then
+        assertThatThrownBy { authService.refreshToken(request) }
+            .isInstanceOf(InterruptServerException::class.java)
+            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
     }
 
 }
