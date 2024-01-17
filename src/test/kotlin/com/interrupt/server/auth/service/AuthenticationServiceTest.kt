@@ -112,7 +112,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    fun `전달 받은 refreshToken 과 토큰에 포함된 jtl 로 저장소에서 찾은 refreshToken 이 다른 경우 예외를 반환한다`() {
+    fun `토큰 재발급 시 전달 받은 refreshToken 과 토큰에 포함된 jtl 로 저장소에서 찾은 refreshToken 이 다른 경우 예외를 반환한다`() {
         // given
         val originRefreshToken = "originRefreshToken"
         val request = TokenRefreshRequest(originRefreshToken)
@@ -135,7 +135,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    fun `전달 받은 refreshToken 이 유효하지 않다면 예외를 반환한다`() {
+    fun `토큰 재발급 시 전달 받은 refreshToken 이 유효하지 않다면 예외를 반환한다`() {
         // given
         val originRefreshToken = "originRefreshToken"
         val request = TokenRefreshRequest(originRefreshToken)
@@ -151,6 +151,33 @@ class AuthenticationServiceTest {
         every { originAuthenticationCredentials.credentials } returns originCredentials
         every { originCredentials.refreshToken } returns originRefreshToken
         every { jwtService.isTokenValid(originRefreshToken, any<UserDetails>()) } returns false
+
+        // when then
+        assertThatThrownBy { authService.refreshToken(request) }
+            .isInstanceOf(InterruptServerException::class.java)
+            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
+    }
+
+    @Test
+    fun `토큰 재발급 시 전달 받은 토큰의 jtl 로 찾은 accessToken 이 만료되기 전 이면 예외를 반환한다`() {
+        // given
+        val originAccessToken = "originAccessToken"
+        val originRefreshToken = "originRefreshToken"
+        val request = TokenRefreshRequest(originRefreshToken)
+        val loginId = "loginId"
+        val member = mockk<Member>()
+        val originAuthenticationCredentials: AuthenticationCredentials = mockk()
+        val originCredentials: Credentials = mockk()
+
+        every { jwtService.extractUsername(any<String>()) } returns loginId
+        every { jwtService.extractJti(any<String>()) } returns "key"
+        every { memberQueryRepository.findByLoginId(any<String>()) } returns member
+        every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
+        every { originAuthenticationCredentials.credentials } returns originCredentials
+        every { originCredentials.refreshToken } returns originRefreshToken
+        every { jwtService.isTokenValid(any<String>(), any<UserDetails>()) } returns true
+        every { originCredentials.accessToken } returns originAccessToken
+        every { jwtService.checkTokenExpiredByTokenString(originAccessToken) } returns false
 
         // when then
         assertThatThrownBy { authService.refreshToken(request) }
