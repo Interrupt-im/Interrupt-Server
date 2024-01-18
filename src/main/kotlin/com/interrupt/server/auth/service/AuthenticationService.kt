@@ -43,8 +43,8 @@ class AuthenticationService(
     fun refreshToken(request: TokenRefreshRequest): TokenRefreshResponse {
         val presentedRefreshToken = request.refreshToken
 
-        val loginId: String = jwtService.extractUsername(presentedRefreshToken)
-        val jti = jwtService.extractJti(presentedRefreshToken)
+        val loginId: String = jwtService.getUsername(presentedRefreshToken)
+        val jti = jwtService.getJtl(presentedRefreshToken)
 
         val user = memberQueryRepository.findByLoginId(loginId).isValidMember()
 

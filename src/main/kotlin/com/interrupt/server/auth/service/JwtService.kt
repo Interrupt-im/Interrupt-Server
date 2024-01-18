@@ -11,41 +11,30 @@ import com.interrupt.server.common.exception.InterruptServerException
 import com.interrupt.server.member.entity.Member
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.security.Keys
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
 class JwtService(
+    private val tokenProvider: TokenProvider,
     private val jwtProperties: JwtProperties,
     private val objectMapper: ObjectMapper
 ) {
 
-    private val secretKey = Keys.hmacShaKeyFor(
-        jwtProperties.key.toByteArray()
-    )
+    fun getUsername(token: String): String = tokenProvider.extractUsername(token).isValidClaimFromToken()
 
-    fun extractUsername(token: String): String = extractAllClaims(token)?.subject.isValidClaimFromToken()
-
-    fun extractJti(token: String): String = extractAllClaims(token)?.id.isValidClaimFromToken()
+    fun getJtl(token: String): String = tokenProvider.extractJti(token).isValidClaimFromToken()
 
     private fun String?.isValidClaimFromToken(): String =
         if (isNullOrBlank()) throw InterruptServerException(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED)
         else this
 
-    private fun extractAllClaims(token: String): Claims? =
-        Jwts.parser()
-            .verifyWith(secretKey)
-            .build()
-            .parseSignedClaims(token)
-            .payload
-
     fun generateAccessToken(userDetails: UserDetails, jti: String): String =
-        buildToken(userDetails, jti, jwtProperties.accessTokenExpiration)
+        tokenProvider.buildToken(userDetails, jti, jwtProperties.accessTokenExpiration)
 
     fun generateRefreshToken(userDetails: UserDetails, jti: String): String =
-        buildToken(userDetails, jti, jwtProperties.refreshTokenExpiration)
+        tokenProvider.buildToken(userDetails, jti, jwtProperties.refreshTokenExpiration)
 
     fun generateAuthenticationCredentials(user: Member): AuthenticationCredentials {
         val jti = UUID.randomUUID().toString()
@@ -59,24 +48,10 @@ class JwtService(
         return AuthenticationCredentials(credentials, identifier)
     }
 
-    fun buildToken(userDetails: UserDetails, jti: String, expiration: Long, additionalClaims: Map<String, Any> = emptyMap()): String =
-        Jwts.builder()
-            .claims()
-            .subject(userDetails.username)
-            .issuedAt(Date(System.currentTimeMillis()))
-            .expiration(Date(System.currentTimeMillis() + expiration))
-            .add(additionalClaims)
-            .id(jti)
-            .and()
-            .signWith(secretKey)
-            .compact()
-
     fun isTokenValid(token: String, userDetails: UserDetails): Boolean =
-        (extractUsername(token) == userDetails.username) && isTokenActive(token)
+        (getUsername(token) == userDetails.username) && isTokenActive(token)
 
-    private fun isTokenActive(token: String): Boolean = extractExpiration(token)?.after(Date()) ?: false
-
-    private fun extractExpiration(token: String): Date? = extractAllClaims(token)?.expiration
+    private fun isTokenActive(token: String): Boolean = tokenProvider.extractExpiration(token)?.after(Date()) ?: false
 
     fun checkTokenExpiredByTokenString(token: String): Boolean {
         val parts = token.split(".")
