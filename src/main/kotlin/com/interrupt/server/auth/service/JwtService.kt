@@ -9,10 +9,9 @@ import com.interrupt.server.auth.entity.Identifier
 import com.interrupt.server.common.exception.ErrorCode
 import com.interrupt.server.common.exception.InterruptServerException
 import com.interrupt.server.member.entity.Member
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwts
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
+import java.time.ZonedDateTime
 import java.util.*
 
 @Service
@@ -64,7 +63,7 @@ class JwtService(
             objectMapper.readValue(payload, object : TypeReference<MutableMap<String, String>>() {})["exp"]?.toLong()
             ?: throw InterruptServerException(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED)
 
-        val current = System.currentTimeMillis() / 1000
+        val current = ZonedDateTime.now().toInstant().toEpochMilli() / 1000
 
         return expiration < current
     }
