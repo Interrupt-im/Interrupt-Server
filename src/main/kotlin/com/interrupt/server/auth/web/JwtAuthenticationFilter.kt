@@ -35,7 +35,7 @@ class JwtAuthenticationFilter(
 
         val jwt = authHeader.substring(7)
         val username = jwtService.getUsername(jwt)
-        val jti = jwtService.getJtl(jwt)
+        val jti = jwtService.getJti(jwt)
         val authenticationCredentials = tokenRedisRepository.findById(jti)
 
         if (authenticationCredentials?.credentials?.accessToken == jwt && SecurityContextHolder.getContext().authentication == null) {

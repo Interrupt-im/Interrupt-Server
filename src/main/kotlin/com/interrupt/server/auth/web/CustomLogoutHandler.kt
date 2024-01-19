@@ -22,7 +22,7 @@ class CustomLogoutHandler(
         if (authHeader == null || !authHeader.startsWith("Bearer ")) return
 
         val jwt = authHeader.substring(7)
-        val jti = jwtService.getJtl(jwt)
+        val jti = jwtService.getJti(jwt)
 
         tokenRedisRepository.findById(jti)?.let {
             tokenRedisRepository.deleteById(jti)

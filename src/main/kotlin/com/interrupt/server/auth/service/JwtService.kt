@@ -24,7 +24,7 @@ class JwtService(
 
     fun getUsername(token: String): String = tokenProvider.extractUsername(token).isValidClaimFromToken()
 
-    fun getJtl(token: String): String = tokenProvider.extractJti(token).isValidClaimFromToken()
+    fun getJti(token: String): String = tokenProvider.extractJti(token).isValidClaimFromToken()
 
     private fun String?.isValidClaimFromToken(): String =
         if (isNullOrBlank()) throw InterruptServerException(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED)

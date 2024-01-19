@@ -85,7 +85,7 @@ class AuthenticationServiceTest {
         val newRefreshToken = "newRefreshToken"
 
         every { jwtService.getUsername(any<String>()) } returns loginId
-        every { jwtService.getJtl(any<String>()) } returns "key"
+        every { jwtService.getJti(any<String>()) } returns "key"
         every { memberQueryRepository.findByLoginId(any<String>()) } returns member
         every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
         every { originAuthenticationCredentials.credentials } returns originCredentials
@@ -112,7 +112,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    fun `토큰 재발급 시 전달 받은 refreshToken 과 토큰에 포함된 jtl 로 저장소에서 찾은 refreshToken 이 다른 경우 예외를 반환한다`() {
+    fun `토큰 재발급 시 전달 받은 refreshToken 과 토큰에 포함된 jti 로 저장소에서 찾은 refreshToken 이 다른 경우 예외를 반환한다`() {
         // given
         val originRefreshToken = "originRefreshToken"
         val request = TokenRefreshRequest(originRefreshToken)
@@ -122,7 +122,7 @@ class AuthenticationServiceTest {
         val originCredentials: Credentials = mockk()
 
         every { jwtService.getUsername(any<String>()) } returns loginId
-        every { jwtService.getJtl(any<String>()) } returns "key"
+        every { jwtService.getJti(any<String>()) } returns "key"
         every { memberQueryRepository.findByLoginId(any<String>()) } returns member
         every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
         every { originAuthenticationCredentials.credentials } returns originCredentials
@@ -145,7 +145,7 @@ class AuthenticationServiceTest {
         val originCredentials: Credentials = mockk()
 
         every { jwtService.getUsername(any<String>()) } returns loginId
-        every { jwtService.getJtl(any<String>()) } returns "key"
+        every { jwtService.getJti(any<String>()) } returns "key"
         every { memberQueryRepository.findByLoginId(any<String>()) } returns member
         every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
         every { originAuthenticationCredentials.credentials } returns originCredentials
@@ -159,7 +159,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    fun `토큰 재발급 시 전달 받은 토큰의 jtl 로 찾은 accessToken 이 만료되기 전 이면 예외를 반환한다`() {
+    fun `토큰 재발급 시 전달 받은 토큰의 jti 로 찾은 accessToken 이 만료되기 전 이면 예외를 반환한다`() {
         // given
         val originAccessToken = "originAccessToken"
         val originRefreshToken = "originRefreshToken"
@@ -170,7 +170,7 @@ class AuthenticationServiceTest {
         val originCredentials: Credentials = mockk()
 
         every { jwtService.getUsername(any<String>()) } returns loginId
-        every { jwtService.getJtl(any<String>()) } returns "key"
+        every { jwtService.getJti(any<String>()) } returns "key"
         every { memberQueryRepository.findByLoginId(any<String>()) } returns member
         every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
         every { originAuthenticationCredentials.credentials } returns originCredentials
