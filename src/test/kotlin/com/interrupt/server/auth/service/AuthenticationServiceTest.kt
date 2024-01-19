@@ -84,8 +84,8 @@ class AuthenticationServiceTest {
         val newAccessToken = "newAccessToken"
         val newRefreshToken = "newRefreshToken"
 
-        every { jwtService.extractUsername(any<String>()) } returns loginId
-        every { jwtService.extractJti(any<String>()) } returns "key"
+        every { jwtService.getUsername(any<String>()) } returns loginId
+        every { jwtService.getJtl(any<String>()) } returns "key"
         every { memberQueryRepository.findByLoginId(any<String>()) } returns member
         every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
         every { originAuthenticationCredentials.credentials } returns originCredentials
@@ -121,8 +121,8 @@ class AuthenticationServiceTest {
         val originAuthenticationCredentials: AuthenticationCredentials = mockk()
         val originCredentials: Credentials = mockk()
 
-        every { jwtService.extractUsername(any<String>()) } returns loginId
-        every { jwtService.extractJti(any<String>()) } returns "key"
+        every { jwtService.getUsername(any<String>()) } returns loginId
+        every { jwtService.getJtl(any<String>()) } returns "key"
         every { memberQueryRepository.findByLoginId(any<String>()) } returns member
         every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
         every { originAuthenticationCredentials.credentials } returns originCredentials
@@ -144,8 +144,8 @@ class AuthenticationServiceTest {
         val originAuthenticationCredentials: AuthenticationCredentials = mockk()
         val originCredentials: Credentials = mockk()
 
-        every { jwtService.extractUsername(any<String>()) } returns loginId
-        every { jwtService.extractJti(any<String>()) } returns "key"
+        every { jwtService.getUsername(any<String>()) } returns loginId
+        every { jwtService.getJtl(any<String>()) } returns "key"
         every { memberQueryRepository.findByLoginId(any<String>()) } returns member
         every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
         every { originAuthenticationCredentials.credentials } returns originCredentials
@@ -169,8 +169,8 @@ class AuthenticationServiceTest {
         val originAuthenticationCredentials: AuthenticationCredentials = mockk()
         val originCredentials: Credentials = mockk()
 
-        every { jwtService.extractUsername(any<String>()) } returns loginId
-        every { jwtService.extractJti(any<String>()) } returns "key"
+        every { jwtService.getUsername(any<String>()) } returns loginId
+        every { jwtService.getJtl(any<String>()) } returns "key"
         every { memberQueryRepository.findByLoginId(any<String>()) } returns member
         every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
         every { originAuthenticationCredentials.credentials } returns originCredentials

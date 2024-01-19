@@ -26,7 +26,7 @@ class AuthenticationServiceIntegrationTest: IntegrationTestSupport() {
     @Autowired
     private lateinit var memberRepository: MemberRepository
     @Autowired
-    private lateinit var jwtService: JwtService
+    private lateinit var tokenProvider: TokenProvider
     @Autowired
     private lateinit var jwtProperties: JwtProperties
     @Autowired
@@ -57,8 +57,9 @@ class AuthenticationServiceIntegrationTest: IntegrationTestSupport() {
         val member = memberRepository.save(Member(loginId, encoder.encode(password), "name", "email"))
 
         val jti = UUID.randomUUID().toString()
-        val accessToken = jwtService.buildToken(member, jti, 1L)
-        val refreshToken = jwtService.buildToken(member, jti, jwtProperties.refreshTokenExpiration)
+
+        val accessToken = tokenProvider.buildToken(member, jti, 1L)
+        val refreshToken = tokenProvider.buildToken(member, jti, jwtProperties.refreshTokenExpiration)
 
         val authenticationCredentials = AuthenticationCredentials(Credentials(accessToken, refreshToken), Identifier(jti, member.id))
 
