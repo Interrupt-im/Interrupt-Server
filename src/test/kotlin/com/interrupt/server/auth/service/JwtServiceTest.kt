@@ -216,7 +216,34 @@ class JwtServiceTest {
     }
 
     @Test
-    fun `토큰 문자열을 이용해 만료시간이 지났는지 체크한다`() {
+    fun `토큰 문자열을 이용해 만료시간이 지나지 않았으면 false 를 반환한다`() {
+        // given
+        val token = "token.token.token"
+        val decoder = mockk<Base64.Decoder>()
+        val bytes = ByteArray(1) { 0x01 }
+        val readObject = mutableMapOf("exp" to "1000")
+        val zonedDateTime: ZonedDateTime = mockk()
+        val instant: Instant = mockk()
+        val currentMillis = 900L
+
+        mockkStatic(Base64::class)
+        every { Base64.getDecoder() } returns decoder
+        every { decoder.decode(any<String>()) } returns bytes
+        every { objectMapper.readValue(any<String>(), any<TypeReference<MutableMap<String, String>>>()) } returns readObject
+        mockkStatic(ZonedDateTime::class)
+        every { ZonedDateTime.now() } returns zonedDateTime
+        every { zonedDateTime.toInstant() } returns instant
+        every { instant.toEpochMilli() } returns currentMillis
+
+        // when
+        val isExpired = jwtService.checkTokenExpiredByTokenString(token)
+
+        // then
+        assertThat(isExpired).isFalse()
+    }
+
+    @Test
+    fun `토큰 문자열을 이용해 만료시간이 지났으면 true 를 반환한다`() {
         // given
         val token = "token.token.token"
         val decoder = mockk<Base64.Decoder>()
@@ -236,10 +263,29 @@ class JwtServiceTest {
         every { instant.toEpochMilli() } returns currentMillis
 
         // when
-        val isNotExpired = jwtService.checkTokenExpiredByTokenString(token)
+        val isExpired = jwtService.checkTokenExpiredByTokenString(token)
 
         // then
-        assertThat(isNotExpired).isTrue()
+        assertThat(isExpired).isTrue()
+    }
+
+    @Test
+    fun `토큰 문자열을 이용해 만료시간을 체크할 때 토큰에 만료시간이 없다면 예외를 반환한다`() {
+        // given
+        val token = "token.token.token"
+        val decoder = mockk<Base64.Decoder>()
+        val bytes = ByteArray(1) { 0x01 }
+        val readObject = mutableMapOf("" to "")
+
+        mockkStatic(Base64::class)
+        every { Base64.getDecoder() } returns decoder
+        every { decoder.decode(any<String>()) } returns bytes
+        every { objectMapper.readValue(any<String>(), any<TypeReference<MutableMap<String, String>>>()) } returns readObject
+
+        // when then
+        assertThatThrownBy { jwtService.checkTokenExpiredByTokenString(token) }
+            .isInstanceOf(InterruptServerException::class.java)
+            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
     }
 
 }
