@@ -20,7 +20,7 @@ class JwtAuthenticationFilter(
     private val tokenRedisRepository: TokenRedisRepository,
 ): OncePerRequestFilter() {
 
-    override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
+    public override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
 
         if (request.servletPath.contains("/api/v1/auth")) {
             filterChain.doFilter(request, response)
