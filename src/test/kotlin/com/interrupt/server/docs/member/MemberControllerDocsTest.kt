@@ -9,8 +9,11 @@ import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRe
 import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckResponse
 import com.interrupt.server.member.dto.register.MemberRegisterRequest
 import com.interrupt.server.member.dto.update.MemberUpdateRequest
+import com.interrupt.server.member.entity.Member
 import com.interrupt.server.member.service.MemberService
-import io.mockk.*
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document
@@ -95,14 +98,14 @@ class MemberControllerDocsTest: RestDocsSupport() {
 
     @Test
     fun `회원 수정 API`() {
-        val request = MemberUpdateRequest("password123", "홍길동", "test@test.com", "0000")
+        val password = "password123"
+        val request = MemberUpdateRequest(password, "홍길동", "test@test.com", "0000")
         val fields = ConstrainedFields(request::class.java)
-        val paths = ConstrainedPath(MemberController::updateMember)
 
-        justRun { memberService.updateMember(any<String>(), any<MemberUpdateRequest>()) }
+        justRun { memberService.updateMember(any<Member>(), any<MemberUpdateRequest>()) }
 
         val result = mockMvc.perform(
-            patch("/api/v1/members/{loginId}", "loginId")
+            patch("/api/v1/members")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON))
 
@@ -112,8 +115,6 @@ class MemberControllerDocsTest: RestDocsSupport() {
             .andDo(document("update-member",
                 getDocumentRequest(),
                 getDocumentResponse(),
-                pathParameters(
-                    paths.withName("loginId").description("회원 ID")),
                 requestFields(
                     fields.withPath("password").type(JsonFieldType.STRING)
                         .optional()
@@ -135,12 +136,11 @@ class MemberControllerDocsTest: RestDocsSupport() {
     fun `회원 탈퇴 API`() {
         val request = MemberDeleteRequest("password123")
         val fields = ConstrainedFields(request::class.java)
-        val paths = ConstrainedPath(MemberController::deleteMember)
 
-        justRun { memberService.deleteMember(any<String>(), any<MemberDeleteRequest>()) }
+        justRun { memberService.deleteMember(any<Member>(), any<MemberDeleteRequest>()) }
 
         val result = mockMvc.perform(
-            delete("/api/v1/members/{loginId}", "loginId")
+            delete("/api/v1/members")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -151,8 +151,6 @@ class MemberControllerDocsTest: RestDocsSupport() {
             .andDo(document("delete-member",
                 getDocumentRequest(),
                 getDocumentResponse(),
-                pathParameters(
-                    paths.withName("loginId").description("회원 ID")),
                 requestFields(
                     fields.withPath("password").type(JsonFieldType.STRING)
                         .optional()

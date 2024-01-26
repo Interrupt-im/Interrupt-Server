@@ -2,7 +2,6 @@ package com.interrupt.server.member.service
 
 import com.interrupt.server.common.exception.ErrorCode
 import com.interrupt.server.common.exception.InterruptServerException
-import com.interrupt.server.common.security.StringEncoder
 import com.interrupt.server.email.dto.EmailType
 import com.interrupt.server.email.entity.EmailMessage
 import com.interrupt.server.email.service.EmailSendService
@@ -28,18 +27,19 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.LocalDateTime
 
 class MemberServiceTest {
 
     companion object {
 
-        private val memberRepository: MemberRepository = mockk<MemberRepository>()
-        private val emailSendService: EmailSendService = mockk<EmailSendService>()
-        private val emailVerifyCodeRepository: EmailVerifyCodeRepository = mockk<EmailVerifyCodeRepository>()
-        private val memberRecoverRepository: MemberRecoverRepository = mockk<MemberRecoverRepository>()
-        private val stringEncoder: StringEncoder = mockk<StringEncoder>()
-        private val memberService = MemberService(memberRepository, emailSendService, emailVerifyCodeRepository, memberRecoverRepository, stringEncoder)
+        private val memberRepository: MemberRepository = mockk()
+        private val emailSendService: EmailSendService = mockk()
+        private val emailVerifyCodeRepository: EmailVerifyCodeRepository = mockk()
+        private val memberRecoverRepository: MemberRecoverRepository = mockk()
+        private val passwordEncoder: PasswordEncoder = mockk()
+        private val memberService = MemberService(memberRepository, emailSendService, emailVerifyCodeRepository, memberRecoverRepository, passwordEncoder)
 
         @BeforeAll
         @JvmStatic
@@ -62,9 +62,8 @@ class MemberServiceTest {
         val verifyCode = EmailVerifyCode(memberRegisterRequest.email!!, "000000", true).apply { uuid = memberRegisterRequest.emailVerifyCodeKey!! }
 
         every { emailVerifyCodeRepository.findByUuid(any<String>()) } returns verifyCode
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
-        every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { memberRepository.findByLoginId(any<String>()) } returns null
+        every { passwordEncoder.encode(any<String>()) } answers { it.invocation.args[0] as String }
         every { memberRepository.save(any<Member>()) } returns
                 Member(
                     memberRegisterRequest.loginId!!,
@@ -84,16 +83,6 @@ class MemberServiceTest {
         val verifyCode = EmailVerifyCode(memberRegisterRequest.email!!, "000000", false).apply { uuid = memberRegisterRequest.emailVerifyCodeKey!! }
 
         every { emailVerifyCodeRepository.findByUuid(any<String>()) } returns verifyCode
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
-        every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
-        every { memberRepository.findByLoginId(any<String>()) } returns mockk<Member>(relaxed = true)
-        every { memberRepository.save(any<Member>()) } returns
-                Member(
-                    memberRegisterRequest.loginId!!,
-                    memberRegisterRequest.password!!,
-                    memberRegisterRequest.name!!,
-                    memberRegisterRequest.email!!,
-                )
 
         // when
         val result = assertThatThrownBy { memberService.registerMember(memberRegisterRequest) }
@@ -109,7 +98,6 @@ class MemberServiceTest {
         // given
         val memberRegisterRequest = MemberRegisterRequest("test1", "testPassword", "testName", "test@mail.com", "0000")
 
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { emailVerifyCodeRepository.findByUuid(any<String>()) } returns null
 
         // when
@@ -128,16 +116,7 @@ class MemberServiceTest {
         val verifyCode = EmailVerifyCode(memberRegisterRequest.email!!, "000000", true).apply { uuid = memberRegisterRequest.emailVerifyCodeKey!! }
 
         every { emailVerifyCodeRepository.findByUuid(any<String>()) } returns verifyCode
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
-        every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { memberRepository.findByLoginId(any<String>()) } returns mockk<Member>(relaxed = true)
-        every { memberRepository.save(any<Member>()) } returns
-                Member(
-                    memberRegisterRequest.loginId!!,
-                    memberRegisterRequest.password!!,
-                    memberRegisterRequest.name!!,
-                    memberRegisterRequest.email!!,
-                    )
 
         // when
         val result = assertThatThrownBy { memberService.registerMember(memberRegisterRequest) }
@@ -154,7 +133,6 @@ class MemberServiceTest {
         val loginId = "testId"
         val request = LoginIdDuplicateCheckRequest(loginId)
 
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { memberRepository.findByLoginId(any<String>()) } returns null
 
         // when
@@ -170,7 +148,6 @@ class MemberServiceTest {
         val loginId = "testId"
         val request = LoginIdDuplicateCheckRequest(loginId)
 
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { memberRepository.findByLoginId(any<String>()) } returns Member(loginId, "testPw", "testName", "test@test.com")
 
         // when
@@ -187,7 +164,6 @@ class MemberServiceTest {
 
         every { emailSendService.generateEmailTemplate(EmailType.MEMBER_REGISTER.template, any<Map<String, Any>>()) } returns "contents"
         justRun { emailSendService.sendMail(any<EmailMessage>()) }
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { emailVerifyCodeRepository.save(any<EmailVerifyCode>()) } answers { (it.invocation.args[0] as EmailVerifyCode).apply { uuid = "emailVerifyCodeKey" } }
 
         // when
@@ -253,39 +229,30 @@ class MemberServiceTest {
         // given
         val loginId = "test1"
         val password = "testPassword"
+        val member = Member(loginId, password, "name", "email")
         val memberDeleteRequest = MemberDeleteRequest(password)
 
-        val savedMemberStub = Member(
-            loginId,
-            password,
-            "testName",
-            "test@mail.com"
-        )
-
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
-        every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
-
-        every { memberRepository.findByLoginIdAndLoginPassword(loginId, password) } returns savedMemberStub
-        every { memberRepository.save(any<Member>()) } returns savedMemberStub.also { it.deletedAt = LocalDateTime.now() }
+        every { passwordEncoder.encode(any<String>()) } answers { it.invocation.args[0] as String }
+        every { memberRepository.findByLoginIdAndLoginPassword(loginId, password) } returns member
+        every { memberRepository.save(any<Member>()) } returns member.also { it.deletedAt = LocalDateTime.now() }
 
         // when then
-        memberService.deleteMember(loginId, memberDeleteRequest)
+        memberService.deleteMember(member, memberDeleteRequest)
     }
 
     @Test
-    fun `존재하지 않는 회원 ID 와 비밀번호로 회원탈퇴를 시도하면 적절한 예외를 반환`() {
+    fun `잘못된 비밀번호로 회원탈퇴를 시도하면 적절한 예외를 반환`() {
         // given
         val loginId = "test1"
-        val password = "testPassword"
-        val memberDeleteRequest = MemberDeleteRequest(password)
+        val member = Member(loginId, "password", "name", "email")
+        val wrongPassword = "testPassword"
+        val memberDeleteRequest = MemberDeleteRequest(wrongPassword)
 
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
-        every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
-
-        every { memberRepository.findByLoginIdAndLoginPassword(loginId, password) } returns null
+        every { passwordEncoder.encode(any<String>()) } answers { it.invocation.args[0] as String }
+        every { memberRepository.findByLoginIdAndLoginPassword(loginId, wrongPassword) } returns null
 
         // when
-        val result = assertThatThrownBy { memberService.deleteMember(loginId, memberDeleteRequest) }
+        val result = assertThatThrownBy { memberService.deleteMember(member, memberDeleteRequest) }
 
         // then
         result.isInstanceOf(InterruptServerException::class.java)
@@ -298,7 +265,7 @@ class MemberServiceTest {
         val loginId = "testLoginId"
         val userName = "testName"
         val userEmail = "test@test.com"
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
+
         every { memberRepository.findByNameAndEmail(any<String>(), any<String>()) } returns Member(loginId, "password", userName, userEmail)
         every { emailSendService.generateEmailTemplate(EmailType.LOGIN_ID_RECOVER.template, any<Map<String, Any>>()) } returns "contents"
         justRun { emailSendService.sendMail(any<EmailMessage>()) }
@@ -316,7 +283,7 @@ class MemberServiceTest {
         // given
         val userName = "testName"
         val userEmail = "test@test.com"
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
+
         every { memberRepository.findByNameAndEmail(any<String>(), any<String>()) } returns null
 
         // when
@@ -336,7 +303,6 @@ class MemberServiceTest {
         val loginId = "testLoginId"
 
         every { memberRecoverRepository.findByUuid(memberRecoverKey) } returns MemberRecover("test@test.com", loginId, verifyCode)
-        every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
 
         // when
         val response = memberService.validateLoginIdRecoverVerifyCode(VerifyRecoverLoginIdRequest(memberRecoverKey, verifyCode))
@@ -387,7 +353,6 @@ class MemberServiceTest {
         // given
         val request = RecoverPasswordRequest("testLoginId", "test@test.com")
 
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { memberRepository.findByLoginIdAndEmail(any<String>(), any<String>()) } returns Member(request.loginId!!, "password", "name", request.email!!)
         every { emailSendService.generateEmailTemplate(EmailType.PASSWORD_RECOVER.template, any<Map<String, Any>>()) } returns "contents"
         justRun { emailSendService.sendMail(any<EmailMessage>()) }
@@ -405,7 +370,7 @@ class MemberServiceTest {
         // given
         val loginId = "testLoginId"
         val userEmail = "test@test.com"
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
+
         every { memberRepository.findByLoginIdAndEmail(any<String>(), any<String>()) } returns null
 
         // when
@@ -427,9 +392,9 @@ class MemberServiceTest {
         val memberStub = Member(loginId, "password", "name", "test@test.com")
 
         every { memberRecoverRepository.findByUuid(memberRecoverKey) } returns MemberRecover("test@test.com", loginId, verifyCode)
-        every { stringEncoder.decrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { memberRepository.findByLoginId(loginId) } returns memberStub
         every { memberRepository.save(memberStub.apply { loginPassword = newPassword }) } answers { it.invocation.args[0] as Member }
+        every { passwordEncoder.encode(any<String>()) } answers { it.invocation.args[0] as String }
 
         // when then
         memberService.validatePasswordRecoverVerifyCode(VerifyRecoverPasswordRequest(memberRecoverKey, verifyCode, newPassword))
@@ -474,7 +439,7 @@ class MemberServiceTest {
     }
 
     @Test
-    fun `회원 ID 를 이용해 회원 엔티티를 찾고 해당 엔티티에 대해 회원 정보 수정을 수행한다`() {
+    fun `회원 정보 수정을 수행한다`() {
         // given
         val loginId = "loginId"
         val newPassword = "newPassword"
@@ -483,7 +448,7 @@ class MemberServiceTest {
         val emailVerifyCodeKey = "0000"
 
         every { memberRepository.findByLoginId(loginId) } returns memberStub
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
+        every { passwordEncoder.encode(any<String>()) } answers { it.invocation.args[0] as String }
         every { emailVerifyCodeRepository.findByUuid(emailVerifyCodeKey) } returns EmailVerifyCode(newEmail, "000000", true)
 
         every { memberRepository.save(memberStub.also {
@@ -493,20 +458,7 @@ class MemberServiceTest {
 
         // when then
         val request = MemberUpdateRequest(newPassword, email = newEmail, emailVerifyCodeKey = emailVerifyCodeKey)
-        memberService.updateMember(loginId, request)
-    }
-
-    @Test
-    fun `회원정보를 수정할 때 회원 ID 에 해당하는 회원 엔티티가 없으면 예외를 반환한다`() {
-        // given
-        val loginId = "loginId"
-
-        every { memberRepository.findByLoginId(loginId) } returns null
-
-        // when then
-        assertThatThrownBy { memberService.updateMember(loginId, MemberUpdateRequest(emailVerifyCodeKey = "0000")) }
-            .isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.MEMBER_NOT_FOUND.message)
+        memberService.updateMember(memberStub, request)
     }
 
     @Test
@@ -520,15 +472,14 @@ class MemberServiceTest {
         val emailVerifyCodeKey2 = "1111"
 
         every { memberRepository.findByLoginId(loginId) } returns memberStub
-        every { stringEncoder.encrypt(any<String>()) } answers { it.invocation.args[0] as String }
         every { emailVerifyCodeRepository.findByUuid(emailVerifyCodeKey) } returns EmailVerifyCode(newEmail1, emailVerifyCodeKey, false)
         every { emailVerifyCodeRepository.findByUuid(emailVerifyCodeKey2) } returns null
 
         // when then
-        assertThatThrownBy { memberService.updateMember(loginId, MemberUpdateRequest(email = newEmail1, emailVerifyCodeKey = emailVerifyCodeKey)) }
+        assertThatThrownBy { memberService.updateMember(memberStub, MemberUpdateRequest(email = newEmail1, emailVerifyCodeKey = emailVerifyCodeKey)) }
             .isInstanceOf(InterruptServerException::class.java)
             .hasMessage(ErrorCode.EMAIL_NOT_VERIFIED.message)
-        assertThatThrownBy { memberService.updateMember(loginId, MemberUpdateRequest(email = newEmail2, emailVerifyCodeKey = emailVerifyCodeKey2)) }
+        assertThatThrownBy { memberService.updateMember(memberStub, MemberUpdateRequest(email = newEmail2, emailVerifyCodeKey = emailVerifyCodeKey2)) }
             .isInstanceOf(InterruptServerException::class.java)
             .hasMessage(ErrorCode.EMAIL_VERIFY_CODE_NOT_FOUND.message)
     }
