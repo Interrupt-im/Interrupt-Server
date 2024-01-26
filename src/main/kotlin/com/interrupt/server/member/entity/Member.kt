@@ -39,7 +39,7 @@ class Member(
 
     override fun isEnabled(): Boolean = this.deletedAt == null
 
-    fun update(loginId: String? = null, loginPassword: String? = null, name: String? = null, email: String? = null) {
+    fun update(loginPassword: String? = null, name: String? = null, email: String? = null) {
         loginPassword?.let { this.loginPassword = it }
         name?.let { this.name = it }
         email?.let { this.email = it }
