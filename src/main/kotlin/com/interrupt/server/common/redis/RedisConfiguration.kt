@@ -36,40 +36,4 @@ class RedisConfiguration(
         }
     }
 
-//    @Bean(name = ["emailVerifyRedisTemplate"])
-//    fun emailVerifyRedisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, EmailVerifyCode> {
-//        return RedisTemplate<String, EmailVerifyCode>().apply {
-//            connectionFactory = redisConnectionFactory
-//            keySerializer = StringRedisSerializer()
-//            valueSerializer = Jackson2JsonRedisSerializer(EmailVerifyCode::class.java)
-//        }
-//    }
-//
-//    @Bean(name = ["memberRecoverRedisTemplate"])
-//    fun memberRecoverRedisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, MemberRecover> {
-//        return RedisTemplate<String, MemberRecover>().apply {
-//            connectionFactory = redisConnectionFactory
-//            keySerializer = StringRedisSerializer()
-//            valueSerializer = Jackson2JsonRedisSerializer(MemberRecover::class.java)
-//        }
-//    }
-//
-//    @Bean(name = ["jobGroupRedisTemplate"])
-//    fun jobGroupRedisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, JobGroupDto> {
-//        return RedisTemplate<String, JobGroupDto>().apply {
-//            connectionFactory = redisConnectionFactory
-//            keySerializer = StringRedisSerializer()
-//            valueSerializer = Jackson2JsonRedisSerializer(JobGroupDto::class.java)
-//        }
-//    }
-//
-//    @Bean(name = ["skillGroupRedisTemplate"])
-//    fun skillGroupRedisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, SkillGroupDto> {
-//        return RedisTemplate<String, SkillGroupDto>().apply {
-//            connectionFactory = redisConnectionFactory
-//            keySerializer = StringRedisSerializer()
-//            valueSerializer = Jackson2JsonRedisSerializer(SkillGroupDto::class.java)
-//        }
-//    }
-
 }
