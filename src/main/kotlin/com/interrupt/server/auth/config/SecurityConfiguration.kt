@@ -11,7 +11,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.authentication.logout.LogoutHandler
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher
@@ -24,7 +26,9 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector
 class SecurityConfiguration(
     private val jwtAuthFilter: JwtAuthenticationFilter,
     private val authenticationProvider: AuthenticationProvider,
-    private val logoutHandler: LogoutHandler
+    private val logoutHandler: LogoutHandler,
+    private val entryPoint: AuthenticationEntryPoint,
+    private val accessDeniedHandler: AccessDeniedHandler
 ) {
 
     private companion object {
@@ -61,6 +65,10 @@ class SecurityConfiguration(
                     .addLogoutHandler(logoutHandler)
                     .logoutSuccessHandler { req, res, auth -> SecurityContextHolder.clearContext() }
 //                    .logoutSuccessUrl()
+            }
+            exceptionHandling {
+                it.authenticationEntryPoint(entryPoint)
+                    .accessDeniedHandler(accessDeniedHandler)
             }
             build()
         }
