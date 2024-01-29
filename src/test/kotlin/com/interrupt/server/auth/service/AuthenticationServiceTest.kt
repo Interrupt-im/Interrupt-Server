@@ -74,7 +74,7 @@ class AuthenticationServiceTest {
         val originRefreshToken = "originRefreshToken"
         val request = TokenRefreshRequest(originRefreshToken)
         val loginId = "loginId"
-        val member = mockk<Member>()
+        val member: Member = mockk()
         val originAuthenticationCredentials: AuthenticationCredentials = mockk()
         val originCredentials: Credentials = mockk()
         val newAuthenticationCredentials = mockk<AuthenticationCredentials>()
@@ -112,12 +112,48 @@ class AuthenticationServiceTest {
     }
 
     @Test
+    fun `토큰 재발급 시 전달 받은 refreshToken 의 username 으로 찾은 UserDetails 가 없다면 예외를 반환한다`() {
+        // given
+        val originRefreshToken = "originRefreshToken"
+        val request = TokenRefreshRequest(originRefreshToken)
+        val loginId = "loginId"
+
+        every { jwtService.getUsername(any<String>()) } returns loginId
+        every { jwtService.getJti(any<String>()) } returns "key"
+        every { memberQueryRepository.findByLoginId(any<String>()) } returns null
+
+        // when then
+        assertThatThrownBy { authService.refreshToken(request) }
+            .isInstanceOf(InterruptServerException::class.java)
+            .hasMessage(ErrorCode.MEMBER_NOT_FOUND.message)
+    }
+
+    @Test
+    fun `토큰 재발급 시 전달 받은 refreshToken 의 jti 으로 찾은 TokenCache 가 없다면 예외를 반환한다`() {
+        // given
+        val originRefreshToken = "originRefreshToken"
+        val request = TokenRefreshRequest(originRefreshToken)
+        val loginId = "loginId"
+        val member: Member = mockk()
+
+        every { jwtService.getUsername(any<String>()) } returns loginId
+        every { jwtService.getJti(any<String>()) } returns "key"
+        every { memberQueryRepository.findByLoginId(any<String>()) } returns member
+        every { tokenRedisRepository.findById(any<String>()) } returns null
+
+        // when then
+        assertThatThrownBy { authService.refreshToken(request) }
+            .isInstanceOf(InterruptServerException::class.java)
+            .hasMessage(ErrorCode.TOKEN_NOT_FOUND.message)
+    }
+
+    @Test
     fun `토큰 재발급 시 전달 받은 refreshToken 과 토큰에 포함된 jti 로 저장소에서 찾은 refreshToken 이 다른 경우 예외를 반환한다`() {
         // given
         val originRefreshToken = "originRefreshToken"
         val request = TokenRefreshRequest(originRefreshToken)
         val loginId = "loginId"
-        val member = mockk<Member>()
+        val member: Member = mockk()
         val originAuthenticationCredentials: AuthenticationCredentials = mockk()
         val originCredentials: Credentials = mockk()
 
@@ -131,7 +167,7 @@ class AuthenticationServiceTest {
         // when then
         assertThatThrownBy { authService.refreshToken(request) }
             .isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
+            .hasMessage(ErrorCode.MISS_MATCH_TOKEN.message)
     }
 
     @Test
@@ -140,7 +176,7 @@ class AuthenticationServiceTest {
         val originRefreshToken = "originRefreshToken"
         val request = TokenRefreshRequest(originRefreshToken)
         val loginId = "loginId"
-        val member = mockk<Member>()
+        val member: Member = mockk()
         val originAuthenticationCredentials: AuthenticationCredentials = mockk()
         val originCredentials: Credentials = mockk()
 
@@ -155,7 +191,7 @@ class AuthenticationServiceTest {
         // when then
         assertThatThrownBy { authService.refreshToken(request) }
             .isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
+            .hasMessage(ErrorCode.INVALID_REFRESH_TOKEN.message)
     }
 
     @Test
@@ -165,7 +201,7 @@ class AuthenticationServiceTest {
         val originRefreshToken = "originRefreshToken"
         val request = TokenRefreshRequest(originRefreshToken)
         val loginId = "loginId"
-        val member = mockk<Member>()
+        val member: Member = mockk()
         val originAuthenticationCredentials: AuthenticationCredentials = mockk()
         val originCredentials: Credentials = mockk()
 
@@ -182,7 +218,7 @@ class AuthenticationServiceTest {
         // when then
         assertThatThrownBy { authService.refreshToken(request) }
             .isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
+            .hasMessage(ErrorCode.EXPIRED_TOKEN.message)
     }
 
 }

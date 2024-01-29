@@ -54,7 +54,7 @@ class CustomLogoutHandlerTest {
         // when then
         assertThatThrownBy { logoutHandler.logout(request, mockk(), mockk()) }
             .isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
+            .hasMessage(ErrorCode.TOKEN_NOT_FOUND.message)
     }
 
 }

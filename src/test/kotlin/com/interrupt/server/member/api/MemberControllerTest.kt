@@ -274,7 +274,7 @@ class MemberControllerTest: ControllerTestSupport() {
     }
     
     @Test
-    fun `회원 탈퇴'`() {
+    fun `회원 탈퇴`() {
         // given
         val request = MemberDeleteRequest("ward123!")
 

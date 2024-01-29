@@ -51,10 +51,10 @@ class JwtServiceTest {
         // when then
         assertThatThrownBy { jwtService.getUsername(token1) }
             .isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
+            .hasMessage(ErrorCode.EMPTY_CLAIM.message)
         assertThatThrownBy { jwtService.getUsername(token2) }
             .isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
+            .hasMessage(ErrorCode.EMPTY_CLAIM.message)
     }
 
     @Test
@@ -83,10 +83,10 @@ class JwtServiceTest {
         // when then
         assertThatThrownBy { jwtService.getJti(token1) }
             .isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
+            .hasMessage(ErrorCode.EMPTY_CLAIM.message)
         assertThatThrownBy { jwtService.getJti(token2) }
             .isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
+            .hasMessage(ErrorCode.EMPTY_CLAIM.message)
     }
 
     @Test
@@ -285,7 +285,7 @@ class JwtServiceTest {
         // when then
         assertThatThrownBy { jwtService.checkTokenExpiredByTokenString(token) }
             .isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED.message)
+            .hasMessage(ErrorCode.INVALID_ACCESS_TOKEN.message)
     }
 
 }
