@@ -27,7 +27,7 @@ class CustomLogoutHandler(
         tokenRedisRepository.findById(jti)?.let {
             tokenRedisRepository.deleteById(jti)
             SecurityContextHolder.clearContext()
-        } ?: throw InterruptServerException(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED)
+        } ?: throw InterruptServerException(ErrorCode.TOKEN_NOT_FOUND)
     }
 
 }

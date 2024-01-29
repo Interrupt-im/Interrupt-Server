@@ -26,7 +26,7 @@ class JwtService(
     fun getJti(token: String): String = tokenProvider.extractJti(token).isValidClaimFromToken()
 
     private fun String?.isValidClaimFromToken(): String =
-        if (isNullOrBlank()) throw InterruptServerException(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED)
+        if (isNullOrBlank()) throw InterruptServerException(ErrorCode.EMPTY_CLAIM)
         else this
 
     fun generateAccessToken(userDetails: UserDetails, jti: String): String =
@@ -55,13 +55,13 @@ class JwtService(
     fun checkTokenExpiredByTokenString(token: String): Boolean {
         val parts = token.split(".")
 
-        if (parts.size != 3) throw InterruptServerException(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED)
+        if (parts.size != 3) throw InterruptServerException(ErrorCode.INVALID_ACCESS_TOKEN)
 
         val payload = String(Base64.getDecoder().decode(parts[1]))
 
         val expiration =
             objectMapper.readValue(payload, object : TypeReference<MutableMap<String, String>>() {})["exp"]?.toLong()
-            ?: throw InterruptServerException(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED)
+            ?: throw InterruptServerException(ErrorCode.INVALID_ACCESS_TOKEN)
 
         val current = ZonedDateTime.now().toInstant().toEpochMilli() / 1000
 

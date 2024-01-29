@@ -63,7 +63,7 @@ class AuthenticationService(
     }
 
     private fun validateActiveAccessToken(accessToken: String, member: Member) {
-        if (!jwtService.checkTokenExpiredByTokenString(accessToken)) throw InterruptServerException(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED)
+        if (!jwtService.checkTokenExpiredByTokenString(accessToken)) throw InterruptServerException(ErrorCode.EXPIRED_TOKEN)
         tokenRedisRepository.deleteById(member.loginId)
     }
 
@@ -74,14 +74,14 @@ class AuthenticationService(
     }
 
     private fun validateRefreshToken(jwt: String, refreshToken: String, user: UserDetails) {
-        if (jwt != refreshToken) throw InterruptServerException(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED)
-        if (!jwtService.isTokenValid(jwt, user)) throw InterruptServerException(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED)
+        if (jwt != refreshToken) throw InterruptServerException(ErrorCode.MISS_MATCH_TOKEN)
+        if (!jwtService.isTokenValid(jwt, user)) throw InterruptServerException(ErrorCode.INVALID_REFRESH_TOKEN)
     }
 
-    private fun Member?.isValidMember(): Member = this ?: throw InterruptServerException(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED)
+    private fun Member?.isValidMember(): Member = this ?: throw InterruptServerException(ErrorCode.MEMBER_NOT_FOUND)
 
     private fun AuthenticationCredentials?.isValidToken(): AuthenticationCredentials =
-        this?.let { this } ?: throw throw InterruptServerException(ErrorCode.SUSPICIOUS_ACTIVITY_DETECTED)
+        this?.let { this } ?: throw throw InterruptServerException(ErrorCode.TOKEN_NOT_FOUND)
 
 }
 
