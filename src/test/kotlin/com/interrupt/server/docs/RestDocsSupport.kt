@@ -68,19 +68,21 @@ abstract class RestDocsSupport {
     @BeforeEach
     fun setUp(provider: RestDocumentationContextProvider) {
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(initController())
-            .setCustomArgumentResolvers(object: HandlerMethodArgumentResolver {
-                override fun supportsParameter(parameter: MethodParameter): Boolean {
-                    val hasAnnotation = parameter.hasParameterAnnotation(LoginMember::class.java)
-                    val isMemberType = Member::class.java.isAssignableFrom(parameter.parameterType)
+        val memberArgumentResolver = object : HandlerMethodArgumentResolver {
+            override fun supportsParameter(parameter: MethodParameter): Boolean {
+                val hasAnnotation = parameter.hasParameterAnnotation(LoginMember::class.java)
+                val isMemberType = Member::class.java.isAssignableFrom(parameter.parameterType)
 
-                    return (hasAnnotation && isMemberType)
-                }
+                return (hasAnnotation && isMemberType)
+            }
 
-                override fun resolveArgument(parameter: MethodParameter, mavContainer: ModelAndViewContainer?, webRequest: NativeWebRequest, binderFactory: WebDataBinderFactory?): Any? =
-                    Member("loginId", "password", "name", "email@interrupt.im")
+            override fun resolveArgument(parameter: MethodParameter, mavContainer: ModelAndViewContainer?, webRequest: NativeWebRequest, binderFactory: WebDataBinderFactory?): Any? =
+                Member("loginId", "password", "name", "email@interrupt.im")
+        }
 
-            })
+        this.mockMvc = MockMvcBuilders
+            .standaloneSetup(initController())
+            .setCustomArgumentResolvers(memberArgumentResolver)
             .apply<StandaloneMockMvcBuilder?>(documentationConfiguration(provider))
             .build()
     }
