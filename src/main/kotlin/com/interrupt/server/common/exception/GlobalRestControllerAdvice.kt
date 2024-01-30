@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.SignatureException
 import jakarta.validation.ConstraintViolationException
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.security.authentication.InsufficientAuthenticationException
 import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -22,6 +23,11 @@ class GlobalRestControllerAdvice {
 
     @ExceptionHandler(AuthenticationException::class)
     fun handleAuthenticationException(e: AuthenticationException): ResponseEntity<ExceptionResponse<*>> =
+        InterruptServerException(cause = e, errorCode = ErrorCode.UNAUTHORIZED)
+            .let { ResponseEntity(ExceptionResponse(it.errorCode.status.value(), it.errorCode, it.errorCode.message, null), it.errorCode.status) }
+
+    @ExceptionHandler(InsufficientAuthenticationException::class)
+    fun handleInsufficientAuthenticationException(e: InsufficientAuthenticationException): ResponseEntity<ExceptionResponse<*>> =
         InterruptServerException(cause = e, errorCode = ErrorCode.UNAUTHORIZED)
             .let { ResponseEntity(ExceptionResponse(it.errorCode.status.value(), it.errorCode, it.errorCode.message, null), it.errorCode.status) }
 
