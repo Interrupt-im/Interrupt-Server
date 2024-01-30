@@ -1,5 +1,6 @@
 package com.interrupt.server.member.api
 
+import com.interrupt.WithCustomMockUser
 import com.interrupt.server.ControllerTestSupport
 import com.interrupt.server.member.dto.delete.MemberDeleteRequest
 import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRequest
@@ -216,6 +217,7 @@ class MemberControllerTest: ControllerTestSupport() {
     }
 
     @Test
+    @WithCustomMockUser
     fun `회원 수정`() {
         // given
         val request = MemberUpdateRequest("newPassword123!", "홍길동", "email@domail.com", "0000")
@@ -232,13 +234,14 @@ class MemberControllerTest: ControllerTestSupport() {
     }
 
     @Test
+    @WithCustomMockUser
     fun `회원 수정 시 비밀번호가 존재한다면 8~20자로 이루어져아 한다`() {
         // given
         val request = MemberUpdateRequest(password = "new1234")
 
         // when then
         mockMvc.perform(
-            patch("/api/v1/members/{loginId}", "memberId")
+            patch("/api/v1/members")
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
@@ -246,13 +249,14 @@ class MemberControllerTest: ControllerTestSupport() {
     }
 
     @Test
+    @WithCustomMockUser
     fun `회원 수정 시 비밀번호가 존재한다면 영문과 숫자는 모두 포함되어야 한다`() {
         // given
         val request = MemberUpdateRequest(password = "newPassword!")
 
         // when then
         mockMvc.perform(
-            patch("/api/v1/members/{loginId}", "memberId")
+            patch("/api/v1/members")
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
@@ -260,13 +264,14 @@ class MemberControllerTest: ControllerTestSupport() {
     }
 
     @Test
+    @WithCustomMockUser
     fun `회원 수정 시 이메일이 존재한다면 올바른 형식이어야 한다`() {
         // given
         val request = MemberUpdateRequest(email = "emaildomain")
 
         // when then
         mockMvc.perform(
-            patch("/api/v1/members/{loginId}", "memberId")
+            patch("/api/v1/members")
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
@@ -274,6 +279,7 @@ class MemberControllerTest: ControllerTestSupport() {
     }
     
     @Test
+    @WithCustomMockUser
     fun `회원 탈퇴`() {
         // given
         val request = MemberDeleteRequest("ward123!")
@@ -282,7 +288,7 @@ class MemberControllerTest: ControllerTestSupport() {
 
         // when then
         mockMvc.perform(
-            delete("/api/v1/members/{loginId}", "memberId")
+            delete("/api/v1/members")
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
@@ -296,7 +302,7 @@ class MemberControllerTest: ControllerTestSupport() {
 
         // when then
         mockMvc.perform(
-            delete("/api/v1/members/{loginId}", "memberId")
+            delete("/api/v1/members")
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
@@ -310,7 +316,7 @@ class MemberControllerTest: ControllerTestSupport() {
 
         // when then
         mockMvc.perform(
-            delete("/api/v1/members/{loginId}", "memberId")
+            delete("/api/v1/members")
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
@@ -324,7 +330,7 @@ class MemberControllerTest: ControllerTestSupport() {
 
         // when then
         mockMvc.perform(
-            delete("/api/v1/members/{loginId}", "memberId")
+            delete("/api/v1/members")
                 .content(objectMapper.writeValueAsBytes(request))
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
