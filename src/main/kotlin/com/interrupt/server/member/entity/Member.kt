@@ -1,5 +1,6 @@
 package com.interrupt.server.member.entity
 
+import com.interrupt.server.auth.service.RsaColumnEncryptor
 import com.interrupt.server.common.entity.SoftDeleteBaseEntity
 import com.interrupt.server.member.dto.update.MemberUpdateRequest
 import jakarta.persistence.*
@@ -13,15 +14,19 @@ import org.springframework.security.core.userdetails.UserDetails
 )
 class Member(
     @field:Column(name = "login_id", nullable = false, unique = true)
+    @field:Convert(converter = RsaColumnEncryptor::class)
     val loginId: String,
     @field:Column(name = "password", nullable = false)
     var loginPassword: String,
     @field:Column(name = "name", nullable = false)
+    @field:Convert(converter = RsaColumnEncryptor::class)
     var name: String,
     @field:Column(name = "email", nullable = false)
+    @field:Convert(converter = RsaColumnEncryptor::class)
     var email: String,
     @field:Column(name = "role", nullable = false)
     @field:Enumerated(EnumType.STRING)
+    @field:Convert(converter = RsaColumnEncryptor::class)
     val role: MemberRole = MemberRole.USER
 ): SoftDeleteBaseEntity(), UserDetails {
 
