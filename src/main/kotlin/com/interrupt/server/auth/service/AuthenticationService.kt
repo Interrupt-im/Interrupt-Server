@@ -1,6 +1,8 @@
 package com.interrupt.server.auth.service
 
 import com.interrupt.server.auth.config.JwtProperties
+import com.interrupt.server.auth.dto.login.SignInRequest
+import com.interrupt.server.auth.dto.login.SignInResponse
 import com.interrupt.server.auth.dto.refresh.TokenRefreshRequest
 import com.interrupt.server.auth.dto.refresh.TokenRefreshResponse
 import com.interrupt.server.auth.entity.AuthenticationCredentials
@@ -8,10 +10,8 @@ import com.interrupt.server.auth.entity.TokenCache
 import com.interrupt.server.auth.repository.TokenRedisRepository
 import com.interrupt.server.common.exception.ErrorCode
 import com.interrupt.server.common.exception.InterruptServerException
-import com.interrupt.server.auth.dto.login.SignInRequest
-import com.interrupt.server.auth.dto.login.SignInResponse
 import com.interrupt.server.member.entity.Member
-import com.interrupt.server.member.repository.MemberRepository
+import com.interrupt.server.member.repository.MemberQueryRepository
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class AuthenticationService(
     private val tokenRedisRepository: TokenRedisRepository,
-    private val memberQueryRepository: MemberRepository,
+    private val memberQueryRepository: MemberQueryRepository,
     private val jwtService: JwtService,
     private val authenticationManager: AuthenticationManager,
     private val jwtProperties: JwtProperties,

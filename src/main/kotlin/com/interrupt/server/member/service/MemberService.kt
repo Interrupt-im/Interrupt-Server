@@ -21,6 +21,7 @@ import com.interrupt.server.member.entity.EmailVerifyCode
 import com.interrupt.server.member.entity.Member
 import com.interrupt.server.member.entity.MemberRecover
 import com.interrupt.server.member.repository.EmailVerifyCodeRepository
+import com.interrupt.server.member.repository.MemberQueryRepository
 import com.interrupt.server.member.repository.MemberRecoverRepository
 import com.interrupt.server.member.repository.MemberRepository
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -33,6 +34,7 @@ import kotlin.random.Random
 @Transactional(readOnly = true)
 class MemberService(
     private val memberRepository: MemberRepository,
+    private val memberQueryRepository: MemberQueryRepository,
     private val emailSendService: EmailSendService,
     private val emailVerifyCodeRepository: EmailVerifyCodeRepository,
     private val memberRecoverRepository: MemberRecoverRepository,
@@ -47,7 +49,7 @@ class MemberService(
         val emailVerifyCode = emailVerifyCodeRepository.findByUuid(memberRegisterRequest.emailVerifyCodeKey!!)
         validateVerifiedEmail(emailVerifyCode)
 
-        validateDuplicatedLoginId(memberRepository.findByLoginId(memberRegisterRequest.loginId!!))
+        validateDuplicatedLoginId(memberQueryRepository.findByLoginId(memberRegisterRequest.loginId!!))
 
         val member = memberRegisterRequest.let {
             Member(it.loginId!!, passwordEncoder.encode(it.password), it.name!!, it.email!!)
@@ -60,7 +62,7 @@ class MemberService(
      * 회원 ID 중복 체크
      */
     fun checkLoginIdDuplication(request: LoginIdDuplicateCheckRequest): LoginIdDuplicateCheckResponse =
-        memberRepository.findByLoginId(request.loginId!!)
+        memberQueryRepository.findByLoginId(request.loginId!!)
             ?.let { LoginIdDuplicateCheckResponse(isUnique = false) }
             ?: LoginIdDuplicateCheckResponse(isUnique = true)
 
@@ -101,7 +103,7 @@ class MemberService(
      * 회원 탈퇴
      */
     fun deleteMember(member: Member, memberDeleteRequest: MemberDeleteRequest) {
-        val foundMember = memberRepository.findByLoginId(member.loginId)
+        val foundMember = memberQueryRepository.findByLoginId(member.loginId)
         validateExistMember(foundMember)
         validateUserCredentials(foundMember!!, memberDeleteRequest.password!!)
 
@@ -115,7 +117,7 @@ class MemberService(
     fun applySendLoginIdRecoverVerifyCode(recoverLoginIdRequest: RecoverLoginIdRequest): RecoverLoginIdResponse {
 
         val foundMember = recoverLoginIdRequest.let {
-            memberRepository.findByNameAndEmail(it.name!!, it.email!!)
+            memberQueryRepository.findByNameAndEmail(it.name!!, it.email!!)
         }
 
         validateExistMember(foundMember)
@@ -153,7 +155,7 @@ class MemberService(
     fun applySendPasswordRecoverVerifyCode(recoverPasswordRequest: RecoverPasswordRequest): RecoverPasswordResponse {
 
         val foundMember = recoverPasswordRequest.let {
-            memberRepository.findByLoginIdAndEmail(it.loginId!!, it.email!!)
+            memberQueryRepository.findByLoginIdAndEmail(it.loginId!!, it.email!!)
         }
         validateExistMember(foundMember)
 
@@ -180,7 +182,7 @@ class MemberService(
         validateExistMemberRecover(foundMemberRecover)
         validateCorrectVerifyCode(enteredVerifyCode = recoverPasswordRequest.verifyCode!!, foundMemberRecover!!.verifyCode)
 
-        val foundMember = memberRepository.findByLoginId(foundMemberRecover.loginId)
+        val foundMember = memberQueryRepository.findByLoginId(foundMemberRecover.loginId)
         validateExistMember(foundMember)
 
         foundMember!!.loginPassword = passwordEncoder.encode(recoverPasswordRequest.password!!)

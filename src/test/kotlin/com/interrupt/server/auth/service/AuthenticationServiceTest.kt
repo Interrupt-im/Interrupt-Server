@@ -11,7 +11,7 @@ import com.interrupt.server.auth.repository.TokenRedisRepository
 import com.interrupt.server.common.exception.ErrorCode
 import com.interrupt.server.common.exception.InterruptServerException
 import com.interrupt.server.member.entity.Member
-import com.interrupt.server.member.repository.MemberRepository
+import com.interrupt.server.member.repository.MemberQueryRepository
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
@@ -26,7 +26,7 @@ import org.springframework.security.core.userdetails.UserDetails
 class AuthenticationServiceTest {
 
     private val tokenRedisRepository: TokenRedisRepository = mockk()
-    private val memberQueryRepository: MemberRepository = mockk()
+    private val memberQueryRepository: MemberQueryRepository = mockk()
     private val jwtService: JwtService = mockk()
     private val authenticationManager: AuthenticationManager = mockk()
     private val jwtProperties: JwtProperties = mockk()

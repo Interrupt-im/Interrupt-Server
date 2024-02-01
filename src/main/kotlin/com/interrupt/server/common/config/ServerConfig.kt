@@ -1,6 +1,6 @@
 package com.interrupt.server.common.config
 
-import com.interrupt.server.member.repository.MemberRepository
+import com.interrupt.server.member.repository.MemberQueryRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -16,7 +16,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
 class ServerConfig(
-    private val memberRepository: MemberRepository
+    private val memberQueryRepository: MemberQueryRepository
 ): WebMvcConfigurer {
 
     override fun addCorsMappings(registry: CorsRegistry) {
@@ -26,7 +26,7 @@ class ServerConfig(
 
     @Bean
     fun userDetailsService(): UserDetailsService = UserDetailsService {
-        memberRepository.findByLoginId(it) ?: throw UsernameNotFoundException("해당하는 유저를 찾을 수 없습니다.")
+        memberQueryRepository.findByLoginId(it) ?: throw UsernameNotFoundException("해당하는 유저를 찾을 수 없습니다.")
     }
 
     @Bean

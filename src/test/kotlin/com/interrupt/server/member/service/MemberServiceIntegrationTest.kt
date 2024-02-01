@@ -19,6 +19,7 @@ import com.interrupt.server.member.entity.EmailVerifyCode
 import com.interrupt.server.member.entity.Member
 import com.interrupt.server.member.entity.MemberRecover
 import com.interrupt.server.member.repository.EmailVerifyCodeRepository
+import com.interrupt.server.member.repository.MemberQueryRepository
 import com.interrupt.server.member.repository.MemberRecoverRepository
 import com.interrupt.server.member.repository.MemberRepository
 import com.ninjasquad.springmockk.SpykBean
@@ -37,6 +38,8 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
 
     @Autowired
     private lateinit var memberRepository: MemberRepository
+    @Autowired
+    private lateinit var memberQueryRepository: MemberQueryRepository
     @SpykBean
     private lateinit var emailSendService: EmailSendService
     @Autowired
@@ -206,7 +209,7 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
         memberService.validatePasswordRecoverVerifyCode(request)
 
         // then
-        val result = memberRepository.findByLoginId(loginId)
+        val result = memberQueryRepository.findByLoginId(loginId)
         assertThat(passwordEncoder.matches(newPassword, result?.loginPassword)).isTrue()
     }
 
@@ -234,7 +237,7 @@ class MemberServiceIntegrationTest: IntegrationTestSupport() {
         memberService.updateMember(member, request)
 
         // then
-        val updatedMember = memberRepository.findByLoginId(loginId)
+        val updatedMember = memberQueryRepository.findByLoginId(loginId)
         assertThat(updatedMember)
             .isNotNull
             .extracting("loginId", "name", "email")
