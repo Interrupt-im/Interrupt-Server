@@ -24,3 +24,7 @@ jwt:
   key: ${JWT_KEY}
   access-token-expiration: 3600000 # 1 day
   refresh-token-expiration: 604800000 # 7 days
+
+rsa:
+  public-key: ${rsa.public-key}
+  private-key: ${rsa.private-key}
