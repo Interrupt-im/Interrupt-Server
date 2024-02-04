@@ -1,6 +1,6 @@
 package com.interrupt.server.member.api
 
-import com.interrupt.WithCustomMockUser
+import com.interrupt.server.WithCustomMockUser
 import com.interrupt.server.ControllerTestSupport
 import com.interrupt.server.member.dto.delete.MemberDeleteRequest
 import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRequest

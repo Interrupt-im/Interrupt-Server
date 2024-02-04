@@ -1,6 +1,5 @@
 package com.interrupt.server
 
-import com.interrupt.WithCustomMockUser
 import com.interrupt.server.member.entity.Member
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority

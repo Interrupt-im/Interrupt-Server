@@ -1,4 +1,4 @@
-package com.interrupt
+package com.interrupt.server
 
 import com.interrupt.server.WithCustomMockUserSecurityContextFactory
 import com.interrupt.server.member.entity.MemberRole
