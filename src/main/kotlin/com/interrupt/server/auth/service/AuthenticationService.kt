@@ -52,7 +52,7 @@ class AuthenticationService(
 
         validateRefreshToken(presentedRefreshToken, foundTokens.credentials.refreshToken, user)
 
-        validateActiveAccessToken(foundTokens.credentials.accessToken, user)
+        validateActiveAccessToken(foundTokens.credentials.accessToken, jti)
 
         val authenticationCredentials = jwtService.generateAuthenticationCredentials(user)
 
@@ -62,9 +62,11 @@ class AuthenticationService(
         return authenticationCredentials.credentials.run { TokenRefreshResponse(accessToken, refreshToken) }
     }
 
-    private fun validateActiveAccessToken(accessToken: String, member: Member) {
-        if (!jwtService.checkTokenExpiredByTokenString(accessToken)) throw InterruptServerException(ErrorCode.EXPIRED_TOKEN)
-        tokenRedisRepository.deleteById(member.loginId)
+    private fun validateActiveAccessToken(accessToken: String, jti: String) {
+        if (!jwtService.checkTokenExpiredByTokenString(accessToken)) {
+            tokenRedisRepository.deleteById(jti)
+            throw InterruptServerException(ErrorCode.INVALID_TOKEN_REISSUE_REQUEST)
+        }
     }
 
     private fun saveTokenCache(uuid: String, authenticationCredentials: AuthenticationCredentials) {

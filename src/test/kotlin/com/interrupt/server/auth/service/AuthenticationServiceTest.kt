@@ -15,6 +15,7 @@ import com.interrupt.server.member.repository.MemberQueryRepository
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -195,18 +196,19 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    fun `토큰 재발급 시 전달 받은 토큰의 jti 로 찾은 accessToken 이 만료되기 전 이면 예외를 반환한다`() {
+    fun `토큰 재발급 시 전달 받은 토큰의 jti 로 찾은 accessToken 이 만료되기 전 이면 토큰 저장소에서 토큰을 삭제하고 예외를 반환한다`() {
         // given
         val originAccessToken = "originAccessToken"
         val originRefreshToken = "originRefreshToken"
         val request = TokenRefreshRequest(originRefreshToken)
         val loginId = "loginId"
+        val jti = "key"
         val member: Member = mockk()
         val originAuthenticationCredentials: AuthenticationCredentials = mockk()
         val originCredentials: Credentials = mockk()
 
         every { jwtService.getUsername(any<String>()) } returns loginId
-        every { jwtService.getJti(any<String>()) } returns "key"
+        every { jwtService.getJti(any<String>()) } returns jti
         every { memberQueryRepository.findByLoginId(any<String>()) } returns member
         every { tokenRedisRepository.findById(any<String>()) } returns originAuthenticationCredentials
         every { originAuthenticationCredentials.credentials } returns originCredentials
@@ -214,11 +216,13 @@ class AuthenticationServiceTest {
         every { jwtService.isTokenValid(any<String>(), any<UserDetails>()) } returns true
         every { originCredentials.accessToken } returns originAccessToken
         every { jwtService.checkTokenExpiredByTokenString(originAccessToken) } returns false
+        every { tokenRedisRepository.deleteById(any<String>()) } returns true
 
         // when then
         assertThatThrownBy { authService.refreshToken(request) }
             .isInstanceOf(InterruptServerException::class.java)
-            .hasMessage(ErrorCode.EXPIRED_TOKEN.message)
+            .hasMessage(ErrorCode.INVALID_TOKEN_REISSUE_REQUEST.message)
+        verify(atMost = 1) { tokenRedisRepository.deleteById(jti) }
     }
 
 }

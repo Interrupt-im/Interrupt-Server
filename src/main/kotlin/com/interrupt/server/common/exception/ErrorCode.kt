@@ -18,6 +18,7 @@ enum class ErrorCode(
     EMPTY_CLAIM(HttpStatus.UNAUTHORIZED, "CLAIM 정보가 비어있습니다.", "SE0007"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "토큰 인증에 실패하였습니다.", "SE0008"),
     FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.", "SE0009"),
+    INVALID_TOKEN_REISSUE_REQUEST(HttpStatus.BAD_REQUEST, "토큰을 재발급 할 수 없습니다.", "SE0010"),
 
     // MEMBER
     DUPLICATED_REGISTER_LOGIN_ID(HttpStatus.CONFLICT, "이미 존재하는 아이디 입니다.", "ME0001"),
