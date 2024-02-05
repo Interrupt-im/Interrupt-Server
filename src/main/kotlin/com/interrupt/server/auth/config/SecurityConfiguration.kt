@@ -22,7 +22,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector
 
 @Configuration
 @EnableWebSecurity
-@EnableConfigurationProperties(JwtProperties::class, RsaKeyProperties::class)
+@EnableConfigurationProperties(JwtProperties::class, AesKeyProperties::class)
 class SecurityConfiguration(
     private val jwtAuthFilter: JwtAuthenticationFilter,
     private val authenticationProvider: AuthenticationProvider,

@@ -178,7 +178,7 @@ class JwtServiceTest {
     }
 
     @Test
-    fun `토큰 유효성 검증에서 토큰의 만료시간이 지났으면 false 를 반환한다`() {
+    fun `토큰 유효성 검증에서 토큰의 만료시간이 지났으면 true 를 반환한다`() {
         // given
         val token = "token"
         val userDetails: UserDetails = mockk()
