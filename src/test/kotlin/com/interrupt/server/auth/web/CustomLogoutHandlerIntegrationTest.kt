@@ -1,6 +1,6 @@
 package com.interrupt.server.auth.web
 
-import com.interrupt.server.RestTemplateTestSupport
+import com.interrupt.server.IntegrationTestSupport
 import com.interrupt.server.auth.entity.TokenCache
 import com.interrupt.server.auth.repository.TokenRedisRepository
 import com.interrupt.server.auth.service.JwtService
@@ -12,9 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.web.client.postForEntity
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import java.util.*
 
-class CustomLogoutHandlerIntegrationTest: RestTemplateTestSupport() {
+class CustomLogoutHandlerIntegrationTest: IntegrationTestSupport() {
 
     @Autowired
     private lateinit var memberRepository: MemberRepository
