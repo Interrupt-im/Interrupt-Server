@@ -1,7 +1,6 @@
 package com.interrupt.server.member.component
 
 import com.interrupt.server.auth.config.AesKeyProperties
-import jakarta.annotation.PostConstruct
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter
 import org.springframework.stereotype.Component
@@ -18,23 +17,27 @@ class AesColumnEncryptor(
 ): AttributeConverter<String, String> {
 
     private val charset = Charsets.UTF_8
-    private lateinit var encryptCipher: Cipher
-    private lateinit var decryptCipher: Cipher
+    private val encryptCipher: Cipher = initEncryptCipher()
+    private val decryptCipher: Cipher = initDecryptCipher()
 
-    @PostConstruct
-    fun init() {
+    private fun initEncryptCipher(): Cipher {
         val secretKey = initSecretKey(aesKeyProperties.secretKey, aesKeyProperties.algorithm)
         val spec = initSpec(aesKeyProperties.iv)
 
-        encryptCipher = Cipher.getInstance(aesKeyProperties.transformation).apply {
+        return Cipher.getInstance(aesKeyProperties.transformation).apply {
             init(Cipher.ENCRYPT_MODE, secretKey, spec)
         }
+    }
 
-        decryptCipher = Cipher.getInstance(aesKeyProperties.transformation).apply {
+    private fun initDecryptCipher(): Cipher {
+        val secretKey = initSecretKey(aesKeyProperties.secretKey, aesKeyProperties.algorithm)
+        val spec = initSpec(aesKeyProperties.iv)
+
+        return Cipher.getInstance(aesKeyProperties.transformation).apply {
             init(Cipher.DECRYPT_MODE, secretKey, spec)
         }
     }
-    
+
     private fun initSecretKey(key: String, algorithm: String): SecretKey {
         val keyByteArray = Base64.getDecoder().decode(key)
         return SecretKeySpec(keyByteArray, algorithm)

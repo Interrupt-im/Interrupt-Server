@@ -18,11 +18,6 @@ class AesColumnEncryptorTest {
 
     private val aesColumnEncryptor = AesColumnEncryptor(aesKeyProperties)
 
-    @BeforeEach
-    fun setUp() {
-        aesColumnEncryptor.init()
-    }
-
     @Test
     fun `문자열을 RSA 암호화 한다`() {
         // given
