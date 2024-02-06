@@ -1,0 +1,78 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:test?MODE=MySQL;
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        highlight_sql: true
+        storage_engine: innodb
+    defer-datasource-initialization: true
+
+  output:
+    ansi:
+      enabled: always
+
+  sql:
+    init:
+      mode: EMBEDDED
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: test
+    password: test
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+logging:
+  level:
+    org:
+      hibernate:
+        type: trace
+        SQL: debug
+        type.descriptor.sql: trace
+        orm:
+          jdbc:
+            bind: trace
+      springframework:
+        orm:
+          jpa: debug
+        transaction: debug
+
+jwt:
+  key: abcdefghijklmnopqrstuvwxyz1234567890
+  access-token-expiration: 3600000 # 1 day
+  refresh-token-expiration: 604800000 # 7 days
+
+aes:
+  secret-key: B/7aN1ds1rgdPH+6cv8Kd3XP/0m/PBxRiTV2vL7cpl0=
+  iv: wpkVFdWbfKrqa+rK4DvPiA==
+  algorithm: AES
+  transformation: AES/CBC/PKCS5Padding

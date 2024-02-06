@@ -7,8 +7,9 @@ import com.interrupt.server.docs.RestDocsSupport
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyResponse
 import com.interrupt.server.member.dto.emailverify.EmailVerifyRequest
-import com.interrupt.server.member.dto.login.MemberLoginRequest
-import com.interrupt.server.member.dto.login.MemberLoginResponse
+import com.interrupt.server.auth.dto.login.SignInRequest
+import com.interrupt.server.auth.dto.login.SignInResponse
+import com.interrupt.server.auth.service.AuthenticationService
 import com.interrupt.server.member.dto.recover.*
 import com.interrupt.server.member.service.MemberService
 import io.mockk.every
@@ -26,9 +27,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 class AuthControllerDocsTest: RestDocsSupport() {
 
-    private val memberService: MemberService = mockk<MemberService>()
+    private val authService: AuthenticationService = mockk()
+    private val memberService: MemberService = mockk()
 
-    override fun initController(): Any = AuthController(memberService)
+    override fun initController(): Any = AuthController(authService, memberService)
 
     @Test
     fun `이메일 인증 코드 요청 API`() {
@@ -97,11 +99,11 @@ class AuthControllerDocsTest: RestDocsSupport() {
 
     @Test
     fun `로그인 API`() {
-        val request = MemberLoginRequest("memberId", "password123")
+        val request = SignInRequest("memberId", "password123")
         val fields = ConstrainedFields(request::class.java)
 
-        every { memberService.login(any<MemberLoginRequest>()) } returns
-                MemberLoginResponse("name")
+        every { authService.login(any<SignInRequest>()) } returns
+                SignInResponse("accessToken", "refreshToken")
 
         val result = mockMvc.perform(
             post("/api/v1/auth/login")
@@ -124,8 +126,10 @@ class AuthControllerDocsTest: RestDocsSupport() {
                 ),
                 responseFields(
                     createDocsResponseDescriptors(
-                        fieldWithPath("data.name").type(JsonFieldType.STRING)
-                            .description("회원 이름")
+                        fieldWithPath("data.accessToken").type(JsonFieldType.STRING)
+                            .description("access-token"),
+                        fieldWithPath("data.refreshToken").type(JsonFieldType.STRING)
+                            .description("refresh-token")
                     )
                 )
             ))

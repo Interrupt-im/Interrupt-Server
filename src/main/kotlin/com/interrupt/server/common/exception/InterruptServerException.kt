@@ -4,9 +4,9 @@ import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 class InterruptServerException @JvmOverloads constructor(
+    val errorCode: ErrorCode,
     message: String? = null,
     override val cause: Throwable? = null,
-    val errorCode: ErrorCode,
 ): RuntimeException(message, cause) {
 
     private val log: KLogger = KotlinLogging.logger {  }
@@ -16,7 +16,7 @@ class InterruptServerException @JvmOverloads constructor(
             """
                 server error
                 cause: $cause
-                message: ${this.message}
+                message: ${message ?: errorCode.message}
                 errorCode: $errorCode
             """.trimIndent()
         }

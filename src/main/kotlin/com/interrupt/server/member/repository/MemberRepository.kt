@@ -1,18 +1,10 @@
 package com.interrupt.server.member.repository
 
 import com.interrupt.server.member.entity.Member
+import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface MemberRepository: JpaRepository<Member, Long> {
-
-    fun findByLoginId(loginId: String): Member?
-
-    fun findByLoginIdAndPassword(loginId: String, password: String): Member?
-
-    fun findByNameAndEmail(name: String, email: String): Member?
-
-    fun findByLoginIdAndEmail(encryptedLoginId: String, encryptedEmail: String): Member?
-
+interface MemberRepository: JpaRepository<Member, Long>, KotlinJdslJpqlExecutor {
 }

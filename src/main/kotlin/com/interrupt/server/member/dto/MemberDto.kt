@@ -13,7 +13,7 @@ data class MemberDto(
     fun toEntity(): Member = Member(loginId, password, name, email)
 
     companion object {
-        fun of(entity: Member) = entity.let { MemberDto(it.id, it.loginId, it.password, it.name, it.email) }
+        fun of(entity: Member) = entity.let { MemberDto(it.id, it.loginId, it.loginPassword, it.name, it.email) }
     }
 
 }

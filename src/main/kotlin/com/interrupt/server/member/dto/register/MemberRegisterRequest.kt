@@ -35,6 +35,6 @@ data class MemberRegisterRequest(
 ) {
 
     fun toEntity(): Member =
-        Member(loginId = loginId!!, password = password!!, name = name!!, email = email!!,)
+        Member(loginId = loginId!!, loginPassword = password!!, name = name!!, email = email!!,)
 
 }

@@ -61,5 +61,13 @@ logging:
           jpa: debug
         transaction: debug
 
-security:
-  encrypt-key: 7a3b15e8f2772c2a9f28d04996b9f35c
+jwt:
+  key: 7a3b15e8f2772c2a9f28d04996b9f35casdf231rfv2r3
+  access-token-expiration: 3600000 # 1 day
+  refresh-token-expiration: 604800000 # 7 days
+
+aes:
+  secret-key: B/7aN1ds1rgdPH+6cv8Kd3XP/0m/PBxRiTV2vL7cpl0=
+  iv: wpkVFdWbfKrqa+rK4DvPiA==
+  algorithm: AES
+  transformation: AES/CBC/PKCS5Padding

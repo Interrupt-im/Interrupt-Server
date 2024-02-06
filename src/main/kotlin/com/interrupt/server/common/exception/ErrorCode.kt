@@ -8,6 +8,18 @@ enum class ErrorCode(
     val code: String,
 ) {
 
+    // SECURITY
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다.", "SE0001"),
+    MISS_MATCH_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 일치하지 않습니다.", "SE0002"),
+    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "토큰이 유효하지 않습니다.", "SE0003"),
+    INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "액세스 토큰이 유효하지 않습니다.", "SE0004"),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 유효하지 않습니다.", "SE0005"),
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "토큰을 찾을 수 없습니다.", "SE0006"),
+    EMPTY_CLAIM(HttpStatus.UNAUTHORIZED, "CLAIM 정보가 비어있습니다.", "SE0007"),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "토큰 인증에 실패하였습니다.", "SE0008"),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다.", "SE0009"),
+    INVALID_TOKEN_REISSUE_REQUEST(HttpStatus.BAD_REQUEST, "토큰을 재발급 할 수 없습니다.", "SE0010"),
+
     // MEMBER
     DUPLICATED_REGISTER_LOGIN_ID(HttpStatus.CONFLICT, "이미 존재하는 아이디 입니다.", "ME0001"),
     FAILED_LOGIN(HttpStatus.BAD_REQUEST, "아이디 또는 비밀번호를 확인해 주세요.", "ME0002"),

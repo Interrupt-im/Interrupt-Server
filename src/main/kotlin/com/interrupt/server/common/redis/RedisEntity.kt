@@ -1,4 +1,4 @@
-package com.interrupt.server.common.annotation
+package com.interrupt.server.common.redis
 
 @MustBeDocumented
 @Target(AnnotationTarget.CLASS)

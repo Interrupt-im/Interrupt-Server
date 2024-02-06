@@ -2,14 +2,11 @@ package com.interrupt.server.member.service
 
 import com.interrupt.server.common.exception.ErrorCode
 import com.interrupt.server.common.exception.InterruptServerException
-import com.interrupt.server.common.security.StringEncoder
 import com.interrupt.server.email.dto.EmailContent
 import com.interrupt.server.email.dto.EmailType
 import com.interrupt.server.email.dto.EmailType.LOGIN_ID_RECOVER
 import com.interrupt.server.email.dto.EmailType.PASSWORD_RECOVER
 import com.interrupt.server.email.entity.EmailMessage
-import com.interrupt.server.member.entity.EmailVerifyCode
-import com.interrupt.server.member.repository.EmailVerifyCodeRepository
 import com.interrupt.server.email.service.EmailSendService
 import com.interrupt.server.member.dto.delete.MemberDeleteRequest
 import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRequest
@@ -17,15 +14,17 @@ import com.interrupt.server.member.dto.duplicatedidcheck.LoginIdDuplicateCheckRe
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyRequest
 import com.interrupt.server.member.dto.emailverify.EmailVerificationApplyResponse
 import com.interrupt.server.member.dto.emailverify.EmailVerifyRequest
-import com.interrupt.server.member.dto.login.MemberLoginRequest
-import com.interrupt.server.member.dto.login.MemberLoginResponse
 import com.interrupt.server.member.dto.recover.*
 import com.interrupt.server.member.dto.register.MemberRegisterRequest
 import com.interrupt.server.member.dto.update.MemberUpdateRequest
+import com.interrupt.server.member.entity.EmailVerifyCode
 import com.interrupt.server.member.entity.Member
 import com.interrupt.server.member.entity.MemberRecover
+import com.interrupt.server.member.repository.EmailVerifyCodeRepository
+import com.interrupt.server.member.repository.MemberQueryRepository
 import com.interrupt.server.member.repository.MemberRecoverRepository
 import com.interrupt.server.member.repository.MemberRepository
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -35,10 +34,11 @@ import kotlin.random.Random
 @Transactional(readOnly = true)
 class MemberService(
     private val memberRepository: MemberRepository,
+    private val memberQueryRepository: MemberQueryRepository,
     private val emailSendService: EmailSendService,
     private val emailVerifyCodeRepository: EmailVerifyCodeRepository,
     private val memberRecoverRepository: MemberRecoverRepository,
-    private val stringEncoder: StringEncoder,
+    private val passwordEncoder: PasswordEncoder,
 ) {
 
     /**
@@ -49,15 +49,11 @@ class MemberService(
         val emailVerifyCode = emailVerifyCodeRepository.findByUuid(memberRegisterRequest.emailVerifyCodeKey!!)
         validateVerifiedEmail(emailVerifyCode)
 
-        val encryptedLoginId = stringEncoder.encrypt(memberRegisterRequest.loginId!!)
-        validateDuplicatedLoginId(memberRepository.findByLoginId(encryptedLoginId))
+        validateDuplicatedLoginId(memberQueryRepository.findByLoginId(memberRegisterRequest.loginId!!))
 
-        val member = memberRegisterRequest.also {
-            it.loginId = encryptedLoginId
-            it.password = stringEncoder.encrypt(it.password!!)
-            it.name = stringEncoder.encrypt(it.name!!)
-            it.email = stringEncoder.encrypt(memberRegisterRequest.email!!)
-        }.toEntity()
+        val member = memberRegisterRequest.let {
+            Member(it.loginId!!, passwordEncoder.encode(it.password), it.name!!, it.email!!)
+        }
 
         memberRepository.save(member)
     }
@@ -66,7 +62,7 @@ class MemberService(
      * 회원 ID 중복 체크
      */
     fun checkLoginIdDuplication(request: LoginIdDuplicateCheckRequest): LoginIdDuplicateCheckResponse =
-        memberRepository.findByLoginId(stringEncoder.encrypt(request.loginId!!))
+        memberQueryRepository.findByLoginId(request.loginId!!)
             ?.let { LoginIdDuplicateCheckResponse(isUnique = false) }
             ?: LoginIdDuplicateCheckResponse(isUnique = true)
 
@@ -85,9 +81,7 @@ class MemberService(
 
         emailSendService.sendMail(emailMessage)
 
-        val encryptedEmail = stringEncoder.encrypt(emailVerificationApplyRequest.email)
-
-        val emailVerifyCode = emailVerifyCodeRepository.save(EmailVerifyCode(encryptedEmail, verifyCode))
+        val emailVerifyCode = emailVerifyCodeRepository.save(EmailVerifyCode(emailVerificationApplyRequest.email, verifyCode))
 
         return EmailVerificationApplyResponse(emailVerifyCode.uuid)
     }
@@ -106,30 +100,14 @@ class MemberService(
     }
 
     /**
-     * 로그인
-     */
-    fun login(memberLoginRequest: MemberLoginRequest): MemberLoginResponse {
-        val encryptedLoginId = stringEncoder.encrypt(memberLoginRequest.loginId!!)
-        val encryptedPassword = stringEncoder.encrypt(memberLoginRequest.password!!)
-
-        memberRepository.findByLoginIdAndPassword(encryptedLoginId, encryptedPassword)?.let {
-            return MemberLoginResponse.of(it).also { response ->
-                response.name = stringEncoder.decrypt(response.name)
-            }
-
-        } ?: throw InterruptServerException(errorCode = ErrorCode.FAILED_LOGIN)
-    }
-
-    /**
      * 회원 탈퇴
      */
-    fun deleteMember(loginId: String, memberDeleteRequest: MemberDeleteRequest) {
-        val encryptedLoginId = stringEncoder.encrypt(loginId)
-        val encryptedPassword = stringEncoder.encrypt(memberDeleteRequest.password!!)
-
-        val foundMember = memberRepository.findByLoginIdAndPassword(encryptedLoginId, encryptedPassword)
+    fun deleteMember(member: Member, memberDeleteRequest: MemberDeleteRequest) {
+        val foundMember = memberQueryRepository.findByLoginId(member.loginId)
         validateExistMember(foundMember)
-        foundMember!!.deletedAt = LocalDateTime.now()
+        validateUserCredentials(foundMember!!, memberDeleteRequest.password!!)
+
+        foundMember.deletedAt = LocalDateTime.now()
         memberRepository.save(foundMember)
     }
 
@@ -138,9 +116,9 @@ class MemberService(
      */
     fun applySendLoginIdRecoverVerifyCode(recoverLoginIdRequest: RecoverLoginIdRequest): RecoverLoginIdResponse {
 
-        val encryptedName = stringEncoder.encrypt(recoverLoginIdRequest.name!!)
-        val encryptedEmail = stringEncoder.encrypt(recoverLoginIdRequest.email!!)
-        val foundMember = memberRepository.findByNameAndEmail(encryptedName, encryptedEmail)
+        val foundMember = recoverLoginIdRequest.let {
+            memberQueryRepository.findByNameAndEmail(it.name!!, it.email!!)
+        }
 
         validateExistMember(foundMember)
 
@@ -148,13 +126,13 @@ class MemberService(
         val content = emailSendService.generateEmailTemplate(LOGIN_ID_RECOVER.template, mapOf(("notice" to "아이디"), ("code" to verifyCode)))
 
         val emailMessage = EmailMessage(
-            to = recoverLoginIdRequest.email,
+            to = recoverLoginIdRequest.email!!,
             emailContents = EmailContent(LOGIN_ID_RECOVER.subject, content)
         )
 
         emailSendService.sendMail(emailMessage)
 
-        val memberRecover = memberRecoverRepository.save(MemberRecover(encryptedEmail, foundMember!!.loginId, verifyCode))
+        val memberRecover = memberRecoverRepository.save(MemberRecover(recoverLoginIdRequest.email, foundMember!!.loginId, verifyCode))
 
         return RecoverLoginIdResponse(memberRecover.uuid)
     }
@@ -168,7 +146,7 @@ class MemberService(
 
         validateCorrectVerifyCode(enteredVerifyCode = recoverLoginIdRequest.verifyCode!!, foundMemberRecover!!.verifyCode)
 
-        return VerifyRecoverLoginIdResponse(stringEncoder.decrypt(foundMemberRecover.loginId))
+        return VerifyRecoverLoginIdResponse(foundMemberRecover.loginId)
     }
 
     /**
@@ -176,23 +154,22 @@ class MemberService(
      */
     fun applySendPasswordRecoverVerifyCode(recoverPasswordRequest: RecoverPasswordRequest): RecoverPasswordResponse {
 
-        val encryptedLoginId = stringEncoder.encrypt(recoverPasswordRequest.loginId!!)
-        val encryptedEmail = stringEncoder.encrypt(recoverPasswordRequest.email!!)
-
-        val foundMember = memberRepository.findByLoginIdAndEmail(encryptedLoginId, encryptedEmail)
+        val foundMember = recoverPasswordRequest.let {
+            memberQueryRepository.findByLoginIdAndEmail(it.loginId!!, it.email!!)
+        }
         validateExistMember(foundMember)
 
         val verifyCode = generateRandomCode()
         val content = emailSendService.generateEmailTemplate(PASSWORD_RECOVER.template, mapOf(("recover" to "비밀번호"), ("code" to verifyCode)))
 
         val emailMessage = EmailMessage(
-            to = recoverPasswordRequest.email,
+            to = recoverPasswordRequest.email!!,
             emailContents = EmailContent(content, PASSWORD_RECOVER.subject)
         )
 
         emailSendService.sendMail(emailMessage)
 
-        val memberRecover = memberRecoverRepository.save(MemberRecover(encryptedEmail, encryptedLoginId, verifyCode))
+        val memberRecover = memberRecoverRepository.save(MemberRecover(foundMember!!.email, foundMember.loginId, verifyCode))
 
         return RecoverPasswordResponse(memberRecover.uuid)
     }
@@ -205,44 +182,39 @@ class MemberService(
         validateExistMemberRecover(foundMemberRecover)
         validateCorrectVerifyCode(enteredVerifyCode = recoverPasswordRequest.verifyCode!!, foundMemberRecover!!.verifyCode)
 
-        val foundMember = memberRepository.findByLoginId(foundMemberRecover.loginId)
+        val foundMember = memberQueryRepository.findByLoginId(foundMemberRecover.loginId)
         validateExistMember(foundMember)
 
-        foundMember!!.password = stringEncoder.encrypt(recoverPasswordRequest.password!!)
+        foundMember!!.loginPassword = passwordEncoder.encode(recoverPasswordRequest.password!!)
         memberRepository.save(foundMember)
     }
 
     /**
      * 회원 정보 수정
      */
-    fun updateMember(loginId: String, memberUpdateRequest: MemberUpdateRequest) {
-        val encryptedLoginId = stringEncoder.encrypt(loginId)
-        val foundMember = memberRepository.findByLoginId(encryptedLoginId)
-        validateExistMember(foundMember)
-
+    fun updateMember(member: Member, memberUpdateRequest: MemberUpdateRequest) {
         memberUpdateRequest.password?.let {
-            foundMember!!.password = stringEncoder.encrypt(it)
-        }
-
-        memberUpdateRequest.name?.let {
-            foundMember!!.name = stringEncoder.encrypt(it)
+            memberUpdateRequest.password = passwordEncoder.encode(it)
         }
 
         memberUpdateRequest.email?.let {
-            val encryptedEmail = stringEncoder.encrypt(it)
             val emailVerifyCode = memberUpdateRequest.emailVerifyCodeKey?.let { emailVerifyCodeKey->
                 emailVerifyCodeRepository.findByUuid(emailVerifyCodeKey)
             }
             validateVerifiedEmail(emailVerifyCode)
-
-            foundMember!!.email = encryptedEmail
         }
 
-        memberRepository.save(foundMember!!)
+        member.update(memberUpdateRequest)
+
+        memberRepository.save(member)
     }
 
     private fun validateExistMember(member: Member?) {
         if (member == null) throw InterruptServerException(errorCode = ErrorCode.MEMBER_NOT_FOUND)
+    }
+
+    private fun validateUserCredentials(member: Member, password: String) {
+        if (!passwordEncoder.matches(password, member.loginPassword)) throw InterruptServerException(errorCode = ErrorCode.FAILED_LOGIN)
     }
 
     private fun validateCorrectVerifyCode(enteredVerifyCode: String, verifyCode: String) {

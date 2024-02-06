@@ -1,7 +1,7 @@
 package com.interrupt.server.career.job.dto
 
 import com.interrupt.server.career.job.entity.JobGroup
-import com.interrupt.server.common.annotation.RedisEntity
+import com.interrupt.server.common.redis.RedisEntity
 
 @RedisEntity
 data class JobGroupDto(
