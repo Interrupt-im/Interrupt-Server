@@ -22,7 +22,6 @@ spring:
         show_sql: false
         format_sql: true
         highlight_sql: true
-#        dialect: org.hibernate.dialect.MySQL5Dialect
         storage_engine: innodb
         default_batch_fetch_size: 100
     defer-datasource-initialization: true
@@ -53,8 +52,6 @@ spring:
             enable: true
 
 logging:
-  #  pattern:
-  #    console: "[%d{HH:mm:ss.SSS}][%-5level][%logger.%method:line%line] - %msg%n"
   level:
     org:
       hibernate:
@@ -70,3 +67,12 @@ logging:
 
 security:
   encrypt-key: 7a3b15e8f2772c2a9f28d04996b9f35c
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
