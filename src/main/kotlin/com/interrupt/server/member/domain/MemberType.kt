@@ -1,4 +1,4 @@
-package com.interrupt.server.user.domain
+package com.interrupt.server.member.domain
 
 enum class MemberType {
     SELLER,
