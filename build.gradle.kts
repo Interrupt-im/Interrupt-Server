@@ -25,6 +25,9 @@ dependencies {
     // Validation
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    // crypto
+    implementation("org.springframework.security:spring-security-crypto")
+
     // JPA
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
