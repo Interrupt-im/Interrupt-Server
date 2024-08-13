@@ -1,20 +1,27 @@
 package com.interrupt.server.member.domain
 
 import com.interrupt.server.global.exception.ApplicationException
+import com.interrupt.server.member.fake.FakePasswordEncoder
 import com.interrupt.server.member.fixture.MemberFixture
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrowExactly
+import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.throwable.shouldHaveMessage
+import io.mockk.every
+import org.springframework.security.crypto.password.PasswordEncoder
 
+@DisplayName("Member 도메인 테스트")
 class MemberTest : BehaviorSpec({
+    val passwordEncoder: PasswordEncoder = FakePasswordEncoder()
+
     Given("유효한 이메일, 비밀번호, 닉네임, 회원 유형인 경우") {
         val memberFixture = MemberFixture.`고객 1`
 
         Then("객체를 정상적으로 생성할 수 있다") {
             shouldNotThrowAny {
-                Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
+                Member(memberFixture.email, Password(memberFixture.password, passwordEncoder), memberFixture.nickname, memberFixture.memberType)
             }
         }
     }
@@ -25,7 +32,7 @@ class MemberTest : BehaviorSpec({
 
             Then("예외를 던진다") {
                 shouldThrowExactly<ApplicationException> {
-                    Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
+                    Member(memberFixture.email, Password(memberFixture.password, passwordEncoder), memberFixture.nickname, memberFixture.memberType)
                 } shouldHaveMessage "이메일 값이 없습니다."
             }
         }
@@ -35,7 +42,7 @@ class MemberTest : BehaviorSpec({
 
             Then("예외를 던진다") {
                 shouldThrowExactly<ApplicationException> {
-                    Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
+                    Member(memberFixture.email, Password(memberFixture.password, passwordEncoder), memberFixture.nickname, memberFixture.memberType)
                 } shouldHaveMessage "이메일 값이 없습니다."
             }
         }
@@ -54,7 +61,7 @@ class MemberTest : BehaviorSpec({
             When("이메일 형식이 올바르지 않다면") {
                 Then("예외를 던진다") {
                     shouldThrowExactly<ApplicationException> {
-                        Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
+                        Member(memberFixture.email, Password(memberFixture.password, passwordEncoder), memberFixture.nickname, memberFixture.memberType)
                     } shouldHaveMessage "이메일 형식이 올바르지 않습니다."
                 }
             }
@@ -67,7 +74,7 @@ class MemberTest : BehaviorSpec({
 
             Then("예외를 던진다") {
                 shouldThrowExactly<ApplicationException> {
-                    Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
+                    Member(memberFixture.email, Password(memberFixture.password, passwordEncoder), memberFixture.nickname, memberFixture.memberType)
                 } shouldHaveMessage "비밀번호 값이 없습니다."
             }
         }
@@ -77,13 +84,13 @@ class MemberTest : BehaviorSpec({
 
             Then("예외를 던진다") {
                 shouldThrowExactly<ApplicationException> {
-                    Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
+                    Member(memberFixture.email, Password(memberFixture.password, passwordEncoder), memberFixture.nickname, memberFixture.memberType)
                 } shouldHaveMessage "비밀번호 값이 없습니다."
             }
         }
 
         withData(
-            nameFn = { "잘못 된 비밀번호 형식 - $it(${it.loginPassword})" },
+            nameFn = { "잘못 된 비밀번호 형식 - $it(${it.password})" },
             listOf(
                 MemberFixture.`비밀번호 형식 비정상 회원1`,
                 MemberFixture.`비밀번호 형식 비정상 회원2`,
@@ -95,7 +102,7 @@ class MemberTest : BehaviorSpec({
             When("비밀번호 형식이 올바르지 않다면") {
                 Then("예외를 던진다") {
                     shouldThrowExactly<ApplicationException> {
-                        Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
+                        Member(memberFixture.email, Password(memberFixture.password, passwordEncoder), memberFixture.nickname, memberFixture.memberType)
                     } shouldHaveMessage "비밀번호는 영어, 숫자, 특수문자로 이루어진 8자 이상 15자 이하여야 합니다."
                 }
             }
@@ -108,7 +115,7 @@ class MemberTest : BehaviorSpec({
 
             Then("예외를 던진다") {
                 shouldThrowExactly<ApplicationException> {
-                    Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
+                    Member(memberFixture.email, Password(memberFixture.password, passwordEncoder), memberFixture.nickname, memberFixture.memberType)
                 } shouldHaveMessage "닉네임 값이 없습니다."
             }
         }
@@ -118,7 +125,7 @@ class MemberTest : BehaviorSpec({
 
             Then("예외를 던진다") {
                 shouldThrowExactly<ApplicationException> {
-                    Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
+                    Member(memberFixture.email, Password(memberFixture.password, passwordEncoder), memberFixture.nickname, memberFixture.memberType)
                 } shouldHaveMessage "닉네임 값이 없습니다."
             }
         }
@@ -134,7 +141,7 @@ class MemberTest : BehaviorSpec({
             When("닉네임 형식이 올바르지 않다면") {
                 Then("예외를 던진다") {
                     shouldThrowExactly<ApplicationException> {
-                        Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
+                        Member(memberFixture.email, Password(memberFixture.password, passwordEncoder), memberFixture.nickname, memberFixture.memberType)
                     } shouldHaveMessage "닉네임은 한글, 영어, 숫자로 이루어진 8자 이상 15자 이하여야 합니다."
                 }
             }
@@ -147,28 +154,8 @@ class MemberTest : BehaviorSpec({
 
             Then("예외를 던진다") {
                 shouldThrowExactly<ApplicationException> {
-                    Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
+                    Member(memberFixture.email, Password(memberFixture.password, passwordEncoder), memberFixture.nickname, memberFixture.memberType)
                 } shouldHaveMessage "회원 유형 값이 없습니다."
-            }
-        }
-
-        When("회원 유형이 공백 이라면") {
-            val memberFixture = MemberFixture.`회원 유형 공백 회원`
-
-            Then("예외를 던진다") {
-                shouldThrowExactly<ApplicationException> {
-                    Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
-                } shouldHaveMessage "회원 유형 값이 없습니다."
-            }
-        }
-
-        When("존재 하지 않는 회원 유형 이라면") {
-            val memberFixture = MemberFixture.`없는 회원 유형 회원`
-
-            Then("예외를 던진다") {
-                shouldThrowExactly<ApplicationException> {
-                    Member(memberFixture.email, memberFixture.loginPassword, memberFixture.nickname, memberFixture.memberType)
-                } shouldHaveMessage "올바른 회원 유형이 아닙니다."
             }
         }
     }
