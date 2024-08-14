@@ -27,6 +27,20 @@ class Password(
         return passwordEncoder.encode(password)
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Password) return false
+
+        if (password != other.password) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return password.hashCode()
+    }
+
+
     companion object {
         private val PASSWORD_REGEX = "^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9!@#$%^&*()_+.,;:<>?-]{8,15}$".toRegex()
     }

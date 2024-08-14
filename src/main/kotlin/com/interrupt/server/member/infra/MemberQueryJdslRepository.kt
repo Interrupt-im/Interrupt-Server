@@ -33,4 +33,17 @@ class MemberQueryJdslRepository(
             .apply { setMaxResults(1) }
             .resultList.isNotEmpty()
     }
+
+    override fun findByIdAndNotDeleted(id: Long): Member? = memberJpaRepository.findAll {
+        select(
+            entity(Member::class)
+        ).from(
+            entity(Member::class)
+        ).where(
+            path(Member::deletedAt).isNull()
+                .and(
+                    path(Member::id).equal(id)
+                )
+        )
+    }.firstOrNull()
 }
