@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 class MemberQueryServiceTest : BehaviorSpec({
 
     val memberQueryRepository: MemberQueryRepository = mockk()
-    val passwordEncoder: PasswordEncoder = FakePasswordEncoder()
+    val passwordEncoder: PasswordEncoder = FakePasswordEncoder.INSTANCE
 
     val memberQueryService = MemberQueryService(memberQueryRepository)
 

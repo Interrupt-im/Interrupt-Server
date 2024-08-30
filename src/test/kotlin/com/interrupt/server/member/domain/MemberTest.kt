@@ -9,12 +9,11 @@ import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.throwable.shouldHaveMessage
-import io.mockk.every
 import org.springframework.security.crypto.password.PasswordEncoder
 
 @DisplayName("Member 도메인 테스트")
 class MemberTest : BehaviorSpec({
-    val passwordEncoder: PasswordEncoder = FakePasswordEncoder()
+    val passwordEncoder: PasswordEncoder = FakePasswordEncoder.INSTANCE
 
     Given("유효한 이메일, 비밀번호, 닉네임, 회원 유형인 경우") {
         val memberFixture = MemberFixture.`고객 1`

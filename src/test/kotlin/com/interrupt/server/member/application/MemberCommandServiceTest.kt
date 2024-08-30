@@ -18,7 +18,7 @@ class MemberCommandServiceTest : BehaviorSpec({
 
     val memberCommandRepository: MemberCommandRepository = mockk()
     val memberQueryRepository: MemberQueryRepository = mockk()
-    val passwordEncoder: PasswordEncoder = FakePasswordEncoder()
+    val passwordEncoder: PasswordEncoder = FakePasswordEncoder.INSTANCE
 
     val memberCommandService = MemberCommandService(memberCommandRepository, memberQueryRepository, passwordEncoder)
 
