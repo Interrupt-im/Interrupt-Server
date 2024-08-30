@@ -46,4 +46,17 @@ class MemberQueryJdslRepository(
                 )
         )
     }.firstOrNull()
+
+    override fun findByEmailAndNotDeleted(email: String): Member? = memberJpaRepository.findAll {
+            select(
+                entity(Member::class)
+            ).from(
+                entity(Member::class)
+            ).where(
+                path(Member::deletedAt).isNull()
+                    .and(
+                        path(Member::email).equal(email)
+                    )
+            )
+        }.firstOrNull()
 }
