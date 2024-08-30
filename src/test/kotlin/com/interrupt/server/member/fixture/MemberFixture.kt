@@ -4,6 +4,7 @@ import com.interrupt.server.member.application.command.MemberCreateCommand
 import com.interrupt.server.member.domain.Member
 import com.interrupt.server.member.domain.MemberType
 import com.interrupt.server.member.domain.Password
+import com.interrupt.server.member.presentation.dto.request.MemberRegisterRequest
 import org.springframework.security.crypto.password.PasswordEncoder
 
 enum class MemberFixture(
@@ -43,4 +44,5 @@ enum class MemberFixture(
         Member(email, Password(password, passwordEncoder), nickname, memberType)
     fun `회원 생성 COMMAND 생성`(): MemberCreateCommand =
         MemberCreateCommand(email, password, nickname, memberType)
+    fun `회원 가입 요청 DTO 생성`(): MemberRegisterRequest = MemberRegisterRequest(email, password, nickname, memberType)
 }
