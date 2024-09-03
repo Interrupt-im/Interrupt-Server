@@ -1,10 +1,18 @@
 package com.interrupt.server.auth.domain
 
+typealias Token = AuthenticationCredentials
+
 class AuthenticationCredentials(
     val jti: String,
-    val accessToken: String,
-    val refreshToken: String,
+    accessToken: String,
+    refreshToken: String,
 ) {
+
+    var accessToken: String = accessToken
+        private set
+    var refreshToken: String = refreshToken
+        private set
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -17,6 +25,4 @@ class AuthenticationCredentials(
     override fun hashCode(): Int {
         return jti.hashCode()
     }
-
-
 }
