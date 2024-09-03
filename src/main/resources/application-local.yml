@@ -65,9 +65,6 @@ logging:
           jpa: debug
         transaction: debug
 
-security:
-  encrypt-key: 7a3b15e8f2772c2a9f28d04996b9f35c
-
 server:
   port: 8080
   servlet:
@@ -76,3 +73,8 @@ server:
       charset: UTF-8
       enabled: true
       force: true
+
+jwt:
+  key: abcdefghijklmnopqrstuvwxyz1234567890
+  access-token-expiration: 3600000 # 1 day
+  refresh-token-expiration: 604800000 # 7 days
