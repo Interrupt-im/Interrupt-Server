@@ -1,6 +1,7 @@
 package com.interrupt.server.auth.application
 
 import com.interrupt.server.auth.application.command.LoginCommand
+import com.interrupt.server.auth.application.command.LogoutCommand
 import com.interrupt.server.auth.domain.AuthenticationCredentials
 import com.interrupt.server.global.exception.ApplicationException
 import com.interrupt.server.global.exception.ErrorCode
@@ -34,5 +35,9 @@ class AuthCommandService(
         }
 
         return this
+    }
+
+    fun logout(logoutCommand: LogoutCommand) {
+        tokenCommandRepository.deleteByJti(logoutCommand.jti)
     }
 }
