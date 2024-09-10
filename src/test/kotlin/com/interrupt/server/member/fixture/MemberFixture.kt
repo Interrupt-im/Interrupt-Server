@@ -1,6 +1,7 @@
 package com.interrupt.server.member.fixture
 
 import com.interrupt.server.auth.application.command.LoginCommand
+import com.interrupt.server.auth.presentation.dto.request.LoginRequest
 import com.interrupt.server.member.application.command.MemberCreateCommand
 import com.interrupt.server.member.domain.Member
 import com.interrupt.server.member.domain.MemberType
@@ -56,6 +57,8 @@ enum class MemberFixture(
 
     fun `회원 가입 요청 DTO 생성`(): MemberRegisterRequest = MemberRegisterRequest(email, password, nickname, memberType)
 
-    fun `로그인 COMMAND 생성`(): LoginCommand =
-        LoginCommand(email, password)
+    fun `로그인 COMMAND 생성`(): LoginCommand = LoginCommand(email, password)
+
+    fun `로그인 요청 DTO 생성`(): LoginRequest = LoginRequest(email, password)
+
 }
