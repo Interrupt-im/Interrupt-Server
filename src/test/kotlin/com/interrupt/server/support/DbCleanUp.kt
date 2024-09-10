@@ -25,7 +25,7 @@ class DbCleanUp(
             }
 
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE;")
-        tables.forEach { table -> jdbcTemplate.execute("TRUNCATE table $table") }
+        tables.forEach { table -> jdbcTemplate.execute("TRUNCATE table $table RESTART IDENTITY") }
         jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE;")
     }
 }
