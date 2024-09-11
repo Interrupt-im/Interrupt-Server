@@ -38,6 +38,7 @@ class JwtServiceIntegrationTest : KotestIntegrationTestSupport() {
 
             When("jti 를 추출 하여") {
                 val actual = jwtService.getJti(token)
+
                 Then("반환 한다") {
                     actual shouldBe "jti"
                 }

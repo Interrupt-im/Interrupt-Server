@@ -23,13 +23,14 @@ class TokenCommandRepositoryTest : KotestIntegrationTestSupport() {
 
             When("토큰을 저장소에 저장 하면") {
                 val actual = tokenCommandRepository.save(token)
-                val findByJti = tokenQueryRepository.findByJti(token.jti)
 
                 Then("저장 된 토큰을 반환 한다") {
                     actual shouldBe token
                 }
 
                 Then("저장소에 토큰이 저장 되어 있다") {
+                    val findByJti = tokenQueryRepository.findByJti(token.jti)
+
                     findByJti.shouldNotBeNull()
                         .shouldBeEqualToUsingFields(token)
                 }

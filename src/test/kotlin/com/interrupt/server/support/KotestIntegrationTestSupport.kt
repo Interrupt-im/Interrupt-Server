@@ -3,6 +3,7 @@ package com.interrupt.server.support
 import io.kotest.core.extensions.Extension
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.extensions.spring.SpringExtension
+import io.mockk.clearAllMocks
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
@@ -16,7 +17,8 @@ abstract class KotestIntegrationTestSupport : BehaviorSpec() {
     private lateinit var redisCleanUp: RedisCleanUp
 
     init {
-        afterAny {
+        afterContainer {
+            clearAllMocks()
             cleanUp.all()
             redisCleanUp.all()
         }

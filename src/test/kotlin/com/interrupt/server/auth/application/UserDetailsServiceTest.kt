@@ -28,9 +28,9 @@ class UserDetailsServiceTest : KotestIntegrationTestSupport() {
                 val member = MemberFixture.`고객 1`.`회원 엔티티 생성`()
                 memberCommandRepository.save(member)
 
-                val actual = userDetailsService.loadUserByUsername(member.email)
-
                 Then("회원 정보를 반환 한다") {
+                    val actual = userDetailsService.loadUserByUsername(member.email)
+
                     actual.shouldNotBeNull()
                         .shouldBeEqualToUsingFields(UserDetails(1L, "member1@domain.com"), UserDetails::id, UserDetails::username)
                 }
