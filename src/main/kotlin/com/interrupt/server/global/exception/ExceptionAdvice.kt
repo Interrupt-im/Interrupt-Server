@@ -2,14 +2,11 @@ package com.interrupt.server.global.exception
 
 import com.interrupt.server.global.common.ErrorResponse
 import io.github.oshai.kotlinlogging.KotlinLogging
-import jakarta.validation.ConstraintViolationException
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.HttpRequestMethodNotSupportedException
-import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import javax.naming.AuthenticationException
 
 @RestControllerAdvice
 class ExceptionAdvice {
