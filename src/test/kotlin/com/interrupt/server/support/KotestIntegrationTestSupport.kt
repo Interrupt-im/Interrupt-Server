@@ -18,9 +18,11 @@ abstract class KotestIntegrationTestSupport : BehaviorSpec() {
 
     init {
         afterContainer {
-            clearAllMocks()
-            cleanUp.all()
-            redisCleanUp.all()
+            if (it.a.isWhen()) {
+                clearAllMocks()
+                cleanUp.all()
+                redisCleanUp.all()
+            }
         }
     }
 
