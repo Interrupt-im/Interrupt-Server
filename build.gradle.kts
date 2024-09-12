@@ -36,9 +36,6 @@ dependencies {
     // Spring Web
     implementation("org.springframework.boot:spring-boot-starter-web")
 
-    // Validation
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-
     // crypto
     implementation("org.springframework.security:spring-security-crypto")
 
@@ -83,6 +80,14 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:0.12.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
     implementation(kotlin("stdlib-jdk8"))
+
+    // Ktor
+    implementation("io.ktor:ktor-client-core:2.3.12")
+    implementation("io.ktor:ktor-client-cio:2.3.12")
+    implementation("io.ktor:ktor-client-logging:2.3.12")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
+    implementation("io.ktor:ktor-client-jackson:2.3.12")
+    implementation("io.ktor:ktor-serialization-jackson:2.3.12")
 }
 
 tasks.withType<KotlinCompile> {
