@@ -3,9 +3,16 @@ package com.interrupt.server.member.presentation.dto.response
 import com.interrupt.server.member.domain.Member
 import com.interrupt.server.member.domain.MemberType
 
-class MemberRegisterResponse(member: Member) {
-    val id: Long = member.id
-    val email: String = member.email
-    val nickname: String = member.nickname
-    val memberType: MemberType = member.memberType
+data class MemberRegisterResponse(
+    val id: Long,
+    val email: String,
+    val nickname: String,
+    val memberType: MemberType,
+) {
+    constructor(member: Member): this(
+        member.id,
+        member.email,
+        member.nickname,
+        member.memberType,
+    )
 }

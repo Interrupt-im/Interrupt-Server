@@ -6,9 +6,9 @@ import com.interrupt.server.member.domain.MemberType
 
 data class MemberRegisterRequest(
     val email: String?,
-    val loginPassword: String?,
+    val password: String?,
     val nickname: String?,
     val memberType: MemberType?
 ) {
-    fun toCommand(): MemberCreateCommand = MemberCreateCommand(email, loginPassword, nickname, memberType)
+    fun toCommand(): MemberCreateCommand = MemberCreateCommand(email, password, nickname, memberType)
 }
