@@ -26,7 +26,7 @@ class FakeTokenProvider : TokenProvider {
 
     override fun extractExpiration(token: String): Date? {
         val tokenObject = objectMapper.readValue(token, FakeTokenObject::class.java)
-        return tokenObject.exp?.let { Date(it * 1000) }
+        return tokenObject.exp?.let { Date(it) }
     }
 
     override fun buildToken(member: Member, jti: String, expiration: Long, additionalClaims: Map<String, Any>): String {
@@ -34,5 +34,5 @@ class FakeTokenProvider : TokenProvider {
         return "${member.email}:$jti:$expirationDate:${additionalClaims.entries.joinToString(",") { "${it.key}=${it.value}" }}"
     }
 
-    data class FakeTokenObject(val username: String?, val jti: String?, val exp: Long? /* JwtService 에서 나노초로 사용하고 있음 */)
+    data class FakeTokenObject(val username: String?, val jti: String?, val exp: Long?)
 }

@@ -23,7 +23,8 @@ class FakeTokenRepository : TokenCommandRepository, TokenQueryRepository {
     fun init() {
         tokens.clear()
 
-        listOf(TokenFixture.`토큰 1`, TokenFixture.`토큰 2`)
+        TokenFixture.entries
+            .filter { it.jti != null }
             .map(TokenFixture::`토큰 엔티티 생성`)
             .forEach { token ->
                 tokens[token.jti] = token
