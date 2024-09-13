@@ -13,6 +13,8 @@ class AuthenticationCredentials(
     var refreshToken: String = refreshToken
         private set
 
+    fun isSameRefreshToken(refreshToken: String): Boolean = (this.refreshToken == refreshToken)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
