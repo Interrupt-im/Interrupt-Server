@@ -27,7 +27,7 @@ class JwtServiceTest : BehaviorSpec({
 
     val jwtService = JwtService(tokenProvider, jwtProperties, objectMapper)
 
-    fun currentNano(): Long = ZonedDateTime.now().toInstant().toEpochMilli() / 1000
+    fun currentMilli(): Long = ZonedDateTime.now().toInstant().toEpochMilli()
 
     Given("토큰을 받아 username 을 추출 하여 반환할 때") {
         When("username 을 정상적으로 추출 했다면") {
@@ -134,7 +134,7 @@ class JwtServiceTest : BehaviorSpec({
 
     Given("토큰이 유효 한지 검증할 때") {
         val member = MemberFixture.`고객 1`.`회원 엔티티 생성`(FakePasswordEncoder.INSTANCE)
-        val fakeTokenObject = FakeTokenProvider.FakeTokenObject(member.email, "jti", currentNano() + 5000L)
+        val fakeTokenObject = FakeTokenProvider.FakeTokenObject(member.email, "jti", currentMilli() + 5000L)
         val token = objectMapper.writeValueAsString(fakeTokenObject)
 
         When("정상적인 토큰 이라면") {
@@ -183,7 +183,7 @@ class JwtServiceTest : BehaviorSpec({
         val encoder = Base64.getEncoder()
 
         When("만료 시간이 아직 지나지 않았다면") {
-            val fakeTokenObject = FakeTokenProvider.FakeTokenObject(member.email, "jti", currentNano() + 5000L)
+            val fakeTokenObject = FakeTokenProvider.FakeTokenObject(member.email, "jti", currentMilli() + 5000L)
             val token = "header.${encoder.encode(objectMapper.writeValueAsString(fakeTokenObject).toByteArray()).toString(Charsets.UTF_8)}.sign"
 
             val actual = jwtService.checkTokenExpiredByTokenString(token)
@@ -194,7 +194,7 @@ class JwtServiceTest : BehaviorSpec({
         }
 
         When("만료 시간이 지났다면") {
-            val fakeTokenObject = FakeTokenProvider.FakeTokenObject(member.email, "jti", currentNano() - 5000L)
+            val fakeTokenObject = FakeTokenProvider.FakeTokenObject(member.email, "jti", currentMilli() - 5000L)
             val token = "header.${encoder.encode(objectMapper.writeValueAsString(fakeTokenObject).toByteArray()).toString(Charsets.UTF_8)}.sign"
 
             val actual = jwtService.checkTokenExpiredByTokenString(token)

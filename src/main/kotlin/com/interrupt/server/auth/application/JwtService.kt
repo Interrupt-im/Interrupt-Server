@@ -7,6 +7,8 @@ import com.interrupt.server.global.exception.ApplicationException
 import com.interrupt.server.global.exception.ErrorCode
 import com.interrupt.server.member.domain.Member
 import org.springframework.stereotype.Service
+import java.time.Instant
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Base64
 import java.util.Date
@@ -72,9 +74,7 @@ class JwtService(
 
         val expiration = extractExpiration(payload)
 
-        val current = ZonedDateTime.now().toInstant().toEpochMilli() / 1000
-
-        return expiration <= current
+        return ZonedDateTime.now().isAfter(ZonedDateTime.ofInstant(Instant.ofEpochMilli(expiration), ZoneId.systemDefault()))
     }
 
     private fun checkValidTokenParts(parts: List<String>) {
