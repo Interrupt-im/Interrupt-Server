@@ -1,6 +1,8 @@
 package com.interrupt.server.auth.presentation
 
+import com.interrupt.server.auth.presentation.dto.request.TokenRefreshRequest
 import com.interrupt.server.auth.presentation.dto.response.LoginResponse
+import com.interrupt.server.auth.presentation.dto.response.TokenRefreshResponse
 import com.interrupt.server.global.common.SuccessResponse
 import com.interrupt.server.member.fixture.MemberFixture
 import com.interrupt.server.support.KotestControllerTestSupport
@@ -10,9 +12,10 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNot
 import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.beEmpty
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.call.body
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.HttpStatusCode
 
 @DisplayName("AuthApi 테스트")
 class AuthApiTest : KotestControllerTestSupport() {
@@ -55,6 +58,32 @@ class AuthApiTest : KotestControllerTestSupport() {
                 Then("401 상태 코드를 반환 한다") {
                     actual.status shouldBe HttpStatusCode.Unauthorized
                 }
+            }
+        }
+
+        Given("토큰 재발급 요청이 왔을 때") {
+            WhenWithAuth("로그인 된 회원의 요청 이라면") {
+                val actual = client.post("/api/auth/refresh") {
+                    setBody(TokenRefreshRequest(refreshToken))
+                }
+
+                Then("200 상태 코드를 반환 한다") {
+                    actual.status shouldBe HttpStatusCode.OK
+                }
+
+                Then("새로운 토큰을 응답 한다") {
+                    val body: SuccessResponse<TokenRefreshResponse> = actual.body()
+
+                    assertSoftly {
+                        body.data shouldNotBe null
+                        body.data!!.accessToken shouldNot beEmpty()
+                        body.data!!.refreshToken shouldNot beEmpty()
+                    }
+                }
+            }
+
+            When("로그인 되지 않은 요청 이라면") {
+
             }
         }
     }
