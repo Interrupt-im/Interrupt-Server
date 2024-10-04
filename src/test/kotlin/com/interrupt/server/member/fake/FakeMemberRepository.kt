@@ -1,10 +1,10 @@
 package com.interrupt.server.member.fake
 
+import com.interrupt.server.member.application.MemberCommandRepository
 import com.interrupt.server.member.application.MemberQueryRepository
 import com.interrupt.server.member.domain.Member
-import com.interrupt.server.member.fixture.MemberFixture
 
-class FakeMemberQueryRepository : MemberQueryRepository {
+class FakeMemberRepository : MemberQueryRepository, MemberCommandRepository {
 
     private val members = mutableMapOf<Long, Member>()
 
@@ -16,11 +16,11 @@ class FakeMemberQueryRepository : MemberQueryRepository {
 
     fun init() {
         members.clear()
+    }
 
-        listOf(MemberFixture.`고객 1`, MemberFixture.`고객 2`, MemberFixture.`삭제된 고객 1`)
-            .map(MemberFixture::`회원 엔티티 생성`)
-            .forEachIndexed { index, member ->
-                members[index.toLong() + 1] = member
-            }
+    override fun save(member: Member): Member {
+        this.members[member.id] = member
+
+        return member
     }
 }
