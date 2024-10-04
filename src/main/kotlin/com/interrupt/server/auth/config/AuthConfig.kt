@@ -23,11 +23,13 @@ class AuthConfig(
 ) : WebMvcConfigurer {
 
     override fun addArgumentResolvers(argumentResolvers: MutableList<HandlerMethodArgumentResolver>) {
-        argumentResolvers.add(LoginUserArgumentResolver(jwtService, tokenQueryRepository, memberDetailsService))
+        argumentResolvers.add(LoginUserArgumentResolver(memberDetailsService))
     }
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(UrlWhitelistInterceptor(
+            jwtService,
+            tokenQueryRepository,
             WhitelistUrl("/api/members", listOf(HttpMethod.POST)),
             WhitelistUrl("/api/auth/login", listOf(HttpMethod.POST)),
         ))
