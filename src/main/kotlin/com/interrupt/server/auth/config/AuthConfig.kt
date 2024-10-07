@@ -27,11 +27,21 @@ class AuthConfig(
     }
 
     override fun addInterceptors(registry: InterceptorRegistry) {
-        registry.addInterceptor(UrlWhitelistInterceptor(
-            jwtService,
-            tokenQueryRepository,
-            WhitelistUrl("/api/members", listOf(HttpMethod.POST)),
-            WhitelistUrl("/api/auth/login", listOf(HttpMethod.POST)),
-        ))
+        registry.addInterceptor(
+            UrlWhitelistInterceptor(
+                jwtService,
+                tokenQueryRepository,
+                WhitelistUrl(SIGH_UP_URL, listOf(HttpMethod.POST)),
+                WhitelistUrl(LOGIN_URL, listOf(HttpMethod.POST)),
+            )
+        )
+    }
+
+    companion object {
+
+        private const val SIGH_UP_URL = "/api/members"
+
+        private const val LOGIN_URL = "/api/auth/login"
+
     }
 }

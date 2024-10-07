@@ -66,7 +66,7 @@ class JwtService(
     }
 
     fun checkTokenExpiredByTokenString(token: String): Boolean {
-        val parts = token.split(".")
+        val parts = token.split(TOKEN_PART_SEPARATOR)
 
         checkValidTokenParts(parts)
 
@@ -84,10 +84,15 @@ class JwtService(
     }
 
     private fun extractExpiration(payload: String): Long {
-        objectMapper.readValue(payload, object : TypeReference<MutableMap<String, String>>() {})["exp"]?.let {
+        objectMapper.readValue(payload, object : TypeReference<MutableMap<String, String>>() {})[TOKEN_EXPIRATION_KEY]?.let {
             return it.toLong()
         }
 
         throw ApplicationException(ErrorCode.INVALID_ACCESS_TOKEN)
+    }
+
+    companion object {
+        private const val TOKEN_PART_SEPARATOR = "."
+        private const val TOKEN_EXPIRATION_KEY = "exp"
     }
 }

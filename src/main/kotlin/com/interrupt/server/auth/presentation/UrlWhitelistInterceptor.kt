@@ -34,8 +34,8 @@ class UrlWhitelistInterceptor(
 
         checkValidAccessToken(token, savedToken)
 
-        request.setAttribute("username", username)
-        request.setAttribute("token", savedToken)
+        request.setAttribute(USERNAME_ATTRIBUTE_KEY, username)
+        request.setAttribute(TOKEN_ATTRIBUTE_KEY, savedToken)
 
         return true
     }
@@ -55,5 +55,7 @@ class UrlWhitelistInterceptor(
     companion object {
         private const val AUTH_HEADER_NAME = "Authorization"
         private const val AUTH_HEADER_PREFIX = "Bearer "
+        private const val USERNAME_ATTRIBUTE_KEY = "username"
+        private const val TOKEN_ATTRIBUTE_KEY = "token"
     }
 }

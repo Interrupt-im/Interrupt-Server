@@ -27,8 +27,8 @@ class LoginUserArgumentResolver(
 
     private fun getAuthAttribute(webRequest: NativeWebRequest): Pair<String, Token> {
         return webRequest.let { request ->
-            val username = request.getAttribute("username", RequestAttributes.SCOPE_REQUEST)
-            val token = request.getAttribute("token", RequestAttributes.SCOPE_REQUEST)
+            val username = request.getAttribute(USERNAME_ATTRIBUTE_KEY, RequestAttributes.SCOPE_REQUEST)
+            val token = request.getAttribute(TOKEN_ATTRIBUTE_KEY, RequestAttributes.SCOPE_REQUEST)
 
             checkAuthAttribute(username, token)
 
@@ -40,5 +40,10 @@ class LoginUserArgumentResolver(
         require(username != null && token != null) {
             throw ApplicationException(ErrorCode.UNAUTHORIZED_ACCESS_ATTEMPT)
         }
+    }
+
+    companion object {
+        private const val USERNAME_ATTRIBUTE_KEY = "username"
+        private const val TOKEN_ATTRIBUTE_KEY = "token"
     }
 }
