@@ -30,13 +30,13 @@ class ExceptionAdvice {
     private fun ErrorResponseEntity(
         errorCode: ErrorCode,
         cause: Throwable,
-        message: String? = null,
+        message: String? = errorCode.message,
     ): ResponseEntity<ErrorResponse> {
         log.error {
             """
                 server error
                 cause: $cause
-                message: ${message ?: errorCode.message}
+                message: $message
                 errorCode: $errorCode
             """.trimIndent()
         }
