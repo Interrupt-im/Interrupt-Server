@@ -14,6 +14,7 @@ import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.beEmpty
 import io.ktor.client.call.body
 import io.ktor.client.request.post
+import io.ktor.client.request.delete
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpStatusCode
 
@@ -45,7 +46,7 @@ class AuthApiTest : KotestControllerTestSupport() {
 
         Given("로그아웃 요청이 왔을 때") {
             WhenWithAuth("로그인 된 회원의 요청 이라면") {
-                val actual = client.post("/api/auth/logout")
+                val actual = client.delete("/api/auth/logout")
 
                 Then("204 상태 코드를 반환 한다") {
                     actual.status shouldBe HttpStatusCode.NoContent
@@ -53,7 +54,7 @@ class AuthApiTest : KotestControllerTestSupport() {
             }
 
             When("로그인 되지 않은 요청 이라면") {
-                val actual = client.post("/api/auth/logout")
+                val actual = client.delete("/api/auth/logout")
 
                 Then("401 상태 코드를 반환 한다") {
                     actual.status shouldBe HttpStatusCode.Unauthorized

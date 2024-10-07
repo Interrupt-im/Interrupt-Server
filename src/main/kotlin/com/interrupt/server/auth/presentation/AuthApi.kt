@@ -8,10 +8,7 @@ import com.interrupt.server.auth.presentation.dto.response.LoginResponse
 import com.interrupt.server.auth.presentation.dto.response.TokenRefreshResponse
 import com.interrupt.server.global.common.SuccessResponse
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class AuthApi(
@@ -21,7 +18,7 @@ class AuthApi(
     @PostMapping("/api/auth/login")
     fun login(@RequestBody request: LoginRequest): SuccessResponse<LoginResponse> = SuccessResponse(LoginResponse(authCommandService.login(request.toCommand())))
 
-    @PostMapping("/api/auth/logout")
+    @DeleteMapping("/api/auth/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun logout(@LoginUser userDetails: UserDetails) = authCommandService.logout(LogoutCommand(userDetails.token.jti))
 
