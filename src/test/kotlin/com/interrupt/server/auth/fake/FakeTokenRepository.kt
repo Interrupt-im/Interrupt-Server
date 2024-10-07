@@ -3,7 +3,6 @@ package com.interrupt.server.auth.fake
 import com.interrupt.server.auth.application.TokenCommandRepository
 import com.interrupt.server.auth.application.TokenQueryRepository
 import com.interrupt.server.auth.domain.Token
-import com.interrupt.server.auth.fixture.TokenFixture
 
 class FakeTokenRepository : TokenCommandRepository, TokenQueryRepository {
 
@@ -22,12 +21,5 @@ class FakeTokenRepository : TokenCommandRepository, TokenQueryRepository {
 
     fun init() {
         tokens.clear()
-
-        TokenFixture.entries
-            .filter { it.jti != null }
-            .map(TokenFixture::`토큰 엔티티 생성`)
-            .forEach { token ->
-                tokens[token.jti] = token
-            }
     }
 }

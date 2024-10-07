@@ -17,7 +17,7 @@ import org.springframework.web.context.request.ServletWebRequest
 @DisplayName("LoginUserArgumentResolver 단위 테스트")
 class LoginUserArgumentResolverTest : KotestUnitTestSupport() {
 
-    private val loginUserArgumentResolver = LoginUserArgumentResolver(FakeUserDetailsService(memberRepository))
+    private val loginUserArgumentResolver = LoginUserArgumentResolver(FakeUserDetailsService(memberQueryRepository))
 
     init {
         Given("요청이 왔을 때") {

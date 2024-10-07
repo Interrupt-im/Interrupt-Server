@@ -16,8 +16,7 @@ import io.kotest.matchers.throwable.shouldHaveMessage
 
 @DisplayName("AuthCommandService 단위 테스트")
 class AuthCommandServiceTest : KotestUnitTestSupport() {
-    private val jwtService = FakeJwtService()
-    private val authCommandService = AuthCommandService(memberRepository, FakePasswordService(), jwtService, tokenCommandRepository, tokenQueryRepository)
+    private val authCommandService = AuthCommandService(memberQueryRepository, FakePasswordService(), FakeJwtService(), tokenCommandRepository, tokenQueryRepository)
 
     init {
         Given("로그인 요청을 받았을 때") {
@@ -50,7 +49,7 @@ class AuthCommandServiceTest : KotestUnitTestSupport() {
             When("로그인 회원의 토큰을 이용해 토큰을 삭제한 후엔") {
                 authCommandService.logout(command)
 
-                val actual = tokenRepository.findByJti("jti1")
+                val actual = tokenQueryRepository.findByJti("jti1")
 
                 Then("저장소에서 해당 토큰을 조회할 수 없다") {
                     actual shouldBe null
@@ -62,7 +61,9 @@ class AuthCommandServiceTest : KotestUnitTestSupport() {
 
             When("전달 받은 refreshToken 상태가 정상적이라면") {
                 memberCommandRepository.save(MemberFixture.`고객 1`.`회원 엔티티 생성`())
-                val tokenRefreshCommand = TokenFixture.`액세스 토큰 만료`.`토큰 재발급 COMMAND 생성`()
+                val tokenFixture = TokenFixture.`액세스 토큰 만료`
+                tokenCommandRepository.save(tokenFixture.`토큰 엔티티 생성`())
+                val tokenRefreshCommand = tokenFixture.`토큰 재발급 COMMAND 생성`()
 
                 val actual = authCommandService.refreshToken(tokenRefreshCommand)
 
@@ -87,7 +88,9 @@ class AuthCommandServiceTest : KotestUnitTestSupport() {
 
             When("요청 헤더의 accessToken 과 본문의 refreshToken 의 회원 정보가 서로 다르면") {
                 memberCommandRepository.save(MemberFixture.`고객 1`.`회원 엔티티 생성`())
-                val tokenRefreshCommand = TokenFixture.`회원 정보가 서로 다른 토큰`.`토큰 재발급 COMMAND 생성`()
+                val tokenFixture = TokenFixture.`회원 정보가 서로 다른 토큰`
+                tokenCommandRepository.save(tokenFixture.`토큰 엔티티 생성`())
+                val tokenRefreshCommand = tokenFixture.`토큰 재발급 COMMAND 생성`()
 
                 Then("예외를 던진다") {
                     shouldThrow<ApplicationException> {
@@ -98,6 +101,7 @@ class AuthCommandServiceTest : KotestUnitTestSupport() {
 
             When("저장소에 저장 된 refreshToken 과 파라미터로 받은 refreshToken 이 다르면") {
                 memberCommandRepository.save(MemberFixture.`고객 1`.`회원 엔티티 생성`())
+                tokenCommandRepository.save(TokenFixture.`토큰 1`.`토큰 엔티티 생성`())
                 val tokenRefreshCommand = TokenFixture.`잘못 저장 된 토큰`.`토큰 재발급 COMMAND 생성`()
 
                 Then("예외를 던진다") {
@@ -109,7 +113,9 @@ class AuthCommandServiceTest : KotestUnitTestSupport() {
 
             When("전달 받은 토큰의 jti 로 찾은 accessToken 의 만료시간이 지나지 않았다면") {
                 memberCommandRepository.save(MemberFixture.`고객 1`.`회원 엔티티 생성`())
-                val tokenRefreshCommand = TokenFixture.`액세스 토큰 유효`.`토큰 재발급 COMMAND 생성`()
+                val tokenFixture = TokenFixture.`액세스 토큰 유효`
+                tokenCommandRepository.save(tokenFixture.`토큰 엔티티 생성`())
+                val tokenRefreshCommand = tokenFixture.`토큰 재발급 COMMAND 생성`()
 
                 Then("예외를 던진다") {
                     shouldThrow<ApplicationException> {

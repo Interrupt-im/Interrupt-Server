@@ -13,17 +13,13 @@ import io.kotest.core.spec.style.BehaviorSpec
 import org.springframework.security.crypto.password.PasswordEncoder
 
 abstract class KotestUnitTestSupport : BehaviorSpec() {
-    protected val memberRepository = FakeMemberRepository()
-    protected val memberQueryRepository: MemberQueryRepository
-        get() = memberRepository
-    protected val memberCommandRepository: MemberCommandRepository
-        get() = memberRepository
+    private val memberRepository = FakeMemberRepository()
+    protected val memberQueryRepository: MemberQueryRepository = memberRepository
+    protected val memberCommandRepository: MemberCommandRepository = memberRepository
 
-    protected val tokenRepository = FakeTokenRepository()
-    protected val tokenQueryRepository: TokenQueryRepository
-        get() = tokenRepository
-    protected val tokenCommandRepository: TokenCommandRepository
-        get() = tokenRepository
+    private val tokenRepository = FakeTokenRepository()
+    protected val tokenQueryRepository: TokenQueryRepository = tokenRepository
+    protected val tokenCommandRepository: TokenCommandRepository = tokenRepository
 
     protected val objectMapper: ObjectMapper = jacksonObjectMapper()
     protected val passwordEncoder: PasswordEncoder = FakePasswordEncoder()

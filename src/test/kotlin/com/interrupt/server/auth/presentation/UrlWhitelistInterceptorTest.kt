@@ -19,7 +19,7 @@ import org.springframework.mock.web.MockHttpServletResponse
 class UrlWhitelistInterceptorTest : KotestUnitTestSupport() {
     private val interceptor = UrlWhitelistInterceptor(
         FakeJwtService(),
-        tokenRepository,
+        tokenQueryRepository,
         WhitelistUrl("/method/all"),
         WhitelistUrl("/uri/wild-card/**", listOf(HttpMethod.GET)),
         WhitelistUrl("/method/post", listOf(HttpMethod.POST)),
@@ -111,7 +111,9 @@ class UrlWhitelistInterceptorTest : KotestUnitTestSupport() {
                 val request = MockHttpServletRequest()
                 request.requestURI = "/not-match"
                 request.method = "GET"
-                FakeTokenProvider.FakeTokenObject(MemberFixture.`고객 1`.email, TokenFixture.`토큰 1`.jti, 1000L).also {
+                val tokenFixture = TokenFixture.`토큰 1`
+                tokenCommandRepository.save(tokenFixture.`토큰 엔티티 생성`())
+                FakeTokenProvider.FakeTokenObject(MemberFixture.`고객 1`.email, tokenFixture.jti, 1000L).also {
                     val token = objectMapper.writeValueAsString(it)
                     request.addHeader("Authorization", "Bearer $token")
                 }
