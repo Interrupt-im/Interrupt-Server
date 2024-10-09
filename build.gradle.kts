@@ -68,12 +68,19 @@ dependencies {
 
     // 테스트
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    // mockk
     testImplementation("io.mockk:mockk:1.13.11")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
+
+    // kotest
     testImplementation("io.kotest:kotest-runner-junit5:5.9.0")
     testImplementation("io.kotest:kotest-assertions-core:5.9.0")
     testImplementation("io.kotest:kotest-framework-datatest:5.9.0")
     testImplementation("io.kotest.extensions:kotest-extensions-spring:1.3.0")
+
+    // testcontainers
+    testImplementation("org.testcontainers:testcontainers:1.20.2")
 
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.5")
